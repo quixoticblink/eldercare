@@ -1,21 +1,35 @@
 /* =========================================================
    Eldercare Sprint — microsite styles
-   Editorial, warm, restrained. Serif display, sans body.
+   SGLN TECH theme: blue-gradient hero, navy bookends,
+   SGLN blue accents over a cool-toned light body.
+   Serif display, sans body.
    ========================================================= */
 
 :root {
-  --bg: #FAF7F0;
+  /* light body */
+  --bg: #F5F8FC;
   --bg-elev: #FFFFFF;
-  --bg-warm: #F5EFE2;
-  --text: #1F2937;
-  --text-soft: #4B5563;
-  --text-muted: #8B8578;
-  --accent: #B85C38;
-  --accent-soft: #E8D4C4;
-  --accent-bg: #FBF1E8;
-  --border: #E7E2D6;
-  --border-soft: #EFEBE0;
-  --rule: #D4CDB8;
+  --bg-warm: #E9F1F9;        /* light blue tint — rubric cards, chips, callout */
+  --text: #0F2742;
+  --text-soft: #44566E;
+  --text-muted: #7587A0;
+
+  /* SGLN blue accent */
+  --accent: #1466AC;
+  --accent-soft: #BCD6EC;
+  --accent-bg: #E7F1FA;
+  --border: #DBE3EF;
+  --border-soft: #E7ECF4;
+  --rule: #C3D1E2;
+
+  /* dark sections — header, hero gradient, footer */
+  --navy-deep: #0A2740;
+  --navy-mid: #134B86;
+  --azure: #2487C8;
+  --azure-bright: #4FB0E4;
+  --on-dark: #FFFFFF;
+  --on-dark-soft: #C5DBED;
+  --on-dark-muted: #93A9C2;
 
   --display: "EB Garamond", Georgia, "Times New Roman", serif;
   --body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -92,32 +106,15 @@ a:hover { border-bottom-color: var(--accent); }
 .small { font-size: 0.88rem; color: var(--text-soft); }
 .muted { color: var(--text-muted); }
 
-/* ---------- Layout ---------- */
-
-.container {
-  max-width: var(--measure-wide);
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-.narrow {
-  max-width: var(--measure);
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-section { padding: 5rem 0; border-top: 1px solid var(--border); }
-section:first-of-type { border-top: none; }
-
-/* ---------- Header / Nav ---------- */
+/* ---------- Header / Nav (dark navy) ---------- */
 
 header.site {
   position: sticky;
   top: 0;
-  background: rgba(250, 247, 240, 0.92);
+  background: rgba(10, 39, 64, 0.93);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
   z-index: 50;
 }
 header.site .container {
@@ -130,39 +127,46 @@ header.site .container {
 header.site .brand {
   font-family: var(--display);
   font-size: 1.15rem;
-  color: var(--text);
+  color: var(--on-dark);
   border: none;
   font-weight: 500;
 }
 header.site nav a {
   font-size: 0.88rem;
-  color: var(--text-soft);
+  color: var(--on-dark-soft);
   margin-left: 1.8rem;
   border: none;
 }
-header.site nav a:hover { color: var(--accent); }
+header.site nav a:hover { color: var(--azure-bright); }
 
 @media (max-width: 600px) {
   header.site nav { display: none; }
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero (blue gradient) ---------- */
 
 .hero {
-  padding: 7rem 0 5rem;
+  padding: 8rem 0 6rem;
   border-top: none;
+  background: linear-gradient(122deg, var(--navy-deep) 0%, var(--navy-mid) 58%, var(--azure) 116%);
+  color: var(--on-dark);
 }
 .hero .container { max-width: var(--measure-wide); }
+.hero .eyebrow { color: #93C6E8; }
 .hero h1 {
   max-width: 22ch;
   margin-bottom: 1.5rem;
+  color: var(--on-dark);
 }
 .hero h1 em {
   font-style: italic;
-  color: var(--accent);
+  color: #6FC5EE;
   font-weight: 500;
 }
-.hero .lede { max-width: 38ch; }
+.hero .lede {
+  max-width: 38ch;
+  color: var(--on-dark-soft);
+}
 .hero .meta {
   margin-top: 3rem;
   display: flex;
@@ -170,13 +174,13 @@ header.site nav a:hover { color: var(--accent); }
   gap: 0.5rem 2rem;
   font-family: var(--mono);
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--on-dark-muted);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .hero .meta span { display: inline-flex; align-items: center; gap: 0.5rem; }
 .hero .meta .dot {
-  width: 6px; height: 6px; background: var(--accent);
+  width: 6px; height: 6px; background: var(--azure-bright);
   border-radius: 50%;
 }
 
@@ -209,6 +213,7 @@ header.site nav a:hover { color: var(--accent); }
 .hmw-grid .cell {
   background: var(--bg-elev);
   border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
   padding: 1.5rem;
   border-radius: 6px;
 }
@@ -296,9 +301,9 @@ header.site nav a:hover { color: var(--accent); }
   letter-spacing: 0.02em;
 }
 .timeline .arc .step.final {
-  background: var(--accent-bg);
-  color: var(--accent);
-  border-color: var(--accent-soft);
+  background: var(--accent);
+  color: #FFFFFF;
+  border-color: var(--accent);
 }
 
 /* ---------- Team ---------- */
@@ -351,11 +356,12 @@ header.site nav a:hover { color: var(--accent); }
   border: 1px solid var(--border);
   border-radius: 6px;
   color: var(--text);
-  transition: border-color 120ms ease, transform 120ms ease;
+  transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
 }
 .kb-card:hover {
   border-color: var(--accent);
   transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(20, 102, 172, 0.10);
 }
 .kb-card .name {
   font-family: var(--display);
@@ -414,12 +420,12 @@ header.site nav a:hover { color: var(--accent); }
   line-height: 1.5;
 }
 
-/* ---------- Footer ---------- */
+/* ---------- Footer (dark navy) ---------- */
 
 footer.site {
-  border-top: 1px solid var(--border);
+  border-top: none;
   padding: 4rem 0 5rem;
-  background: var(--bg-warm);
+  background: var(--navy-deep);
 }
 footer.site .container {
   display: grid;
@@ -431,18 +437,24 @@ footer.site h4 {
   font-size: 1.1rem;
   font-weight: 500;
   letter-spacing: 0;
+  color: var(--on-dark);
 }
 footer.site p, footer.site li {
   font-size: 0.88rem;
-  color: var(--text-soft);
+  color: var(--on-dark-soft);
   line-height: 1.6;
 }
 footer.site ul { list-style: none; margin: 0; padding: 0; }
 footer.site li { margin-bottom: 0.3rem; }
+footer.site a {
+  color: #7FC4EC;
+  border-bottom: 1px solid rgba(127, 196, 236, 0.28);
+}
+footer.site a:hover { border-bottom-color: #7FC4EC; }
 footer.site .colophon {
   font-family: var(--mono);
   font-size: 0.72rem;
-  color: var(--text-muted);
+  color: var(--on-dark-muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-top: 2rem;
@@ -451,6 +463,23 @@ footer.site .colophon {
 @media (max-width: 700px) {
   footer.site .container { grid-template-columns: 1fr; gap: 2rem; }
 }
+
+/* ---------- Layout ---------- */
+
+.container {
+  max-width: var(--measure-wide);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.narrow {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+section { padding: 5rem 0; border-top: 1px solid var(--border); }
+section:first-of-type { border-top: none; }
 
 /* ---------- Misc ---------- */
 

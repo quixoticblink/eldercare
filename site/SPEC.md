@@ -8,25 +8,28 @@
 
 ## 1. Design principles
 
-We are aiming for *editorial / warm / restrained*. Reference points: Stripe Press, Vercel's marketing pages, Mercury's writing pages, Anthropic.com. The site should feel like a thoughtful magazine, not a SaaS landing page.
+We are aiming for *editorial / professional / restrained*, themed to **SGLN TECH** — the Singapore Leaders Network technology programme this sprint belongs to. SGLN TECH's brand signature is a blue gradient; the microsite borrows that identity. The site should feel like a thoughtful publication produced by a serious leadership programme — not a SaaS landing page, and not a generic corporate template either.
+
+The structure is *dark bookends, light body*: a blue-gradient hero and a deep-navy footer frame a cool-toned light reading area. Header and footer are navy; the content in between stays light for readability.
 
 What we want:
 
-- **Serif headings, sans-serif body.** EB Garamond for display, Inter for body. Mono only for labels and metadata.
+- **Serif headings, sans-serif body.** EB Garamond for display, Inter for body. Mono only for labels and metadata. This editorial type system is what keeps the site from looking like a stock corporate template — keep it even though the palette is now corporate blue.
 - **Generous whitespace.** Sections are tall (5rem padding top and bottom). Body copy is narrow (about 38rem / 60ch).
-- **Warm cream background.** Not pure white. Not gray. Warm.
-- **One accent color.** A terracotta orange (`#B85C38`). Used sparingly — for the question itself, for hover states, for the dot on hero meta, for emphasis inside `<em>` tags. Never as a background of a full section.
+- **Cool-toned light body.** A very light blue-grey (`--bg`), not pure white, not warm. The reading area stays light.
+- **Blue-gradient hero.** The hero is a diagonal gradient from deep navy to azure — the SGLN TECH signature. White text on top.
+- **One accent color.** SGLN blue (`--accent`, `#1466AC`). Used for the question, hover states, timeline dots, card top-borders, emphasis. A brighter azure (`--azure-bright`) is reserved for small bright marks on dark backgrounds only.
 - **Italics carry intellectual weight.** The lede paragraph is italic. The HMW statement is italic. Single-word emphasis inside paragraphs uses `<em>`. Don't bold-emphasize prose.
 
 What we avoid:
 
-- Drop shadows beyond the most subtle. The whole thing should feel like printed paper, not floating cards.
-- Gradient backgrounds. Cream is the only background.
+- Drop shadows beyond the most subtle. Cards are flat or near-flat; the one exception is a soft blue-tinted lift on knowledge-card hover.
+- Gradients anywhere except the hero. The hero gradient is the signature — don't scatter gradients across other sections.
 - Stock photography. The site is text-driven and the typography does the work.
 - Emoji. Anywhere.
 - Capitalization games. No ALL CAPS HEADLINES. Sentence case for everything except eyebrow labels (which are mono uppercase as a deliberate visual rhythm shift).
 - Animations beyond the most subtle 120ms transitions on hover states.
-- More than one accent color. Don't add green, blue, or pink anywhere.
+- Accent colors outside the blue family. Stay within the SGLN blue / navy / azure palette — no green, no orange, no pink.
 
 ---
 
@@ -34,20 +37,38 @@ What we avoid:
 
 All defined as CSS custom properties in `style.css` under `:root`. Use the variable, never the hex. If you find yourself wanting a color that isn't defined, propose adding it to the palette in the SPEC update log (section 9) first.
 
+Light body — the reading area:
+
 ```
---bg          #FAF7F0  Warm cream, page background
---bg-elev     #FFFFFF  Card surfaces (team, knowledge cards)
---bg-warm     #F5EFE2  Slightly darker warm cream (footer, rubric cards, timeline step chips)
---text        #1F2937  Primary text
---text-soft   #4B5563  Secondary text, descriptions
---text-muted  #8B8578  Tertiary text, eyebrow labels, dates
---accent      #B85C38  Terracotta — the one accent color
---accent-soft #E8D4C4  Faded accent for borders and selection
---accent-bg   #FBF1E8  Tinted background for HMW statement
---border      #E7E2D6  Standard card/section border
---border-soft #EFEBE0  Subtler border for chips and tertiary surfaces
---rule        #D4CDB8  Horizontal rules, timeline spine
+--bg          #F5F8FC  Cool light blue-grey, page background
+--bg-elev     #FFFFFF  Card surfaces (team, knowledge, HMW cells)
+--bg-warm     #E9F1F9  Light blue tint (rubric cards, timeline step chips, callout)
+--text        #0F2742  Primary text, dark navy slate
+--text-soft   #44566E  Secondary text, descriptions
+--text-muted  #7587A0  Tertiary text, eyebrow labels, dates
+--accent      #1466AC  SGLN blue — the one accent color
+--accent-soft #BCD6EC  Faded accent for borders and selection
+--accent-bg   #E7F1FA  Tinted background for the HMW statement
+--border      #DBE3EF  Standard card/section border
+--border-soft #E7ECF4  Subtler border for chips and tertiary surfaces
+--rule        #C3D1E2  Horizontal rules, timeline spine
 ```
+
+Dark sections — header, hero gradient, footer:
+
+```
+--navy-deep     #0A2740  Deepest navy — header bg, footer bg, gradient start
+--navy-mid      #134B86  Mid blue — gradient middle
+--azure         #2487C8  Bright azure — gradient end
+--azure-bright  #4FB0E4  Brightest azure — small marks on dark (hero dot, nav hover)
+--on-dark       #FFFFFF  Text on dark
+--on-dark-soft  #C5DBED  Soft text on dark (hero lede, footer body)
+--on-dark-muted #93A9C2  Muted text on dark (hero meta, footer colophon)
+```
+
+The hero gradient is `linear-gradient(122deg, --navy-deep 0%, --navy-mid 58%, --azure 116%)`. The header is `--navy-deep` at 93% opacity with blur. The footer is solid `--navy-deep`.
+
+A few literal hexes appear in `style.css` for text-on-dark accents that don't recur often enough to justify variables: `#93C6E8` (hero eyebrow), `#6FC5EE` (hero `<em>` highlight), `#7FC4EC` (footer links). If you touch these, keep them in the same light-azure family.
 
 Selection color uses `--accent-soft`. Code (`<code>`) inherits body color but uses mono — no boxes around it.
 
@@ -87,7 +108,7 @@ Two container widths:
 
 Padding inside containers is `1.5rem` horizontal. Sections have `5rem 0` vertical padding. Sections are separated by a 1px `--border` line.
 
-The site is a single scrolling page. Anchor links (`#journey`, `#hmw`, etc.) drive in-page navigation from the sticky header. The header is a translucent strip with backdrop blur — it stays at the top, brand on the left, nav on the right.
+The site is a single scrolling page. Anchor links (`#journey`, `#hmw`, etc.) drive in-page navigation from the sticky header. The header is a deep-navy translucent strip with backdrop blur — brand on the left, nav on the right. The hero directly below it is a blue gradient, so at the top of the page the header reads as floating on the gradient; once you scroll into the light body it reads as a solid dark bar. The footer is solid deep navy. These dark bookends are the SGLN TECH frame around the light reading area.
 
 Mobile breakpoint is `~720px`. The HMW grid collapses to one column, the team grid auto-fits to as many cards as fit at min 200px each, the footer collapses to a single column, and the header nav disappears below 600px (the brand stays).
 
@@ -252,7 +273,8 @@ Remove the `.dormant` class from the `<a>`. Update the description to reflect wh
 
 Keep this current. Each entry: date, what changed, who or what triggered it. Most recent at the top.
 
-- **2026-05-19** — Initial build. Hero, journey (one past entry + four future), HMW with synthesis, team (5 cards), problem space, knowledge index, rubric. Style.css written from scratch. SPEC.md created.
+- **2026-05-19 (theme)** — Re-skinned to the **SGLN TECH** theme. Palette moved from warm cream / terracotta to SGLN blue: cool light-blue-grey body, SGLN-blue accent, blue-gradient hero (deep navy → azure, white text), deep-navy header and footer. Added six dark-section variables (`--navy-deep`, `--navy-mid`, `--azure`, `--azure-bright`, `--on-dark`, `--on-dark-soft`, `--on-dark-muted`). HMW grid cells gained a blue top-border; timeline `.step.final` chip is now solid accent; knowledge cards gained a soft blue hover-lift shadow. `index.html` was NOT changed — re-skin is entirely in `style.css`, all class names preserved. Triggered by request to match the SGLN Tech site (sgln.hcli.org/sgln-tech). Note: exact brand hexes could not be extracted from the live site; palette is a faithful interpretation of the SGLN TECH blue-gradient identity and should be reconciled against official brand colors if they become available.
+- **2026-05-19** — Initial build. Hero, journey (one past entry + four future), HMW with synthesis, team (5 cards), problem space, knowledge index, rubric. Style.css written from scratch. SPEC.md created. (Original theme: warm cream / terracotta editorial.)
 
 ---
 
