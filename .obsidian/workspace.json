@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "site/SPEC.md",
+                "file": "purpose/README.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "SPEC"
+              "title": "README"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "site/SPEC.md",
+                "file": "purpose/README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for SPEC"
+              "title": "Backlinks for README"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "site/SPEC.md",
+                "file": "purpose/README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from SPEC"
+              "title": "Outgoing links from README"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "site/SPEC.md",
+                "file": "purpose/README.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of SPEC"
+              "title": "Outline of README"
             }
           }
         ]
@@ -185,9 +185,11 @@
   },
   "active": "8f3db6ab9ec481af",
   "lastOpenFiles": [
+    "README.md",
+    "site/README.md",
+    "site/SPEC.md",
     "purpose/README.md",
     "purpose",
-    "site/README.md",
     "knowledge/VOICE.md",
     "knowledge/README.md",
     "knowledge/eldercare.md",
