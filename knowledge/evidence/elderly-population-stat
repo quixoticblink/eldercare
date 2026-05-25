@@ -1,5 +1,3 @@
-I want to add a new wiki entry to the eldercare knowledge base.
-
 Topic: Eldery Popluation
 Filename: knowledge/evidence/Elderly-popluation-stat.md
 What I know / context: 
@@ -34,12 +32,3 @@ Asia is catching up fastest: Hong Kong, South Korea and Japan are projected to h
 Singapore leads Southeast Asia, already past 20% — no other ASEAN nation is close
 Sub-Saharan Africa remains young, but will see rapid absolute growth in elderly numbers
 
-Rules:
-1. Read knowledge/VOICE.md (attached / pasted below) for the voice and structural rules. The voice is Andrej Karpathy's: conversational, first-person-ish, technically rigorous, no corporate scaffolding, no closing summaries.
-2. Use knowledge/eldercare.md as the reference example of tone and depth — match it.
-3. Follow the six-section structure: opener (hook first) → tiny worked example → general formulation → walkthrough / code / concrete example → what confused me / pitfalls → connects-to paragraph → 3-5 proposed sibling stubs.
-4. Use [[double-bracket]] cross-links to other entries even if they don't exist yet — those signal which entries should grow next.
-5. Aim for 800–1500 words.
-6. Start with YAML front matter: title, aliases (optional), prereqs (optional), status: draft, last_updated: <TODAY>.
-
-Now write the entry.
