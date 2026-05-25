@@ -1,0 +1,45 @@
+I want to add a new wiki entry to the eldercare knowledge base.
+
+Topic: Eldery Popluation
+Filename: knowledge/evidence/Elderly-popluation-stat.md
+What I know / context: 
+
+1. Current Size
+Singapore is ageing faster than almost any country in Southeast Asia. As of 2025, the elderly population has crossed a symbolic threshold.
+MetricFigureResidents aged 65+~789,580 (2025)Share of resident population18.8% (2025) vs. 13.1% in 2015MilestoneFirst ASEAN nation to exceed 20% elderly citizenryTotal population6.11 million (2025)
+Source: Singapore Department of Statistics, Population Trends 2025
+
+Key finding: In just 10 years (2015–2025), the share of citizens aged 65+ rose from 13.1% to 20.7% — a near-doubling driven by the baby boomer cohort entering old age.
+
+1.2 Projections: Next 5–10 Years
+The pace of ageing will accelerate further. By 2030, Singapore becomes a 'super-aged' nation (defined as >21% aged 65+), and by 2035, roughly one in three citizens will be elderly.
+Year% Citizens 65+Key Note202520.7%Actual — first ASEAN nation past 20%2030~23.9%Singapore becomes 'super-aged' nation2035~33%1 in 3 citizens elderly; median age ~472050~33%Median age projected at 53.4; support ratio <2
+Source: population.gov.sg; Statista; AMRO Asia (2025)
+Key structural drivers: Singapore's Total Fertility Rate sits at ~0.97 (one of the lowest globally), meaning fewer young people enter the population each year while the elderly cohort grows. The old-age support ratio (working-age individuals per elderly person) is projected to drop from 5 today to fewer than 2 by 2050.
+
+2. Global Elderly Population (65+)
+
+2.1 Current Scale
+Population ageing is a worldwide megatrend. As of 2024, there are approximately 830 million people aged 65 and above globally, representing about 10.2% of the world's 8.2 billion population.
+YearEstimated 65+ PopulationShare of Global Population2024~830 million~10.2%~2030~1.0 billion (est.)~12% (est.)2050~1.6 billion~16–17% (1 in 6 people)2054~1.7 billionProjected per UN WPP 20242074~2.0+ billion~20.7% — double today's share
+Source: UN World Population Prospects 2024; Our World in Data; UNFPA
+
+Key finding: Between 1974 and 2024, the global share of people aged 65 nearly doubled (5.5% → 10.3%). It is projected to double again by 2074, reaching 20.7%. (UNFPA, 2024)
+
+2.2 Regional Patterns
+While ageing is a universal phenomenon, Asia is now at the forefront — particularly East and Southeast Asia.
+
+Europe and Northern America currently have the highest proportions of elderly (typically 18–23%)
+Asia is catching up fastest: Hong Kong, South Korea and Japan are projected to have the highest shares of elderly (close to 40%) by 2050
+Singapore leads Southeast Asia, already past 20% — no other ASEAN nation is close
+Sub-Saharan Africa remains young, but will see rapid absolute growth in elderly numbers
+
+Rules:
+1. Read knowledge/VOICE.md (attached / pasted below) for the voice and structural rules. The voice is Andrej Karpathy's: conversational, first-person-ish, technically rigorous, no corporate scaffolding, no closing summaries.
+2. Use knowledge/eldercare.md as the reference example of tone and depth — match it.
+3. Follow the six-section structure: opener (hook first) → tiny worked example → general formulation → walkthrough / code / concrete example → what confused me / pitfalls → connects-to paragraph → 3-5 proposed sibling stubs.
+4. Use [[double-bracket]] cross-links to other entries even if they don't exist yet — those signal which entries should grow next.
+5. Aim for 800–1500 words.
+6. Start with YAML front matter: title, aliases (optional), prereqs (optional), status: draft, last_updated: <TODAY>.
+
+Now write the entry.
