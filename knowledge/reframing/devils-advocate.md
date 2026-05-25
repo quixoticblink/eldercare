@@ -19,6 +19,18 @@ The five seed critiques (drawn from [[hmw-current]]):
 
 5. **TO is unfalsifiable.** "Brimming with communities" describes any outcome we'd see; no kill criterion. We'll declare success regardless.
 
+## Field evidence — round 1 interviews (2026-05-25)
+
+The first round of interviews ([[../evidence/interview-round-1-findings]]) put real weight behind two of the seed critiques and added one.
+
+Critique 1 (infrastructure / human element) got direct support. The solution provider — who builds eldercare tech for a living — said existing implementations "fall short of human-element," and that the smallest meaningful change "cannot be AI." That is the strongest possible version of the critique, from the least convenient possible source.
+
+A sixth critique, sharpened by the field evidence, now belongs here:
+
+6. **A technology companion has a half-life.** Finding 2 of the round 1 synthesis: AI companionship draws "strong affection at the start" but users "figure out certain patterns" and "lose the feeling" over weeks to months. A caregiver separately said she'd accept an AI companion *only because* her grandmother's dementia made the substitution undetectable. If our eventual solution is a technology companion, it is building on a relationship that is documented to decay. The honest devil's-advocate position: any tech here must route toward human connection, not stand in for it — and if our HMW quietly assumes an app, the HMW is already wrong.
+
+Per the team's call on 2026-05-25, this tension is being *recorded*, not resolved — the HMW in [[hmw-current]] is unchanged for now, and the next HMW iteration should engage critique 6 head-on.
+
 ## How this entry should grow
 
 Someone on the team owns this role for one sprint. They pick one (or all) of the critiques above and argue it in earnest — not as a thought experiment but as if they actually believe it. The argument lives in this file. Status moves to `draft` when the arguments are written down. Moves to `solid` when the team has actually engaged with them and the HMW has been revised in response (or deliberately kept despite them, with documented reasoning).

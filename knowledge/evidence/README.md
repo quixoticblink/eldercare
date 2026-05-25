@@ -8,9 +8,14 @@ Every non-trivial claim in `problem/` should be traceable back to here. The rubr
 
 ## What goes here
 
+- **Primary research synthesis.** Our own interviews and observations, synthesized into findings. The receipts here trace back to raw notes in `humans/`.
 - **Statistics with source.** Filename: `<topic>-stats.md` or grouped, e.g. `singapore-loneliness-stats.md`. For each figure, record: the number, the source URL or full citation, the year, what was actually measured (instrument), the sample size, and any caveats.
 - **Instrument notes.** UCLA-3, de Jong Gierveld, single-item loneliness measures — what each measures, how they differ, when to use which.
 - **Annotated citations.** Papers, reports, news pieces. The annotation is the important part: what does this source say, and how reliable is it.
+
+## Current entries
+
+- [[interview-round-1-findings]] — synthesis of six field interviews (May 21–25, 2026). Six findings on the shape of loneliness, why AI companionship decays, and why the WHO needs to narrow. Status: draft. Honest about n=6.
 
 ## Stubs likely to fill in first
 

@@ -22,3 +22,4 @@ Retros go in the same folder with the suffix `-retro.md` (e.g., `2026-06-15-retr
 ## Existing entries
 
 - [[2026-05-19]] — Day 1. First Zoom. Brainstorming → desktop research → narrowed on companionship → HMW exercise → synthesized HMW.
+- [[2026-05-25]] — Round 1 field interviews (May 21–25). Six conversations; six findings; the AI-companionship half-life.

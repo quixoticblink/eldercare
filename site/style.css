@@ -420,6 +420,58 @@ header.site nav a:hover { color: var(--azure-bright); }
   line-height: 1.5;
 }
 
+/* ---------- Field signals ---------- */
+
+.signals { margin-top: 2.5rem; }
+.signal {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr;
+  gap: 1.5rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+}
+.signal:first-child { border-top: none; padding-top: 0.5rem; }
+.signal-num {
+  font-family: var(--display);
+  font-size: 1.7rem;
+  font-style: italic;
+  color: var(--accent);
+  line-height: 1;
+}
+.signal-body h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+.signal-body p {
+  font-size: 0.95rem;
+  color: var(--text-soft);
+  margin-bottom: 1rem;
+}
+.signal-quote {
+  margin: 0;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 1.08rem;
+  line-height: 1.45;
+  color: var(--text);
+  border-left: 3px solid var(--accent-soft);
+  padding-left: 1.1rem;
+}
+.signal-quote cite {
+  display: block;
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 0.6rem;
+}
+
+@media (max-width: 600px) {
+  .signal { grid-template-columns: 1fr; gap: 0.6rem; }
+}
+
 /* ---------- Footer (dark navy) ---------- */
 
 footer.site {

@@ -1,0 +1,29 @@
+---
+title: "Conversation — frontline caretaker, Lee Ah Mooi Old Age Home"
+date: 2026-05-25
+interviewer: SGLN team
+medium: in-person field visit
+status: raw
+---
+
+## Context
+
+A short conversation with a caretaker at Lee Ah Mooi Old Age Home — a higher-care facility for significantly older residents who need high-touch care. The caretaker was not very open to discussing more, so this is a brief note.
+
+## Notes (raw)
+
+- Observed: a large room with hospital-style beds. Posters and photos of earlier visits and volunteers — "looked super old." Posters for legacy planning.
+- What loneliness looks like here: older folks with limited mobility. Few visitors from family. Even volunteers are "rare and far in between." Most interactions end up being with the nurses and caregivers at the centre. There have been some volunteers in the past, but "they do for a limited period and go away." It is very challenging because the elderly here are much older and not very healthy, so there is "limited interaction between themselves" too.
+
+## Quotes worth saving
+
+- Volunteers "do for a limited period and go away."
+- "Limited interaction between themselves."
+
+## My read
+
+This is the hardest end of the spectrum. Once mobility goes and family visits stop, the only relationships left are paid ones — and even peer-to-peer connection fails because every resident is too frail to sustain it. The old posters of past volunteers, plus the "limited period and go away" pattern, suggest a history of engagement efforts that didn't last. Also worth noting: the caretaker was guarded and the conversation was short. That guardedness is itself a signal — access to this setting, and to honest accounts from inside it, will not be easy.
+
+## Follow-ups
+
+We need a fuller frontline-worker interview — this one was too short to lean on. Why volunteer programmes don't stick. The legacy-planning angle that showed up on the posters.

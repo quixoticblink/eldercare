@@ -175,6 +175,12 @@ Cream-tinted block with an accent left border, used for honest asides — "what 
 
 Subtle horizontal rule inside a `.narrow` container, used to separate two sub-areas inside a single section.
 
+### `.signal` (field-interview signals)
+
+Used in the "What We Heard" section. A `.signals` container holds a vertical stack of `.signal` blocks separated by hairline rules. Each `.signal` is a two-column grid: a large serif-italic number (`.signal-num`) on the left, and `.signal-body` on the right holding an `<h3>` finding statement, a paragraph of supporting prose, and a `<blockquote class="signal-quote">` carrying a verbatim interview quote with a `<cite>` attribution. Collapses to one column on mobile.
+
+Use this only for findings backed by a real quote — the quote is the point, it's what makes the section read as human-centred rather than asserted. Keep quotes verbatim (light punctuation cleanup is acceptable for presentation; the exact raw wording lives in the wiki conversation notes). Attributions stay anonymous — respondent role and date, never names.
+
 ---
 
 ## 6. Voice and tone
@@ -202,12 +208,13 @@ Punctuation:
 The page reads in this fixed order. New sections can be added but they should slot in here, not appear at random.
 
 1. **Hero.** Project name (brand in header), the HMW restated as a question, the lede with the "so that" clause, meta line.
-2. **Journey.** The narrative arc. Currently a timeline from May 19 to Demo Day, with past entries in accent and future entries muted.
+2. **Journey.** The narrative arc. Currently a timeline from May 19 onward to Demo Day, with past entries in accent and future entries muted.
 3. **The Question.** The HMW statement, the three-cell grid, the "How we got here" explanation, the honest-about-shortcomings callout.
 4. **Team.** Five cards with initials, names, and lenses.
 5. **Problem Space.** Three paragraphs of observation-first framing, ending with a link to the wiki overview.
-6. **How We Work / Knowledge.** The wiki structure as cards, plus the four-part rubric mapping.
-7. **Footer.** Project description, navigation links, colophon.
+6. **What We Heard.** Field-interview signals. A short intro honest about sample size, then a numbered set of `.signal` blocks — each a finding plus a verbatim quote — ending with links to the wiki synthesis and raw notes. This is the section that most directly evidences "human centricity" for the rubric.
+7. **How We Work / Knowledge.** The wiki structure as cards, plus the four-part rubric mapping.
+8. **Footer.** Project description, navigation links, colophon.
 
 Adding new sections: most additions will fit inside an existing section. If you really need a new top-level section, put it before *Team* (which functions as a midpoint) or between *Problem Space* and *Knowledge*. Don't add anything after the rubric — the rubric is the closer.
 
@@ -273,6 +280,7 @@ Remove the `.dormant` class from the `<a>`. Update the description to reflect wh
 
 Keep this current. Each entry: date, what changed, who or what triggered it. Most recent at the top.
 
+- **2026-05-25 (content)** — Added the **"What We Heard"** section (`#field`) between Problem Space and Knowledge, presenting five signals from round 1 field interviews. New `.signal` component (see section 5). Added a "Round 1" past entry to the journey timeline. Hero meta updated "Day 1 · May 19" → "Started 19 May 2026". Header and footer nav gained the new section; footer gained a link to the interview-findings wiki entry. Triggered by upload of the round 1 interview results.
 - **2026-05-19 (theme)** — Re-skinned to the **SGLN TECH** theme. Palette moved from warm cream / terracotta to SGLN blue: cool light-blue-grey body, SGLN-blue accent, blue-gradient hero (deep navy → azure, white text), deep-navy header and footer. Added six dark-section variables (`--navy-deep`, `--navy-mid`, `--azure`, `--azure-bright`, `--on-dark`, `--on-dark-soft`, `--on-dark-muted`). HMW grid cells gained a blue top-border; timeline `.step.final` chip is now solid accent; knowledge cards gained a soft blue hover-lift shadow. `index.html` was NOT changed — re-skin is entirely in `style.css`, all class names preserved. Triggered by request to match the SGLN Tech site (sgln.hcli.org/sgln-tech). Note: exact brand hexes could not be extracted from the live site; palette is a faithful interpretation of the SGLN TECH blue-gradient identity and should be reconciled against official brand colors if they become available.
 - **2026-05-19** — Initial build. Hero, journey (one past entry + four future), HMW with synthesis, team (5 cards), problem space, knowledge index, rubric. Style.css written from scratch. SPEC.md created. (Original theme: warm cream / terracotta editorial.)
 

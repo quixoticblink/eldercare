@@ -13,16 +13,27 @@ The flow: have a conversation → write the raw notes the same day → after two
 
 This is the folder that produces *evidence of human centricity* for the rubric. If we want to be able to say "our solution is grounded in real conversations with real people," this folder is where those conversations live.
 
-## Existing / planned interviewees
+## Conversations done — round 1 (May 21–25, 2026)
 
-(Check off as conversations happen. Aim for at least one Singapore-resident elderly person before May 26.)
+Six interviews. Synthesis: [[../evidence/interview-round-1-findings]].
 
-- [ ] Abhishek's parents (India, retired)
-- [ ] Aditi's family (perspective on losing a life partner)
-- [ ] Lara's recently-relocated elderly parent
-- [ ] Shobhit's in-laws (Bangkok → Singapore)
-- [ ] At least one Singapore-resident elderly person living alone (Lara sourcing)
-- [ ] At least one family caregiver in Singapore
+- [x] [[2026-05-21-solution-provider-senior-tech]] — founder building tech products for seniors.
+- [x] [[2026-05-22-caregiver-dementia-grandmother]] — caregiver of a grandmother with dementia.
+- [x] [[2026-05-24-elderly-woman-living-with-family]] — elderly woman in a multi-generational household.
+- [x] [[2026-05-25-elderly-gentleman-toa-payoh-aac]] — elderly man, field interview at a Toa Payoh Active Ageing Centre.
+- [x] [[2026-05-25-frontline-caretaker-old-age-home]] — caretaker at Lee Ah Mooi Old Age Home (short).
+- [x] [[2026-05-25-elderly-resident-rc-centre]] — elderly resident with a structured day around the RC centre.
+
+## Still to reach (round 2)
+
+- [ ] A fuller frontline-worker interview (the round 1 one was too short).
+- [ ] More elderly people living genuinely alone.
+- [ ] Someone in the pride-gated group — won't admit a need, won't accept a stranger — reached via a person they already trust.
+- [ ] The team's own family contacts (Abhishek's parents, Aditi's family, Lara's relocated parent, Shobhit's in-laws) as deeper sit-downs.
+
+## Next: empathy maps
+
+Round 1 is enough to start synthesizing. Expect the WHO to split into two or three personas — at minimum the "coping" elderly (structured their own day) versus the "struggling" elderly (lost structure, gated by pride). See [[../evidence/interview-round-1-findings]] for the persona split.
 
 ## Empathy map structure
 
