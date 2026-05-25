@@ -181,6 +181,12 @@ Used in the "What We Heard" section. A `.signals` container holds a vertical sta
 
 Use this only for findings backed by a real quote — the quote is the point, it's what makes the section read as human-centred rather than asserted. Keep quotes verbatim (light punctuation cleanup is acceptable for presentation; the exact raw wording lives in the wiki conversation notes). Attributions stay anonymous — respondent role and date, never names.
 
+### `.empathy-map` (empathy-map quadrants)
+
+Used in the "Empathy Map" section. A `.empathy-map` is a 2×2 grid of `.quadrant` cards — Says, Thinks, Does, Feels, the four classic empathy-map quadrants. Below it, `.empathy-pg` is a two-column pair of `.pg-card` blocks for Pains and Gains. Each card carries a mono uppercase `.q-label` and a short `<ul>` of 3–5 items. The four quadrants are white (`--bg-elev`); the Pains/Gains pair is warm-tinted (`--bg-warm`) so it reads as the synthesis layer beneath the quadrants. The Says quadrant takes a `.says` modifier, which italicises its items because they are verbatim quotes. Both grids collapse to one column below 640px.
+
+This is the one place bulleted lists are correct on the site — empathy-map quadrants are genuine enumerations. Keep items to one line each and grounded in the interviews; the full map with attributions and flagged inferences lives in the wiki.
+
 ---
 
 ## 6. Voice and tone
@@ -213,8 +219,9 @@ The page reads in this fixed order. New sections can be added but they should sl
 4. **Team.** Five cards with initials, names, and lenses.
 5. **Problem Space.** Three paragraphs of observation-first framing, ending with a link to the wiki overview.
 6. **What We Heard.** Field-interview signals. A short intro honest about sample size, then a numbered set of `.signal` blocks — each a finding plus a verbatim quote — ending with links to the wiki synthesis and raw notes. This is the section that most directly evidences "human centricity" for the rubric.
-7. **How We Work / Knowledge.** The wiki structure as cards, plus the four-part rubric mapping.
-8. **Footer.** Project description, navigation links, colophon.
+7. **The Empathy Map.** The customer empathy map synthesized from the six field interviews — a 2×2 of Says / Thinks / Does / Feels, then a Pains / Gains pair, closing on a callout. Sits right after What We Heard because it is the same interviews, synthesized into the persona.
+8. **How We Work / Knowledge.** The wiki structure as cards, plus the four-part rubric mapping.
+9. **Footer.** Project description, navigation links, colophon.
 
 Adding new sections: most additions will fit inside an existing section. If you really need a new top-level section, put it before *Team* (which functions as a midpoint) or between *Problem Space* and *Knowledge*. Don't add anything after the rubric — the rubric is the closer.
 
@@ -280,6 +287,7 @@ Remove the `.dormant` class from the `<a>`. Update the description to reflect wh
 
 Keep this current. Each entry: date, what changed, who or what triggered it. Most recent at the top.
 
+- **2026-05-25 (section)** — Added "The Empathy Map" section (`#empathy`) between What We Heard and Knowledge. New `.empathy-map` component — a 2×2 Says/Thinks/Does/Feels quadrant grid plus a warm-tinted Pains/Gains pair, closing on a `.callout` (see section 5). Content synthesized from the wiki empathy maps (`empathy-map-2.md`, `empathy-elderly.md`). Header and footer nav gained an "Empathy" link. Triggered by a request to surface the empathy-map synthesis on the homepage.
 - **2026-05-25 (supersede)** — Repointed two kb-cards and their footer links to the team's newer, fuller wiki entries. "Empathy map — elderly" now → `empathy-map-2.md` (the six-interview map, replacing the three-interview `empathy-elderly.md`). The loneliness card, renamed "Singapore ageing and loneliness", now → `singapore-eldery-stats-2.md` (replacing the rougher `loneliness.md`). The May 26 timeline entry was reworded to match the six-interview basis. The superseded wiki files still exist but are no longer linked from the site. HMW unchanged. Triggered by the user's decision to treat the newer entries as current.
 - **2026-05-25 (sync)** — Synced the site with new knowledge-base entries. The "May 26 · upcoming" journey entry became a completed "deliverable met" entry (HMW held; first empathy map synthesized). Three kb-cards added — "Empathy map — elderly", "Interview round 1 — findings", "Loneliness — what it is". "Humans", "Evidence" and "Devil's advocate" card descriptions refreshed to match current wiki state. Footer gained empathy-map and loneliness deep-links. HMW unchanged in the wiki, so no HMW edit. Triggered by team additions to the knowledge base (empathy map, loneliness overview).
 - **2026-05-25 (content)** — Added the **"What We Heard"** section (`#field`) between Problem Space and Knowledge, presenting five signals from round 1 field interviews. New `.signal` component (see section 5). Added a "Round 1" past entry to the journey timeline. Hero meta updated "Day 1 · May 19" → "Started 19 May 2026". Header and footer nav gained the new section; footer gained a link to the interview-findings wiki entry. Triggered by upload of the round 1 interview results.
