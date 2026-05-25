@@ -16,12 +16,13 @@ Every non-trivial claim in `problem/` should be traceable back to here. The rubr
 ## Current entries
 
 - [[interview-round-1-findings]] — synthesis of six field interviews (May 21–25, 2026). Six findings on the shape of loneliness, why AI companionship decays, and why the WHO needs to narrow. Status: draft. Honest about n=6.
+- [[elderly-population-stat]] — the demographic numbers. Singapore's 65+ share (the resident-vs-citizen distinction), the trajectory to 2030/2050, the structural drivers, and global context. Singapore figures verified against Singapore Department of Statistics and NPTD primary sources. Status: draft.
 
 ## Stubs likely to fill in first
 
 - [[singapore-loneliness-stats]] — figures from Duke-NUS, NCSS, and other Singapore-specific surveys.
 - [[loneliness-instruments]] — UCLA-3 vs. de Jong Gierveld vs. single-item; what they actually measure.
-- [[aging-demographics-singapore]] — population pyramid, old-age dependency ratio, projections to 2030/2040.
+- (Singapore demographics — now covered by [[elderly-population-stat]].)
 - [[loneliness-health-outcomes]] — what loneliness predicts (mortality, cognitive decline, etc.) with the actual effect sizes.
 
 ## Capture rule

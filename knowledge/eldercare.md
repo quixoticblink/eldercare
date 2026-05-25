@@ -3,14 +3,14 @@ title: Eldercare
 aliases: [elder care, aging society, senior care]
 prereqs: []
 status: draft
-last_updated: 2026-05-19
+last_updated: 2026-05-25
 ---
 
 ok so eldercare looks like a social-services problem from the outside — old people need help, you build homes and hire caregivers and set up subsidies — and the moment you sit with it for a few hours you realize it's a demographics-meets-technology problem wearing a social-services costume. The world's old-age dependency ratio is doing something it has literally never done before in human history, and most of the existing eldercare infrastructure was designed for the previous demographic shape: lots of young adults per elderly person, big multi-generational families, somebody at home during the day. Those preconditions are breaking simultaneously. The interesting question isn't "how do we do more of what we already do, just at larger scale" — it's: what was the old system actually providing for old people, and which of those functions do we have to rebuild from scratch now that the old scaffolding is gone?
 
 ## A tiny worked example: the Singapore funnel
 
-Smallest concrete version of the problem. Singapore, population ~5.9M. Roughly 19% are 65+ today, around 1.1M people. By 2030 that's projected to be ~25% — about 1 in 4 (compare to ~10% in 2010; twenty years, doubled). Now zoom in further. Of those ~1.1M elderly, somewhere around 70,000 live alone — call it ~6–7% of the elderly population, which sounds small until you remember that's 70,000 individual households. Zoom one more time. Survey work in Singapore (Duke-NUS, NCSS, various academic panels) keeps finding that 30–50% of community-dwelling elderly report feeling lonely "often" or "sometimes" — the number moves around a lot depending on the instrument (UCLA-3 vs. single-item vs. de Jong Gierveld). I'm going to round hard and say: on the order of 30,000 people in one small city-state, today, who would tell you on a survey that they are lonely most of the time. That's roughly the capacity of the National Stadium.
+Smallest concrete version of the problem. Singapore, total population 6.11M (2025). How many are 65+ depends on which population you count: 18.8% of *residents* (citizens plus PRs, about 790,000 people) or 20.7% of *citizens* alone — see [[evidence/elderly-population-stat]] for why one country reports two numbers. Use the resident figure as the working number. Either way it's a fast climb: the resident share was 11.8% as recently as 2015, and citizens aged 65+ are projected to pass one in four by 2030. Now zoom in further. Of those ~790,000 elderly residents, somewhere around 70,000 live alone — call it roughly 9%, which sounds modest until you remember that's 70,000 individual households. Zoom one more time. Survey work in Singapore (Duke-NUS, NCSS, various academic panels) keeps finding that 30–50% of community-dwelling elderly report feeling lonely "often" or "sometimes" — the number moves around a lot depending on the instrument (UCLA-3 vs. single-item vs. de Jong Gierveld). I'm going to round hard and say: on the order of 30,000 people in one small city-state, today, who would tell you on a survey that they are lonely most of the time. That's roughly the capacity of the National Stadium.
 
 The reason that funnel matters is that the problem isn't diffuse and abstract — it concentrates. The "population aging" framing makes it sound like everyone's a little worse off. The funnel says: no, there's a specific identifiable subpopulation that is severely worse off, and you can probably name them by postal code.
 
@@ -58,3 +58,7 @@ The natural next entry is [[elderly-loneliness]], which factors out the specific
 - [[ai-companions-for-elderly]] — the design space for LLM-mediated companionship products: what works, what fails, what's still open.
 - [[demographic-transition]] — the global aging picture; why the dependency ratio is doing something unprecedented; the math of it.
 - [[caregiver-burnout]] — the other half of the eldercare problem; family caregivers as a hidden labor force on the brink of collapse.
+
+---
+
+*2026-05-25: reconciled the Singapore-funnel figures against [[evidence/elderly-population-stat]] — the earlier "population ~5.9M / ~19% / ~1.1M elderly" estimates were rough and wrong; corrected to the verified 6.11M total, 18.8% of residents (~790,000), 20.7% of citizens.*
