@@ -1,7 +1,7 @@
 ---
 title: Humans — empathy and conversation notes
 status: live
-last_updated: 2026-05-19
+last_updated: 2026-05-25
 ---
 
 This folder holds two kinds of artifacts:
@@ -31,9 +31,11 @@ Six interviews. Synthesis: [[../evidence/interview-round-1-findings]].
 - [ ] Someone in the pride-gated group — won't admit a need, won't accept a stranger — reached via a person they already trust.
 - [ ] The team's own family contacts (Abhishek's parents, Aditi's family, Lara's relocated parent, Shobhit's in-laws) as deeper sit-downs.
 
-## Next: empathy maps
+## Empathy maps
 
-Round 1 is enough to start synthesizing. Expect the WHO to split into two or three personas — at minimum the "coping" elderly (structured their own day) versus the "struggling" elderly (lost structure, gated by pride). See [[../evidence/interview-round-1-findings]] for the persona split.
+- [[empathy-elderly]] — draft synthesis across the three round 1 interviews where elderly people spoke for themselves (May 25).
+
+Still to write: split maps for coping vs. struggling ([[../evidence/interview-round-1-findings]]), and maps for caregiver / frontline lenses if useful for solution design.
 
 ## Empathy map structure
 
