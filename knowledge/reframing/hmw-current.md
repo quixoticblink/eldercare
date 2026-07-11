@@ -2,11 +2,11 @@
 title: "How Might We — current"
 aliases: [HMW, the question]
 status: solid
-last_updated: 2026-05-25
+last_updated: 2026-07-11
 based_on: hmw-2026-05-19-individual-exercise.md
 ---
 
-> **Status note (2026-07-08):** the working HMW has narrowed further. The current one is **[[hmw-2026-07-08-post-vanguard]]** — *"how might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a crisis hits — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof."* Predecessors: [[hmw-2026-06-25-caregiver-respite]] (broader respite framing) and this entry (the May 19 companionship synthesis, kept for continuity). Any new design work should reference the July 8 iteration.
+> **Status note (2026-07-11):** the working HMW has broadened. The current one is **[[hmw-2026-07-11-broader-need]]** — *"how might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a need arises — planned or urgent — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof."* The Jul 8 iteration ([[hmw-2026-07-08-post-vanguard]]) narrowed the DO to crisis-only; three days later we caught that as too tight — planned respite (office-meeting overlaps, vacations, routine outings) is the same product with a longer lead time. Full predecessor chain: [[hmw-2026-06-15-ncss-reframe-signal]] → [[hmw-2026-06-25-caregiver-respite]] → [[hmw-2026-07-08-post-vanguard]] → **[[hmw-2026-07-11-broader-need]] (current)**. This entry (the May 19 companionship synthesis) is kept below for continuity. Any new design work should reference the Jul 11 iteration.
 
 ok so after the May 19 exercise — six individual HMWs from the five of us, mapped across WHO / DO / TO — the team converged on a single sentence. Here it is in plain English, the way it should read in a deck:
 
