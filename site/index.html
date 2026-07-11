@@ -28,6 +28,7 @@
       <a href="#field">Field</a>
       <a href="#empathy">Empathy</a>
       <a href="#strategy">Strategy</a>
+      <a href="#showcase">Build</a>
       <a href="#wiki">Knowledge</a>
     </nav>
   </div>
@@ -173,7 +174,7 @@
       <div class="entry">
         <div class="date">July 11, 2026 · Build</div>
         <h3>First prototype, first pitch draft</h3>
-        <p>The prototype and pitch folders woke up six weeks early. A working interactive build — working name <em>Kakis</em> — now walks all three sides of the loop: a caregiver activating trusted respite (planned or urgent, with the six Vanguard triggers as the urgent path), a respite giver training through Vanguard&rsquo;s real certification modules, and an ops console where agents verify, match, and review so one coordinator handles exceptions instead of rosters. Every screen is annotated with the evidence file it stands on. Alongside it, a first sixteen-slide Demo Day deck built against the four-part rubric — including a slide that argues against ourselves.</p>
+        <p>The prototype and pitch folders woke up six weeks early. A working interactive build — working name <em>Kakis</em> — now walks all three sides of the loop: a caregiver activating trusted respite (planned or urgent, with the six Vanguard triggers as the urgent path), a respite giver training through Vanguard&rsquo;s real certification modules, and an ops console where agents verify, match, and review so one coordinator handles exceptions instead of rosters. Every screen is annotated with the evidence file it stands on. Alongside it, a first sixteen-slide Demo Day deck built against the four-part rubric — including a slide that argues against ourselves. Both are live in <a href="#showcase">The Build</a>.</p>
         <div class="arc">
           <span class="step">design brief from evidence</span>
           <span class="step">18 screens, 3 personas</span>
@@ -521,6 +522,37 @@
 </section>
 
 <!-- ============== KNOWLEDGE BASE ============== -->
+<section id="showcase" aria-labelledby="showcase-h">
+  <div class="narrow">
+    <p class="eyebrow">The Build</p>
+    <h2 id="showcase-h">The prototype runs. The deck is a draft.</h2>
+    <p class="lede">Six weeks ahead of the August milestone — both artefacts live here, not just in the wiki.</p>
+    <p>The working name is <em>Kakis</em> — Singlish for the trusted companions you can call on — and it is provisional until the team votes. The prototype walks all three sides of the loop: a caregiver activating respite, planned or urgent; a respite giver training through Vanguard&rsquo;s real certification modules; and an ops console where agents verify, match, and review so one coordinator handles exceptions instead of rosters. Every screen carries a note tracing it back to the evidence.</p>
+  </div>
+  <div class="container">
+    <div class="artefact-grid">
+      <div class="artefact-card">
+        <p class="kind">Interactive prototype · HTML, runs in your browser</p>
+        <p class="name">Kakis — three journeys, eighteen screens</p>
+        <p>Switch between the caregiver, the respite giver, and the admin. Tap through a booking end-to-end — the six-trigger urgent path, the planned path, the match, the multi-payer receipt.</p>
+        <div class="btn-row">
+          <button class="site-btn" id="protoOpen">Launch the prototype</button>
+          <a class="site-btn ghost" href="assets/kakis-prototype.html" target="_blank" rel="noopener">Open full-screen</a>
+        </div>
+      </div>
+      <div class="artefact-card">
+        <p class="kind">Pitch deck · 16 slides · Demo Day draft 1</p>
+        <img class="cover" src="assets/deck-cover.jpg" alt="Title slide of the Kakis pitch deck: Trusted respite when a need arises." loading="lazy">
+        <p>Built against the four-part rubric — journey, thinking, MVP, pitch — with sizing stated honestly and the devil&rsquo;s advocate given its own slide.</p>
+        <div class="btn-row">
+          <a class="site-btn" href="assets/Kakis-DemoDay-Pitch.pdf" target="_blank" rel="noopener">View the deck (PDF)</a>
+          <a class="site-btn ghost" href="assets/Kakis-DemoDay-Pitch.pptx" download>Download .pptx</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="wiki" aria-labelledby="wiki-h">
   <div class="narrow">
     <p class="eyebrow">How We Work</p>
@@ -698,6 +730,7 @@
         <li><a href="#field">What we heard</a></li>
         <li><a href="#empathy">The empathy map</a></li>
         <li><a href="#strategy">Strategy</a></li>
+        <li><a href="#showcase">The build — prototype &amp; deck</a></li>
         <li><a href="#wiki">Knowledge base</a></li>
         <li><a href="https://github.com/quixoticblink/eldercare/tree/main/knowledge">Full wiki on GitHub</a></li>
         <li><a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/README.md">Sprint journal</a></li>
@@ -709,6 +742,48 @@
     </div>
   </div>
 </footer>
+
+<!-- Prototype modal -->
+<div class="proto-modal" id="protoModal" role="dialog" aria-modal="true" aria-label="Kakis prototype">
+  <div class="dialog">
+    <div class="dialog-bar">
+      <span>KAKIS · PROTOTYPE · PASIR RIS PILOT</span>
+      <span class="spacer"></span>
+      <a href="assets/kakis-prototype.html" target="_blank" rel="noopener">Open full-screen</a>
+      <button class="proto-close" id="protoClose">Close ✕</button>
+    </div>
+    <iframe id="protoFrame" data-src="assets/kakis-prototype.html" title="Kakis interactive prototype" loading="lazy"></iframe>
+  </div>
+</div>
+
+<script>
+(function () {
+  var modal = document.getElementById('protoModal');
+  var frame = document.getElementById('protoFrame');
+  var openBtn = document.getElementById('protoOpen');
+  var closeBtn = document.getElementById('protoClose');
+  if (!modal || !openBtn) return;
+  var lastFocus = null;
+  function open() {
+    lastFocus = document.activeElement;
+    if (!frame.src) frame.src = frame.dataset.src; /* lazy: load only on first open */
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
+  function close() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    if (lastFocus) lastFocus.focus();
+  }
+  openBtn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('open')) close();
+  });
+})();
+</script>
 
 </body>
 </html>
