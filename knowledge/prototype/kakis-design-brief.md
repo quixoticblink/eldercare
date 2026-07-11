@@ -2,7 +2,7 @@
 title: "Kakis prototype — design brief and research synthesis"
 status: draft
 last_updated: 2026-07-11
-based_on: [interview-round-1-findings, ncss-idi-findings, vanguard-operational-data, marsiling-aac-grab-interviews, consistency-as-design-constraint, hmw-2026-07-08-post-vanguard, respite-marketplace-concept]
+based_on: [interview-round-1-findings, ncss-idi-findings, vanguard-operational-data, marsiling-aac-grab-interviews, consistency-as-design-constraint, hmw-2026-07-11-broader-need, respite-marketplace-concept]
 ---
 
 ok so this is the bridge document between the evidence base and the first prototype. Every screen in `kakis-prototype.html` should trace back to a finding here, and every finding here traces back to an evidence file. The working name is **Kakis** — Singlish for trusted companions — provisional until the team votes.
@@ -12,7 +12,7 @@ ok so this is the bridge document between the evidence base and the first protot
 The rubric line is *human centricity, feasibility, viability, desirability*. Concretely, the prototype demonstrates the three-sided loop of the crisis-activation respite platform layered on Vanguard's Pasir Ris ICCP pilot:
 
 1. **Respite giver** onboards, picks task skills, completes the Vanguard-certified training path (CPR at St. Luke's, mobility, dementia basics), and receives tiered certification before any job is offered.
-2. **Caregiver** activates trusted respite — crisis-first (six named triggers) or planned — and gets matched with consistency preserved and the multi-payer price stack visible.
+2. **Caregiver** activates trusted respite when a need arises — urgent (six named triggers, jumps the queue) or planned (appointments, vacations, recurring gap-fill — the higher-volume everyday) — and gets matched with consistency preserved and the multi-payer price stack visible. Per [[../reframing/hmw-2026-07-11-broader-need]], both demand curves share one flow and one supply layer.
 3. **Admin** runs the operation through agents — onboarding verification, matching tuning, quality review — approving recommendations rather than doing manual work. The thesis: Vanguard's phone-triage + WhatsApp-roster pattern works at 20–30 bookings/month; agents are how it survives 200+.
 
 ## Research synthesis → design requirements
@@ -23,7 +23,7 @@ The rubric line is *human centricity, feasibility, viability, desirability*. Con
 |---|---|---|
 | R1 | Seniors *repel* new helpers; months to adjust (NCSS IDI 1; round-1 signal 05) | Sticky matching: "your kaki" regulars surface first; new matches labelled with the pre-relationship step; matching agent optimises a consistency score, not just speed |
 | R2 | First-session-with-staff is Vanguard's operational answer (vanguard-operational-data) | Every first visit to a new senior is paired with a Vanguard care staff — shown in both caregiver match result and respite-giver job card |
-| R3 | Crisis activation is the wedge — six triggers (hmw-2026-07-08) | The request flow leads with "What happened?" — six tactile trigger cards; planned booking is secondary |
+| R3 | The need is planned *or* urgent; crisis is the sharpest wedge, planned is the volume (hmw-2026-07-11, superseding the crisis-only Jul 8 framing) | Two peer entry points: "Get help now" (six tactile trigger cards, jumps the queue) and "Book ahead" (dates, recurring slots). One flow, two lead times |
 | R4 | Willingness-to-pay broken; multi-payer stack required (vanguard pricing: $10–12 pay / ~$26 cost / $25–35 charge) | Price breakdown shows the stack: base rate minus subsidy minus fund contribution = caregiver pays. Nothing hidden |
 | R5 | MOH/AIC hesitancy on rating/ranking care staff (devils-advocate 14) | **No public star ratings anywhere.** Post-visit feedback is a private care note routed to the quality agent; admin sees themes, not leaderboards |
 | R6 | Caregiver is the buyer, not the senior (Marsiling; grab sizing) | The booking UI is the caregiver's phone. The senior never has to install anything |
@@ -44,3 +44,7 @@ Signature element: the **six-trigger crisis picker** — the strategy made tacti
 - No real payments, MOM checks, or St. Luke's registry integration.
 - The senior-facing surface is deliberately out of scope (R6); a future iteration should test a print/voice artifact for the senior.
 - Agent behaviours are scripted; the point is the *operating model*, not the model.
+
+---
+
+*2026-07-11 (later): updated for [[../reframing/hmw-2026-07-11-broader-need]] — the DO broadened from "when a crisis hits" to "when a need arises, planned or urgent." R3 revised; "Book ahead" promoted to a peer path; recurring bookings added.*

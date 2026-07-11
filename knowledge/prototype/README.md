@@ -8,7 +8,7 @@ Woke up on 2026-07-11, ahead of the 2026-08-20 SGLN prototype milestone. Working
 
 What's here:
 
-- **`kakis-prototype.html`** — the interactive mobile-app prototype. Open it in any browser. Three switchable personas, 18 screens: the caregiver's crisis-activation flow (six triggers → match → multi-payer receipt → tracking → report), the respite giver's onboarding (skills → Vanguard training path → certification wallet → visits), and the agent-driven admin console (onboarding verification, matching weights, quality review). Every screen has a demo-notes panel citing the evidence file it's grounded in.
+- **`kakis-prototype.html`** — the interactive mobile-app prototype. Open it in any browser. Three switchable personas, 18 screens: the caregiver's respite-activation flow, planned or urgent per [[../reframing/hmw-2026-07-11-broader-need]] (six urgent triggers or Book-ahead → match → multi-payer receipt → tracking → report), the respite giver's onboarding (skills → Vanguard training path → certification wallet → visits), and the agent-driven admin console (onboarding verification, matching weights, quality review). Every screen has a demo-notes panel citing the evidence file it's grounded in.
 - **`kakis-design-brief.md`** — the research-synthesis bridge between the evidence base and the prototype. Ten findings → ten design requirements (R1–R10). Read this first if you're wondering *why* a screen looks the way it does.
 
 Deliberate scope cuts, documented in the brief: no real matching algorithm, no payments, senior-facing surface out of scope (the caregiver is the buyer — R6), agent behaviours scripted.

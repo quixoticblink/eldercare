@@ -295,7 +295,7 @@ button.li:hover{border-color:var(--pandan)}
 
 <header class="topbar">
   <div class="wordmark">Kakis<span class="dot">.</span></div>
-  <div class="tagline"><strong>Trusted respite when a crisis hits.</strong> Prototype · Pasir Ris ICCP pilot · SGLN TECH 2026</div>
+  <div class="tagline"><strong>Trusted respite when a need arises.</strong> Prototype · Pasir Ris ICCP pilot · SGLN TECH 2026</div>
   <nav class="personas" aria-label="Switch persona">
     <button data-persona="cg" class="active">Caregiver</button>
     <button data-persona="rg">Respite giver</button>
@@ -325,8 +325,8 @@ button.li:hover{border-color:var(--pandan)}
           <h1>Morning, Priya<span class="sub">Caring for Mr Nathan · Pasir Ris Dr 4</span></h1>
         </div>
 
-        <button class="btn gold" data-go="cg-crisis" style="min-height:64px;font-size:1.02rem;flex-direction:column;gap:2px">⚡ Get help now<span style="font-weight:400;font-size:.74rem;display:block">for a crisis — matched within hours</span></button>
-        <button class="btn ghost" data-go="cg-details">Book ahead</button>
+        <button class="btn gold" data-go="cg-crisis" style="min-height:62px;font-size:1.02rem;flex-direction:column;gap:2px">⚡ Get help now<span style="font-weight:400;font-size:.74rem;display:block">urgent — matched within hours</span></button>
+        <button class="btn" data-go="cg-details" data-mode="planned" style="min-height:62px;font-size:1.02rem;flex-direction:column;gap:2px">Book ahead<span style="font-weight:400;font-size:.74rem;display:block">planned visits, appointments, vacations</span></button>
 
         <div class="eyebrow-sm">Papa's kakis</div>
         <div class="li">
@@ -367,7 +367,7 @@ button.li:hover{border-color:var(--pandan)}
           <button class="trigger" data-trig="My own emergency"><span class="t-ico">🆘</span><b>My own emergency</b><span>You're unwell or called away — someone trusted steps in</span></button>
         </div>
         <button class="btn gold" id="crisisNext" data-go="cg-details" disabled>Continue</button>
-        <p style="font-size:.72rem;color:var(--slate);text-align:center;margin-top:10px">Not a crisis? <button data-go="cg-details" style="border:0;background:none;color:var(--pandan);font-weight:700;font-size:.72rem;text-decoration:underline">Book ahead instead</button></p>
+        <p style="font-size:.72rem;color:var(--slate);text-align:center;margin-top:10px">Not urgent? <button data-go="cg-details" data-mode="planned" style="border:0;background:none;color:var(--pandan);font-weight:700;font-size:.72rem;text-decoration:underline">Book a planned visit instead</button></p>
       </section>
 
       <section class="screen" id="cg-details">
@@ -389,7 +389,8 @@ button.li:hover{border-color:var(--pandan)}
         <div class="chips" data-single>
           <button class="chip sel">Today, 2–5pm</button>
           <button class="chip">Tomorrow am</button>
-          <button class="chip">Pick time…</button>
+          <button class="chip">Pick a date…</button>
+          <button class="chip">Every Wednesday</button>
         </div>
 
         <label class="f-label">Language with Papa <small>· seniors settle faster in their own language</small></label>
@@ -577,7 +578,7 @@ button.li:hover{border-color:var(--pandan)}
         </button>
         <button class="li" data-go="rg-job">
           <div class="face">☕</div>
-          <div class="body"><b>Companionship, Wed 3–5pm</b><span>Mr Silva, 76 · Elias Rd · mahjong kaki wanted · English</span></div>
+          <div class="body"><b>Companionship, every Wed 3–5pm</b><span>Mr Silva, 76 · Elias Rd · recurring weekly · mahjong kaki wanted · English</span></div>
           <div class="end"><span class="pill grey">$22 + transport</span></div>
         </button>
         <p style="font-size:.72rem;color:var(--slate);text-align:center;margin-top:8px">You only see visits that match your certifications and language.</p>
@@ -816,7 +817,7 @@ const PERSONAS = {
       <p>Priya, 41, works full-time and cares for her father Mr Nathan, 78 — relatively healthy, walks with a stick, Tamil-speaking. This morning their helper left without notice.</p>
       <div class="persona-chip"><div class="face">PR</div><div><b>Priya N.</b><span>Sandwich-generation caregiver · Pasir Ris</span></div></div>
       <div class="persona-chip"><div class="face">NA</div><div><b>Mr Nathan, 78</b><span>The senior — never has to install anything</span></div></div>
-      <p style="margin-top:12px">Walk the flow: <b>Get help now → pick the crisis → match → confirm → track → report.</b></p>`
+      <p style="margin-top:12px">Walk the flow: <b>Get help now → pick what happened → match → confirm → track → report.</b> Planned bookings ("Book ahead") run the same flow with longer lead times — the Jul 11 HMW covers both.</p>`
   },
   rg: {
     home: 'rg-welcome',
@@ -839,9 +840,9 @@ const PERSONAS = {
 };
 
 const NOTES = {
-  'cg-home': {t:'Home = the care circle', b:'The caregiver is the buyer and the user — the senior never installs anything. Regular kakis sit above everything else because <b>consistency is the product</b>. The crisis button outranks planned booking: that is the wedge.', ev:['marsiling-aac-grab-interviews','consistency-as-design-constraint','hmw-2026-07-08-post-vanguard']},
-  'cg-crisis': {t:'The six-trigger picker', b:'The signature screen. Kakis leads with <b>"what happened?"</b> — the six crisis triggers Vanguard named in the room. Closer to insurance than to Uber: it must be trusted before it is ever used.', ev:['hmw-2026-07-08-post-vanguard','vanguard-operational-data (six triggers)']},
-  'cg-details': {t:'Task-typed, language-first', b:'Tasks, not service categories. Language is a first-class field — dialect-only seniors repel helpers they can\'t talk to. Medicine admin shows <b>locked</b>: certification tiers gate tasks, visibly.', ev:['problem/problem.md (task taxonomy)','interview-round-1-findings (signal 03)','marsiling-aac-grab-interviews']},
+  'cg-home': {t:'Home = the care circle', b:'The caregiver is the buyer and the user — the senior never installs anything. Regular kakis sit above everything else because <b>consistency is the product</b>. Two peer paths, per the Jul 11 HMW: <b>urgent</b> (matched in hours) and <b>planned</b> (the higher-volume everyday). Urgent keeps the accent colour; planned keeps the platform useful between crises.', ev:['hmw-2026-07-11-broader-need','marsiling-aac-grab-interviews','consistency-as-design-constraint']},
+  'cg-crisis': {t:'The six-trigger picker (urgent path)', b:'The signature screen for the <b>urgent half</b> of the HMW — the six triggers Vanguard named in the room. Urgent requests jump the queue; planned bookings take the quieter road below. Closer to insurance than to Uber: it must be trusted before it is ever used.', ev:['hmw-2026-07-11-broader-need','vanguard-operational-data (six triggers)']},
+  'cg-details': {t:'One flow, two demand curves', b:'Planned and urgent share this screen — same tasks, same language matching, different lead times ("Every Wednesday" serves the recurring gap-fill case). Tasks, not service categories. Medicine admin shows <b>locked</b>: certification tiers gate tasks, visibly.', ev:['hmw-2026-07-11-broader-need','problem/problem.md (task taxonomy)','marsiling-aac-grab-interviews']},
   'cg-matching': {t:'Consistency-first matching', b:'The matcher checks the senior\'s <b>regulars first</b>, then language, then proximity within the ICCP sub-region — speed is last, not first. Watch the status line: the algorithm narrates its priorities.', ev:['ncss-idi-findings (repel/months)','consistency-as-design-constraint','iccp-model']},
   'cg-matched': {t:'The kaki pass + the payer stack', b:'A match is presented as a <b>pass you can show Papa</b> — trust transfers through artifacts for this cohort. The price breakdown shows the multi-payer stack openly: $84 becomes $27 because private pay alone is broken.', ev:['vanguard-operational-data (pricing)','respite-marketplace-concept (multi-payer stack)']},
   'cg-tracking': {t:'Reassurance without phone calls', b:'Live notes in the kaki\'s own voice replace the anxious lunchtime call — the round-1 caregiver checked in on her grandmother all day while working. Meds confirmation is structured, not vibes.', ev:['2026-05-22-caregiver-dementia-grandmother','ncss-idi-findings (caregiver fatigue)']},
@@ -921,7 +922,14 @@ document.addEventListener('click', e => {
   if(pBtn){ setPersona(pBtn.dataset.persona); return; }
 
   const goBtn = e.target.closest('[data-go]');
-  if(goBtn){ go(goBtn.dataset.go); return; }
+  if(goBtn){
+    if(goBtn.dataset.mode === 'planned'){
+      const echo = document.getElementById('trigEcho');
+      if(echo) echo.textContent = 'Planned visit · days or weeks ahead';
+      $$('.trigger').forEach(t => t.classList.remove('sel'));
+    }
+    go(goBtn.dataset.go); return;
+  }
 
   // crisis trigger selection
   const trig = e.target.closest('.trigger');
