@@ -4,8 +4,9 @@ This is the Vercel-deployable microsite. Static HTML, one CSS file, no build ste
 
 ## Files
 
-- `index.html` — single-page homepage. Hero, journey timeline, the HMW, team, problem space, knowledge-base index, rubric mapping.
-- `style.css` — all styles, editorial / warm / restrained.
+- `index.html` — single-page homepage. Sections in order: Hero, Journey, The Question (HMW chronology), Team, Problem Space, What We Heard (field signals), Empathy Map, Strategy, Knowledge base + rubric.
+- `style.css` — all styles. Editorial / restrained, SGLN TECH theme: blue-gradient hero and deep-navy footer bookending a cool-toned light body. Serif display, sans body, one accent color.
+- `SPEC.md` — the design spec. Colors, typography, component patterns, update recipes, and the update log. **Read this before making any non-trivial change to `index.html` or `style.css`.**
 - `vercel.json` — clean URLs + a couple of security headers.
 
 ## Local preview
@@ -34,15 +35,20 @@ Option 3 — connect this repo to Vercel and set the **Root Directory** to `site
 
 ## How this site relates to the wiki
 
-The microsite is a public-facing summary. The working wiki lives in `../knowledge/`. The site links into wiki entries via relative paths (e.g., `../knowledge/eldercare.md`). On a deployed Vercel site, those links will only resolve if you also include the `knowledge/` folder in deployment — see the project root README for two deployment strategies.
+The microsite is a public-facing summary. The working wiki lives in `../knowledge/`. As of 2026-05-25, every wiki link on the site is an **absolute GitHub URL** (`https://github.com/quixoticblink/eldercare/blob/main/knowledge/...`), not a relative path — that way the links resolve on the deployed Vercel site (Root Directory = `site/`) without needing to bundle the wiki folder into the deployment. Any new wiki link on the site should follow the same scheme. See `SPEC.md` section 9 for the rationale.
+
+The tradeoff: if the GitHub repo ever goes private, public visitors won't be able to follow the links. That's a known and accepted risk for the six-month sprint window.
 
 ## Updating
 
 Most updates over the six-month sprint will be:
 
-- A new entry in the journey timeline (add a `<div class="entry">` block in `index.html` under `#journey`).
-- A new knowledge-base card (add a `<a class="kb-card">` block under `#wiki`).
-- A new HMW iteration (update the `.hmw-statement` and `.hmw-grid` cells; link the old one in the wiki).
-- A new team member or role change (edit a `.team-card`).
+- A new entry in the journey timeline (add a `<div class="entry">` block in `index.html` under `#journey`). See SPEC Recipe 1.
+- A new knowledge-base card (add an `<a class="kb-card">` block under `#wiki`). See SPEC Recipe 3.
+- A new HMW iteration (add a step to the `.hmw-history` chronology and update the `.hmw-statement` + `.hmw-grid` cells to the new current). See SPEC Recipe 2.
+- A new team member or role change (edit a `.team-card`). See SPEC Recipe 4.
+- Activating a dormant knowledge card (remove the `.dormant` class). See SPEC Recipe 5. Strategy has already been activated (2026-06-25); prototype and pitch remain dormant.
 
-Bigger redesigns will probably want to split `index.html` into multiple pages — `journey.html`, `hmw.html`, etc. — when content outgrows a single scroll. The CSS already supports that.
+Anything bigger — a new top-level section, a new component, a palette extension — should start with a SPEC change, not a code change. SPEC section 9 has the pattern.
+
+Bigger redesigns will probably want to split `index.html` into multiple pages — `journey.html`, `hmw.html`, etc. — when content outgrows a single scroll. Likely around month 3 or 4. The CSS already supports that.

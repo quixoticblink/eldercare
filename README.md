@@ -2,9 +2,11 @@
 
 A six-month leadership sprint by five people, asking:
 
-> **How might we help elderly in Singapore experience genuine daily connection, so that Singapore is brimming with elderly communities that are happy, mentally and physically healthy?**
+> **How might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a crisis hits — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof?**
 
 Started May 19, 2026 · Singapore · Public journey.
+
+_The question has moved twice since we started. The [May 19 opener](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-05-19-individual-exercise.md) → [Jun 25 caregiver reframe](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-06-25-caregiver-respite.md) → [Jul 8 post-Vanguard narrowing](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-07-08-post-vanguard.md) is the record of that._
 
 ---
 
@@ -303,7 +305,7 @@ Now update the lens.
 
 ### Prompt 13 — Activate a dormant section
 
-Use this when `strategy/`, `prototype/`, or `pitch/` wakes up — usually around month 3 or 4.
+Use this when `prototype/` or `pitch/` wakes up. (`strategy/` woke up on 2026-06-25 after the NCSS reframe — its card is now active on the microsite.) Prototype is expected around the 2026-08-20 milestone; pitch around Demo Day (September 2026).
 
 ```
 I want to activate the <STRATEGY | PROTOTYPE | PITCH> dormant card on the microsite.
@@ -358,9 +360,9 @@ This is what the sprint will be graded on at Demo Day. Each part is 25 points. T
 
 | Rubric line | Wiki folder that feeds it |
 |---|---|
-| Leadership Journey (evidence of learning over 6 months) | `knowledge/journal/` |
-| Quality of Thinking (evidence-backed analysis) | `knowledge/problem/` + `knowledge/evidence/` + `knowledge/landscape/` |
-| MVP / Prototype (human centricity) | `knowledge/humans/` + later `knowledge/prototype/` |
+| Leadership Journey (evidence of learning over 6 months) | `knowledge/journal/` + `knowledge/reframing/` |
+| Quality of Thinking (evidence-backed analysis and strategy) | `knowledge/problem/` + `knowledge/evidence/` + `knowledge/landscape/` + `knowledge/strategy/` |
+| MVP / Prototype (human centricity) | `knowledge/humans/` + `knowledge/strategy/` + later `knowledge/prototype/` |
 | Presentation & Influence | later `knowledge/pitch/` |
 
 The microsite is the substantive showcase of all four — it's literally what the judges will see when we point them at the URL.
@@ -376,7 +378,16 @@ The microsite is the substantive showcase of all four — it's literally what th
 ## Status
 
 - ✅ Day 1 (May 19, 2026) — problem space, HMW, wiki, microsite, voice + design specs.
-- ☐ Day 7 (May 26, 2026) — empathy maps + HMW revision.
-- ☐ Demo Day — live prototype + pitch.
+- ✅ Round 1 (May 21–25, 2026) — six field interviews, five signals.
+- ✅ Day 7 (May 26, 2026) — HMW held, first empathy map delivered.
+- ✅ NCSS meeting (Jun 15, 2026) — reframe signal; caregiver-respite framing surfaces; Vanguard named as a possible partner.
+- ✅ Solutioning (Jun 25, 2026) — HMW reframed to caregivers; managed-marketplace shape; strategy folder activated.
+- ✅ Vanguard site visit (Jul 8, 2026) — anchor partner confirmed; Pasir Ris ICCP-layered pilot offered by year-end.
+- ✅ HMW narrowing (Jul 8, 2026) — crisis-activation, six named triggers, WHERE + WHEN inside the sentence.
+- ☐ SGLN masterclass (Jul 20, 2026) — checkpoint.
+- ☐ Prototype milestone (Aug 20, 2026) — concept prototype pressure-tested against Vanguard's six crisis triggers.
+- ☐ Demo Day (September 2026) — pilot design + pitch.
 
-See `knowledge/journal/` for the running record.
+**Current phase:** strategy & pilot design. **Anchor partner:** Vanguard (MOH Holdings). **Current HMW:** [reframing/hmw-current.md](knowledge/reframing/hmw-current.md).
+
+See `knowledge/journal/` for the running record and `knowledge/purpose.md` for the always-current snapshot.
