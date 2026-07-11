@@ -2,9 +2,11 @@
 title: "How Might We — current"
 aliases: [HMW, the question]
 status: solid
-last_updated: 2026-05-19
+last_updated: 2026-05-25
 based_on: hmw-2026-05-19-individual-exercise.md
 ---
+
+> **Status note (2026-07-08):** the working HMW has narrowed further. The current one is **[[hmw-2026-07-08-post-vanguard]]** — *"how might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a crisis hits — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof."* Predecessors: [[hmw-2026-06-25-caregiver-respite]] (broader respite framing) and this entry (the May 19 companionship synthesis, kept for continuity). Any new design work should reference the July 8 iteration.
 
 ok so after the May 19 exercise — six individual HMWs from the five of us, mapped across WHO / DO / TO — the team converged on a single sentence. Here it is in plain English, the way it should read in a deck:
 
@@ -23,11 +25,11 @@ Each of us wrote our own HMW first. The exercise generated six attempts (Zheng W
 - [ZW — Zheng Wei] Lonely elderlies / find meaningful companionship / live longer, healthier lives without dependency
 - [LY — Lara] Elderly in Singapore (across all axes) / sense of belonging, assurance not left behind / Singapore brimming with elderly communities, happy, mentally/physically healthy
 
-Two rows did most of the work for the final synthesis:
+Two phrases carried most of the wording forward — but the honest reading of the transcript is that neither cell was cleanly one person's contribution:
 
-- The DO came from ZW's first attempt: "experience genuine daily connection."
-- The TO came from LY: "Singapore is brimming with elderly communities that are happy, mentally/physically healthy."
-- The WHO stayed general: "Elderly in Singapore."
+- The DO — *"experience genuine daily connection"* — appears verbatim in ZW-1. When Aditi verbally endorsed it during the group review, though, she credited Shobhit ("I think Shobhit also wrote that"). Either both wrote similar phrasing or it was misattributed in the moment; treat it as jointly-arrived-at, not cleanly Zheng Wei's.
+- The OUTCOME — *"Singapore is brimming with elderly communities that are happy, mentally/physically healthy"* — the "brimming" wording is Lara's. But the synthesis, out loud, was Shobhit's: he proposed mixing his own "quality of aging, or age well" framing with Lara's "brimming" phrase, and that combination is what actually got adopted.
+- The WHO stayed general — "elderly in Singapore" — but with a live age debate underneath. Shobhit staked a provisional 65+ line; Abhishek pushed for 70+ or 75+ on the argument that many Singaporeans work past 65 so a companionship product bites harder at older ages. We deferred that specific call to sizing data.
 
 ## Why each component does its job
 
@@ -35,9 +37,15 @@ Two rows did most of the work for the final synthesis:
 
 The reason this beats the alternatives is that negations and outputs sit one layer below the actual thing people want. People don't want "less loneliness." Loneliness is the absence of connection; connection is what they're trying to get. Designing for the negation invites solutions that suppress the symptom (a noise machine, a TV show) instead of producing the thing.
 
-**The TO — "Singapore brimming with elderly communities that are happy, mentally/physically healthy."** Notice that the other TOs we wrote tended to fit inside an individual life — "age happily" (AK), "live longer, healthier lives" (ZW), "feel seen and alive" (ZW). LY's TO pulls outcome up to societal scale. It's measurable at the level of communities, not individuals, and it implies a network effect — many such communities, many connected people. If the DO works at the level of one elderly person, the TO insists that the answer has to scale.
+**The TO — "Singapore brimming with elderly communities that are happy, mentally/physically healthy."** Notice that the other TOs we wrote tended to fit inside an individual life — "age happily" (AK), "live longer, healthier lives" (ZW), "feel seen and alive" (ZW). Lara's TO pulls outcome up to societal scale. It's measurable at community level, not individual level, and it implies a network effect — many such communities, many connected people. If the DO works at the level of one elderly person, the TO insists that the answer has to scale.
+
+The out-loud synthesis was Shobhit's. He proposed mixing his own *"quality of aging, or age well"* language with Lara's *"brimming"* phrase, adding the corollary that it reduces healthcare cost and burden. That combination is what got adopted.
+
+The strategic move underneath the TO came from Aditi. Shobhit's original row had *"increase life expectancy"* as the outcome; Aditi pushed back — from a government or investor lens, longer life in an already-aging society *is itself the pressure*. The right framing is *reducing healthcare burden* and *easing sandwich-generation caregiving load*. Lara reinforced it in chat: reframe from "how long" to "how well." That reframe now sits under the entire outcome — the "brimming" language is the vision; the healthcare-burden logic is what makes the vision defensible to anyone deciding whether to fund it.
 
 **The WHO — "elderly in Singapore."** We kept it general even though several of us narrowed it in our individual attempts. SS narrowed to "not working and living without kids/grandkids." AK to "staying alone (couple)." ZW to "socially isolated." Those narrowings are likely correct *as targeting decisions* — and we'll come back to them when we build empathy maps and personas — but we deliberately kept the WHO general at the HMW level so the question doesn't bake in a population assumption before we've talked to anyone.
+
+There was also a live age debate we didn't resolve. Shobhit staked a provisional 65+ line. Abhishek pushed for 70+ or 75+, arguing that many Singaporeans work past 65 so a companionship product has bigger impact at older ages. We deferred that call to sizing data rather than settling it in the meeting. Worth revisiting after the round 1 empathy work.
 
 ## What this HMW does well
 
@@ -81,3 +89,7 @@ A few that should feed the empathy work:
 ## Connects to
 
 [[hmw-2026-05-19-individual-exercise]] preserves the six original HMWs we synthesized from — the record of how this question evolved. [[devils-advocate]] is the entry where each of the five critiques above gets argued in earnest, by name. The empathy work in [[humans]] will be the main input to the next HMW iteration; expect the WHO to narrow once we've had three or four real conversations. The theory of change — how individual daily connection produces community-level flourishing — belongs in its own future entry, [[theory-of-change-connection-to-community]], because the HMW asserts that link without yet justifying it. [[eldercare]] is the broader problem-space overview this HMW sits inside.
+
+---
+
+*2026-05-25: revised against the May 19 meeting transcript. Softened DO and OUTCOME attributions to reflect that they were shared or Shobhit-synthesized rather than cleanly Zheng Wei's / Lara's; surfaced Aditi's healthcare-burden reframe as the load-bearing strategic move under the OUTCOME; added the WHO age debate (65+ / 70+ pending sizing data) that had been missing.*

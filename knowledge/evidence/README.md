@@ -17,6 +17,10 @@ Every non-trivial claim in `problem/` should be traceable back to here. The rubr
 
 - [[interview-round-1-findings]] — synthesis of six field interviews (May 21–25, 2026). Six findings on the shape of loneliness, why AI companionship decays, and why the WHO needs to narrow. Status: draft. Honest about n=6.
 - [[elderly-population-stat]] — the demographic numbers. Singapore's 65+ share (the resident-vs-citizen distinction), the trajectory to 2030/2050, the structural drivers, and global context. Singapore figures verified against Singapore Department of Statistics and NPTD primary sources. Status: draft.
+- [[ncss-idi-findings]] — second-hand evidence from NCSS's late-2025 IDIs with caregivers and seniors (~20–30 respondents, Chinese/Malay/English, via Care Corner + SMU). Six findings including the load-bearing consistency insight (seniors *repel* new helpers, need months to adjust) that most complicates the on-demand marketplace shape. Honest that methodology isn't audited. Status: draft.
+- [[marsiling-aac-grab-interviews]] — second-hand Grab research; 14 seniors and caregivers at Marsiling AAC in their late 70s and 80s. Findings on transport preference, digital hesitancy (scam fear), language and vision barriers, and the caregiver-as-buyer pattern. AAC scale numbers (2,000 elderly in the area; 1,200 registered; ~300 regularly attend).
+- [[grab-eldercare-market-sizing]] — Grab's internal top-down sizing shared 2026-06-25. ~$425M SAM; ~290,800 seniors living without children; population/ADL/caregiver segmentation. Public-source-backed (SingStat, IMDA, Duke-NUS, MOH). Directional; a top-down independent build is still owed.
+- [[vanguard-operational-data]] — the numbers Vanguard shared at the 2026-07-08 visit. Whiteboard demand extrapolation (1M seniors → 70/30 robust → 15–30K national bookings/month), operational scale (160 clients/day, 20–30 chaperone/month), pricing tension ($10–12 pay vs $25–35 charge), micro-worker training, PHV loneliness stats (<3%), sub-region demographics. The substrate for the business case.
 
 ## Stubs likely to fill in first
 

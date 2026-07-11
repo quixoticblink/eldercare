@@ -1,12 +1,14 @@
 ---
 title: Problem space — index
 status: live
-last_updated: 2026-05-19
+last_updated: 2026-07-11
 ---
 
-Entries here describe parts of the problem space we're observing. One topic per file. Each entry is observation-first — what the thing is, what makes it hard, what's known, what's uncertain. No solutioning here.
+Entries here describe parts of the problem space we're observing. One topic per file. Each entry is observation-first — what the thing is, what makes it hard, what's known, what's uncertain.
 
-The umbrella entry is [[../eldercare]] one level up — start there if you're new.
+The umbrella entry is [[../eldercare]] one level up — start there if you're new to the problem space.
+
+The narrower problem statement — the specific problem our solution direction addresses — is [[problem]]. Start there if you already understand the problem space and want to see how the wiki articulates it as a designable problem.
 
 ## Stubs to fill in (from May 19 brainstorming)
 

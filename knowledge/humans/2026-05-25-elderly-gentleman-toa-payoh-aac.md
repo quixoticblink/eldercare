@@ -33,3 +33,14 @@ He is a model of coping well — he has engineered a daily structure of low-stak
 ## Follow-ups
 
 What separates the AAC-goers who participate from the ones who sit silent. The language barrier — how big is it. Whether "ambient presence" (being somewhere with people, not necessarily interacting) can be designed for.
+
+## Field photos from the AAC
+
+Site photos indexed at [[../images/README]]. The AAC where this interview took place is Care Corner Toa Payoh 170 (see [[../landscape/care-corner]]):
+
+- **`../images/IMG_9536.jpg`** — exterior signage. "Care Corner Active Ageing Centre 关怀活跃乐龄站 (Toa Payoh 大巴窑 170)."
+- **`../images/IMG_9537.jpg`** — interior: three elderly women speaking with a Care Corner staff member. Standard daytime scene.
+- **`../images/IMG_9538.jpg`** — **the May 2026 activity calendar** — Chair Zumba, Cognitive Games, Crochet, Calligraphy, Zumba Gold, K-POP Lite Exercise, Muscle Strengthening, Karaoke, Qi Gong, Rummy O, Community Health Post, Hand-Bell melodies. Direct evidence of the *"day has a shape"* structure that made this gentleman "doing fine."
+- **`../images/IMG_9539.jpg`** — notice board with Community Health Post (NHG) offer every Wednesday, intergenerational art & craft workshops with NUS, and "Be patient. Be kind. Please respect our staff" messaging.
+- **`../images/IMG_9533.jpg`** — the HDB "Elderly Fitness Corner" nearby — the ambient outdoor infrastructure the same demographic orbits between AAC sessions.
+- **`../images/IMG_9534.jpg`** — the ageing-quotes display panel in the neighbourhood (Browning, Lewis, Lincoln, plus Proverbs 20:29 in Chinese). Public-space aspirational messaging.

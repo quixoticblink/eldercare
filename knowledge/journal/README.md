@@ -1,7 +1,7 @@
 ---
 title: Journal — the running log
 status: live
-last_updated: 2026-05-19
+last_updated: 2026-07-11
 ---
 
 The most boring folder in the wiki and the most important one. This is where the arc of the sprint gets recorded, one working session at a time. Six months from now, the rubric line *"evidence of learning, adaptation & resilience over 6 months"* is scored from here.
@@ -21,5 +21,10 @@ Retros go in the same folder with the suffix `-retro.md` (e.g., `2026-06-15-retr
 
 ## Existing entries
 
-- [[2026-05-19]] — Day 1. First Zoom. Brainstorming → desktop research → narrowed on companionship → HMW exercise → synthesized HMW.
+- [[2026-05-19]] — Day 1. First Zoom. Family stories → negotiated convergence on companionship → six HMW rows → synthesized HMW.
 - [[2026-05-25]] — Round 1 field interviews (May 21–25). Six conversations; six findings; the AI-companionship half-life.
+- [[2026-05-25-team-sync]] — Evening working session same date as the interview synthesis. Empathy map first drafted; microsite workflow codified; HMW held.
+- [[2026-06-15]] — NCSS meeting. Their sharper HMW; the reframe signal; Vanguard revealed; ownership question opened.
+- [[2026-06-25-solutioning]] — HMW pivots to caregiver respite. Marketplace 2×2 sketched. Blue-sky data-labeling → humanoid overlay proposed. Strategy folder activates.
+- [[2026-07-07-vanguard-prep]] — Vanguard site-visit prep. Lara's skin-in-the-game reframe changes the shape of the partner ask. Entity/counterparty question opened.
+- [[2026-07-08-vanguard-visit]] — the in-person meeting. Crisis-activation wedge emerges. Vanguard volunteers a Pasir Ris pilot. Marketplace framing softens. New HMW iteration follows.

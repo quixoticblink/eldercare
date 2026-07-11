@@ -27,3 +27,12 @@ This is the hardest end of the spectrum. Once mobility goes and family visits st
 ## Follow-ups
 
 We need a fuller frontline-worker interview — this one was too short to lean on. Why volunteer programmes don't stick. The legacy-planning angle that showed up on the posters.
+
+## Field photos from the visit
+
+Site photos are indexed at [[../images/README]]. The most relevant:
+
+- **`../images/IMG_9540.jpg`** — exterior gate, "李亚妹安老院 LEE AH MOOI OLD AGE HOME, No. 01 Thomson Lane." Old low-rise building with construction cranes visible behind.
+- **`../images/IMG_9542.jpg`** — registration desk. Notable: the "NO TIPS ARE PERMITTED 請勿付小賬" sign (a signal about labor and financial norms in the facility) and the still-current COVID mask compliance messaging.
+- **`../images/IMG_9544.jpg`** — the "My Legacy" end-of-life planning materials I noted in the interview. LPA, ACP, CPF nominations, and "When death happens" — how to download the digital death certificate, arrange funeral services, seek emotional support. English and Chinese side by side.
+- **`../images/IMG_9546.jpg`** — the volunteer thank-you board I described as "looked super old." Confirms it: a plaque from SP Manufacturing 20 December 2019, KKH Division of Nursing photos from May 2023, Cartier employee visits — nothing dated after 2023 is prominent. This is the transient-volunteer pattern made visible in a single photo.

@@ -11,6 +11,8 @@ This folder holds two kinds of artifacts:
 
 The flow: have a conversation → write the raw notes the same day → after two or three conversations with similar people, synthesize an empathy map.
 
+Also in this folder: the source PDF of the SGLN Google Form interview responses (`2026-05-SGLN-interview-responses.pdf`), moved here on 2026-07-11 from the former `interviews/` folder.
+
 This is the folder that produces *evidence of human centricity* for the rubric. If we want to be able to say "our solution is grounded in real conversations with real people," this folder is where those conversations live.
 
 ## Conversations done — round 1 (May 21–25, 2026)

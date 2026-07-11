@@ -12,7 +12,7 @@
   --bg-warm: #E9F1F9;        /* light blue tint — rubric cards, chips, callout */
   --text: #0F2742;
   --text-soft: #44566E;
-  --text-muted: #7587A0;
+  --text-muted: #5F7288; /* a11y: tightened from #7587A0 for WCAG AA on small mono eyebrows */
 
   /* SGLN blue accent */
   --accent: #1466AC;
@@ -606,3 +606,150 @@ hr.rule {
   border-radius: 0 4px 4px 0;
 }
 .callout strong { color: var(--text); font-weight: 600; }
+
+/* ---------- HMW history (chronology of iterations) ---------- */
+
+.hmw-history {
+  margin: 2rem 0 2.5rem;
+  border-left: 2px solid var(--border);
+  padding-left: 1.6rem;
+}
+.hmw-step {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 1.25rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--border-soft);
+}
+.hmw-step:first-child { border-top: none; padding-top: 0.5rem; }
+.hmw-step-date {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-top: 0.3rem;
+}
+.hmw-step-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+.hmw-step-body p {
+  font-size: 0.95rem;
+  color: var(--text-soft);
+  margin: 0;
+  line-height: 1.55;
+}
+.hmw-step.current .hmw-step-date { color: var(--accent); }
+.hmw-step.current .hmw-step-label { color: var(--accent); }
+.hmw-step.current .hmw-step-body p { color: var(--text); }
+
+@media (max-width: 600px) {
+  .hmw-step { grid-template-columns: 1fr; gap: 0.4rem; }
+  .hmw-step-date { padding-top: 0; }
+}
+
+/* ---------- Strategy triad ---------- */
+
+.strategy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin: 2.5rem 0 2rem;
+}
+.strategy-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  padding: 1.5rem 1.4rem;
+  border-radius: 6px;
+}
+.strategy-card .strat-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.55rem;
+}
+.strategy-card h4 {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin: 0 0 0.6rem;
+  line-height: 1.25;
+}
+.strategy-card p {
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+.strategy-card p:last-child { margin-bottom: 0; }
+.strategy-card .strat-source {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.strategy-card .strat-source a {
+  border-bottom-color: var(--border);
+  color: var(--text-muted);
+}
+.strategy-card .strat-source a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ---------- Accessibility ---------- */
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--navy-deep);
+  color: var(--on-dark);
+  padding: 0.6rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: none;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  outline: 2px solid var(--azure-bright);
+  outline-offset: 2px;
+}
+
+/* Visible focus for keyboard users across the site */
+a:focus-visible,
+.kb-card:focus-visible,
+.brand:focus-visible,
+header.site nav a:focus-visible,
+footer.site a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+header.site nav a:focus-visible,
+footer.site a:focus-visible {
+  outline-color: var(--azure-bright);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

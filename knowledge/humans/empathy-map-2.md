@@ -84,4 +84,7 @@ This map is the ground-truth complement to [[elderly-loneliness]], which builds 
 - [[active-ageing-centre-model]] — what AACs actually provide, what they're missing, and what the attendance-vs-connection gap looks like from inside the system.
 - [[consistency-as-design-constraint]] — the "consistency is the most important thing" finding deserves its own entry; it's a constraint that cuts across product categories and rules out a large slice of the solution space immediately.
 
-- 
+---
+
+*2026-07-11: The deck version of this empathy map — used at the 2026-05-26 SGLN cohort presentation — is checked into the wiki at [[../artifacts/README|artifacts/SGLN TEAM EMPATHY MAP.pptx]]. Slide 9 contains the narrated pitch script for how the round-1 material was told out loud: Zheng Wei opened with the caregiver-dementia-grandmother story (the moment the grandmother "lights up" when the caregiver visits — matching [[2026-05-22-caregiver-dementia-grandmother]]), Shobhit told the Toa Payoh AAC gentleman story ("wants to remain seen and not forgotten"), Aditi delivered three key stats and framed the problem as "complex, multi-threaded," Abhishek read the HMW, Lara walked through the empathy map. Slide 11 has the WHO/DO/OUTCOME table with author attributions preserved. Preserved for the record of how the round-1 material was translated into a five-minute pitch.*
+

@@ -124,4 +124,6 @@ This entry is the demographic and policy grounding for [[elderly-loneliness]], w
 
 *2026-05-25: Initial draft. Based on Singapore Elderly Population & Loneliness Research Briefing (May 2026) and field interviews. Loneliness instrument notes flagged as needing a separate [[loneliness-instruments]] entry. Singapore policy throughput gap (80% reached ≠ 80% helped) noted as a key uncertainty.*
 
+*2026-07-11: source PDF now checked into the wiki at `sources/Singapore_Elderly_Loneliness_Research.pdf`. Every figure, citation, and study reference in this entry can be traced back to it. Primary sources cited by the PDF — Duke-NUS THE SIGNS Study 2016–17 (Malhotra et al., JAGS 2021); Holt-Lunstad et al. (Perspectives on Psychological Science, 2015); NUS/Duke-NUS Gerontology 2021 (80% co-residence finding); Maulod, Ravindran & Chan (Innovation in Aging, 2023) on the 'unneeded' identity; National Academies of Sciences meta-analysis (2020); Nature meta-analysis 2025 (126 studies, n=1.25M) — should be pulled directly if any figure becomes load-bearing to a public deliverable.*
+
 

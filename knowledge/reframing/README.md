@@ -1,7 +1,7 @@
 ---
 title: Reframing — HMW iterations and devil's advocate
 status: live
-last_updated: 2026-05-19
+last_updated: 2026-07-11
 ---
 
 This is where the framing of the problem lives and gets challenged. The two main artifacts:
@@ -11,9 +11,12 @@ This is where the framing of the problem lives and gets challenged. The two main
 
 ## Current state
 
-- [[hmw-current]] — the synthesized HMW we're working from. Updated 2026-05-19.
+- [[hmw-current]] — historically-standing May 19 synthesis. Kept for continuity; the working HMW has moved on.
 - [[hmw-2026-05-19-individual-exercise]] — the source artifact: six individual HMWs from the May 19 Zoom.
-- [[devils-advocate]] — needs an owner. Five seed critiques are written; arguments are pending.
+- [[hmw-2026-06-15-ncss-reframe-signal]] — the reframe signal opened after the NCSS meeting. Cashed in by the June 25 iteration below.
+- [[hmw-2026-06-25-caregiver-respite]] — broader respite framing from the June 25 solutioning session. Now superseded by the July 8 iteration but retained for continuity.
+- [[hmw-2026-07-08-post-vanguard]] — **the current working HMW.** Narrows the WHO to caregivers in *crisis moments*, names the DO as *activating trusted respite*, and pins the WHERE to Vanguard's Pasir Ris ICCP pilot. Written after the site visit.
+- [[devils-advocate]] — fourteen critiques now, growing with field and partnership evidence. Ownership is partially resolved (Vanguard Pasir Ris pilot); partner-optimism critique softens for Vanguard specifically.
 
 ## How this folder grows
 

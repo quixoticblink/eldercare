@@ -1,3 +1,9 @@
+---
+title: "Purpose & Importance of the Eldercare Sprint"
+status: solid
+last_updated: 2026-07-11
+---
+
 # Purpose & Importance of the Eldercare Sprint
 
 ## What This Is
@@ -94,15 +100,29 @@ Each joined the sprint with family experience of eldercare—caregiving decision
 
 ## Where We Are Now
 
-The sprint is approximately one week in (as of late May 2026). Round 1 field interviews (six conversations) have been completed and synthesized. Key early findings:
+This section is a snapshot; the living record is at [[maps/timeline]] and updates every week.
 
-- Loneliness is often experienced as **loss of structure**, not just absence of people — the "empty calendar" pattern
-- AI-based companionship faces a **half-life problem**: even willing users notice patterns and disengage
-- The elderly population is **not one segment** — those with structured days at Activity Centres differ fundamentally from those isolated at home or in institutions
-- Connection through **contribution and role** is more durable than connection through charity-shaped visits
-- **Consistency** matters more than intensity — one-off programs do not hold
+As of mid-July 2026 (roughly seven weeks in):
 
-Empathy maps are the next milestone (due May 26). Strategy, prototype, and pitch will follow from September onward.
+- **Round 1 field interviews** (six conversations) completed and synthesized ([[evidence/interview-round-1-findings]]).
+- **HMW has gone through four iterations.** Now at *"How might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a crisis hits — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof"* ([[reframing/hmw-2026-07-08-post-vanguard]]).
+- **Partnership frame is real.** NCSS convenes, Vanguard operationally anchors, AIC provides the sector-level demand data. Vanguard has volunteered a Pasir Ris pilot by year-end. See [[maps/actors]].
+- **Strategy activated.** Marketplace 2×2 framework, respite marketplace concept, consistency-as-design-constraint all written up in [[strategy/README|strategy/]].
+- **Prototype window opening.** SGLN masterclass on 20 July, prototype milestone 20 August, Demo Day in September. `prototype/` and `pitch/` folders wake up as we build.
+
+Key early findings that still hold:
+
+- Loneliness is often experienced as **loss of structure**, not just absence of people — the "empty calendar" pattern.
+- AI-based companionship faces a **half-life problem**: even willing users notice patterns and disengage.
+- The elderly population is **not one segment** — those with structured days at Activity Centres differ fundamentally from those isolated at home or in institutions.
+- Connection through **contribution and role** is more durable than connection through charity-shaped visits.
+- **Consistency** matters more than intensity — one-off programs do not hold. Now written up as [[strategy/consistency-as-design-constraint]] with a triangulated evidence base.
+
+Sharper findings from July:
+
+- The wedge is **crisis activation** (helper runaway, spousal-couple emergency, discharge scramble), not routine chaperone. Vanguard's own chaperone service runs at 20–30 appointments/month across four centres — small. The real pain sits elsewhere. See [[evidence/vanguard-operational-data]].
+- The moat is **not code.** Certification, trust, ecosystem density — none of which is software.
+- A **multi-payer stack** (private pay + healthcare fund + philanthropic capital + corporate partners) is required because willingness-to-pay is broken at the senior-facing layer.
 
 ---
 

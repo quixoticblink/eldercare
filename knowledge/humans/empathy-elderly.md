@@ -1,12 +1,17 @@
 ---
-title: "Empathy map — elderly (round 1 synthesis)"
+title: "Empathy map — elderly (round 1 synthesis, superseded)"
 aliases: [elderly persona, empathy map elderly]
-status: draft
-last_updated: 2026-05-25
+status: superseded
+superseded_by: empathy-map-2
+last_updated: 2026-07-11
 based_on:
   - 2026-05-24-elderly-woman-living-with-family
   - 2026-05-25-elderly-gentleman-toa-payoh-aac
   - 2026-05-25-elderly-resident-rc-centre
+---
+
+> **2026-07-11: this file is superseded.** The canonical empathy map is now [[empathy-map-2]] — same three elderly-direct conversations plus the three additional respondents from round 1 (solution provider, caregiver, frontline caretaker), synthesized in a form that carried through to the May 26 SGLN cohort presentation. This file is preserved for continuity as the *first* synthesis (elderly-direct-only) but should not be linked to from new work. Any downstream reference should go to [[empathy-map-2]].
+
 ---
 
 ok so this map synthesizes the three round 1 conversations where elderly people spoke for themselves — not caregivers, caretakers, or founders speaking about seniors. That's n=3, convenience-sampled, and they are not one person: one has engineered a coping day around an Active Ageing Centre, one has a full household and still eats alone, one has done "everything right" on paper and still hits empty-calendar days. Treat this as a first-pass segment map for [[hmw-current]], not a statistically representative portrait of elderly in Singapore.

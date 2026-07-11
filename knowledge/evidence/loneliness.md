@@ -1,4 +1,13 @@
+---
+title: "Loneliness — rough notes (superseded)"
+status: superseded
+superseded_by: singapore-eldery-stats-2
+last_updated: 2026-07-11
+---
 
+> **2026-07-11: this file is superseded.** The content below was a rough dump of loneliness definitions and stats from an early team read of the May 2026 Research Briefing. The properly-structured, source-cited version now lives at [[singapore-eldery-stats-2]], with the source PDF checked into `sources/Singapore_Elderly_Loneliness_Research.pdf`. This entry is preserved for continuity but should not be linked to from new work. If a public-facing citation is needed, use the singapore-eldery-stats-2 entry.
+
+---
 
 Loneliness is defined as a subjective state of perceived social isolation — the distressing experience that occurs when a person's social relationships are perceived as fewer, less satisfying, or less
 meaningful than desired.
