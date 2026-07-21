@@ -1,237 +1,227 @@
 ---
-title: "Kakis prototype — full screen-by-screen spec (feedback copy)"
+title: "Kakis prototype — spec v2 (post-feedback build target)"
 status: draft
-last_updated: 2026-07-11
-based_on: [kakis-prototype.html, kakis-design-brief]
-purpose: annotate this file with feedback; the prototype gets updated from it
+last_updated: 2026-07-21
+based_on: [kakis-prototype.html (v1), kakis-design-brief]
+feedback_round: "Caregiver/elderly: Lara, Aditi · Respite giver: Shobhit, Aditi · Admin: Zheng Wei, Aditi"
+supersedes: v1 of this file (screen mirror with empty FEEDBACK slots — in git history at e2bb2fc)
 ---
 
-This is the complete written mirror of `kakis-prototype.html` — every screen, every element, every piece of copy, every interaction. It exists so feedback can be left directly in this file. **How to give feedback:** every block ends with a `> FEEDBACK:` line — write under it. Add, strike, or rewrite anything; the prototype will be updated to match.
+ok so the v1 spec went out, the team walked the live build (eldercare-rho.vercel.app), and three reviews came back — caregiver/elderly (Lara + Aditi), respite giver (Shobhit + Aditi), admin (Zheng Wei + Aditi). This file is now the **v2 build target**: each block records what v1 did, what the feedback said (attributed), and what v2 will be. The prototype gets rebuilt from this document.
 
-Working name throughout: **Kakis** (provisional).
-
----
-
-## 0. Global shell — what wraps every screen
-
-**Top bar (page, not phone):** "Kakis." wordmark (green serif, gold full stop) · tagline "*Trusted respite when a need arises.* Prototype · Pasir Ris ICCP pilot · SGLN TECH 2026" · three persona tabs: **Caregiver / Respite giver / Admin** (pill toggle, active tab solid green).
-
-**Left panel (desktop only):** scenario card for the active persona — who they are, their situation, and a suggested walk-the-flow order.
-
-**Centre:** a phone frame (390×800, dark bezel, rounded). Inside: status bar (09:41 · Kakis. · PASIR RIS), the active screen, and a persona-specific bottom nav (Caregiver: Home / Get help / Visits · Respite giver: Visits / Training / My impact · Admin: Agents / Onboarding / Matching / Quality).
-
-**Right panel ("Demo notes"):** updates per screen — explains the design intent and lists the evidence files it's grounded in. Built for Demo Day narration.
-
-**Design tokens:** pandan green `#14594A` primary, marigold `#F0A63C` reserved for urgent/activation moments, porcelain-green paper background, clay red only for locks/alerts. Type: Fraunces (display), Instrument Sans (body), Spline Sans Mono (IDs, timestamps, agent logs). No public star ratings anywhere, by design (MOH constraint).
-
-> FEEDBACK:
+**How to read each block:** *v1* → *Feedback (who)* → *v2 target*. Anything marked **[ops]** is a pilot-operations decision, not a prototype change. Anything marked **[tension]** conflicts with an evidence-base constraint and needs a partner ruling before it ships.
 
 ---
 
-## 1. Caregiver journey (persona: Priya, 41 — father Mr Nathan, 78, Tamil-speaking, walks with a stick; helper left this morning)
+## 0. Priority register
 
-### 1.1 `cg-home` — Home / care circle
-
-- Greeting: "Morning, Priya — Caring for Mr Nathan · Pasir Ris Dr 4".
-- **Two peer CTAs:** marigold "⚡ Get help now — *urgent, matched within hours*" → trigger picker; green "Book ahead — *planned visits, appointments, vacations*" → straight to request details in planned mode.
-- **"Papa's kakis"** list: Mdm Halimah, 63 (Chaperone & companionship · 6 visits with Papa · Tamil + English · pill "Regular") and Mr Koh Teck Seng, 61 (Wellness checks · 2 visits · met Papa at the AAC · pill "Backup").
-- **Upcoming:** "Polyclinic escort — Tue 14 Jul, 9:30am · Halimah accompanies Papa · 2 hrs".
-- **Care-plan card** (tinted): "Diabetes meds 2pm daily · walks with a stick · prefers Tamil · Tuesdays: physio. Kept up to date so any kaki arrives prepared." + button "View last visit report".
-
-> FEEDBACK:
-
-### 1.2 `cg-crisis` — "What happened?" (urgent path; the signature screen)
-
-Header: "What happened?" / sub "Kakis is built for the moments care plans break". Six tactile trigger cards in a 2×3 grid (select one → highlights marigold, enables Continue):
-
-1. 🧳 **Helper left suddenly** — bridging care for 1–2 weeks while you find a replacement
-2. 🏥 **Spouse hospitalised** — one parent in hospital, the other now alone at home
-3. 🛏️ **Discharge, no plan** — coming home from hospital and nobody's ready
-4. 📉 **Sudden decline** — a fall, surgery or illness; weeks of extra help needed
-5. 🕊️ **Loss of a spouse** — steady presence through the hardest months
-6. 🆘 **My own emergency** — you're unwell or called away; someone trusted steps in
-
-Footer link: "Not urgent? **Book a planned visit instead**".
-
-> FEEDBACK:
-
-### 1.3 `cg-details` — "What does Papa need?" (shared by urgent + planned)
-
-Header echoes the chosen path (e.g. "Helper left suddenly · crisis activation" or "Planned visit · days or weeks ahead"). Fields, all chip-based single-select:
-
-- **Task type:** Chaperone (selected) · Wellness check · Companionship · Household help · Medicine admin 🔒 (locked — greyed, not selectable).
-- **When:** Today 2–5pm (selected) · Tomorrow am · Pick a date… · Every Wednesday (recurring).
-- **Language with Papa** ("seniors settle faster in their own language"): Tamil (selected) · English · Mandarin · Hokkien · Malay.
-- **Free-text note:** prefilled "Walks with a stick. Gets anxious with new faces — introduce slowly."
-- CTA: marigold "Find Papa's kaki".
-
-> FEEDBACK:
-
-### 1.4 `cg-matching` — matching in progress
-
-Pulsing green-gold orb + three timed status lines that narrate the algorithm's priorities:
-1. "Checking Papa's regular kakis first — familiar faces before new ones."
-2. "Halimah is free 2–5pm · Tamil ✓ · Tier 1 chaperone ✓"
-3. "Applying subsidies from the Pasir Ris care fund…"
-Auto-advances to the match result (~4s).
-
-> FEEDBACK:
-
-### 1.5 `cg-matched` — "Halimah can come" + the kaki pass + the price stack
-
-- **The kaki pass** (dark green card, dashed perforation, signature element): gold avatar "HM", "Mdm Halimah — Chaperone & companionship · Pasir Ris", chips "Tier 1 · Chaperone-ready / Speaks Tamil / CPR certified", consistency line "Papa knows her — **6 visits together** since May. No re-introduction needed.", mono footer "KAKI-PR04-0117 · CERT VERIFIED BY VANGUARD · SHOW THIS PASS TO PAPA".
-- **"What you pay" stack** (receipt style): Visit rate 3 hrs × $28 = **$84.00** → Community care subsidy (Vanguard healthcare fund · crisis activation) **− $45.00** → Foundation top-up (philanthropic pool · means-tested) **− $12.00** → **You pay $27.00**.
-- Buttons: "Confirm booking" / "Change details".
-- (Not shown in this scenario but designed: if no regular is available, the match is a new kaki and the card states "first visit comes with a Vanguard care staff".)
-
-> FEEDBACK:
-
-### 1.6 `cg-tracking` — live visit
-
-Timeline: Booking confirmed (11:02, care plan shared) → On the way (13:44, "arriving by bus 15 — about 12 minutes out") → **With Papa now** (14:07, live note in Halimah's voice: "Uncle recognised me straight away lah. We're off to the market, then his 2pm meds.") → Visit report (pending). Tinted card: "2pm medication reminder — Halimah has Papa's checklist. She'll confirm in the visit report — you don't need to call."
-
-> FEEDBACK:
-
-### 1.7 `cg-report` — visit report + private care note
-
-- Report card in Halimah's voice: market trip, fish for dinner, 2pm meds ticked, good spirits, kampong story, tea and radio. Structured pills: "Meds taken ✓ · Meal eaten ✓ · Mood: cheerful".
-- **Private care note** (tinted): "Anything our care team should know? This goes to a care coordinator — **never** to a public rating." + free-text field.
-- Buttons: "Book Halimah again" / "Done".
-
-> FEEDBACK:
+| Pri | Change | Module |
+|---|---|---|
+| P0 | "Who needs help today?" role-selection landing; persona switcher removed from consumer surface (ops via deep link `#admin`) | Global |
+| P0 | Service-first IA: services shown before urgency; then three urgency tiers (Urgent / Soon / Planned) replacing the binary | Caregiver |
+| P0 | Accessibility bump: 48px min tap targets, larger type on pickers, high contrast; "Need help booking? Call Pasir Ris ICCP" on every consumer screen | Global |
+| P0 | Elderly self-book module (low-density UX, larger type, simpler language) | New |
+| P0 | Respite giver: proper start page (Sign in / Sign up), Singpass consent flow, preference capture, task-centric home | Respite giver |
+| P0 | Admin: "Agents" → "Today"; tally fix; matching split into broad-base states + case-by-case | Admin |
+| P1 | Editable care plan; add-kaki flow; matching backup + ETA by tier; "Why this price?"; cancellation policy; prompt-chip care notes; add-to-regulars + recurring in one tap | Caregiver |
+| P1 | Task detail: OTP start/end, cancel window, cash/cashless label; Impact drill-down; profile with editable prefs + PayNow link | Respite giver |
+| P1 | Quality: three categories, archive/retrievable past cases; settings/profile icon | Admin |
+| [ops] | SLA commitments per tier, subsidy rules per trigger, payment rail, month-1 volume cap | Vanguard |
+| [tension] | Star ratings & feedback shared with organisations vs MOH/AIC no-public-ratings constraint | All |
 
 ---
 
-## 2. Respite giver journey (persona: Mdm Tan Bee Lian, 62 — early retiree, Pasir Ris, joins via her AAC)
+## A. Landing & routing (new, P0)
 
-### 2.1 `rg-welcome` — onboarding invitation
+*v1:* the page opened with a persona switcher (Caregiver / Respite giver / Admin) in the header — a demo affordance, not a product surface.
 
-Centered: 🤝 · "**Be somebody's kaki**" · "Families in Pasir Ris need a trusted hand when a crisis hits — a hospital visit, a helper gone, a spouse in decline." · "Train free with Vanguard. Help on your own schedule. Earn while you're at it." · pills: "Free certified training / $10–12/hr + transport / You choose your hours" · CTA "Start onboarding" · fine print "Identity is verified with Singpass. Training is run by Vanguard, certified at St. Luke's Hospital."
+*Feedback (Lara/Aditi):* consumers never see a persona switcher. Add a landing screen before any module: **"Who needs help today?"** with three routes — "I'm booking for a parent / loved one" → Caregiver · "I'm an elderly person booking for myself" → Elderly self-book · "I want to help as a kaki" → Respite giver. Ops gets a separate build or deep link.
 
-> FEEDBACK:
-
-### 2.2 `rg-skills` — "What can you help with?"
-
-- 🚶 **Chaperone** — Selected ✓
-- ☕ **Companionship** — Selected ✓
-- 🩺 **Wellness checks** — tap to add (toggles)
-- 💊 **Medicine administration** — 🔒 Tier 2 (visible but locked: "needs the clinical module — unlocks after Tier 1")
-- 🧠 **Dementia care** — 🔒 Tier 2 (locked: "needs Vanguard's dementia module")
-- CTA "Continue to training".
-
-> FEEDBACK:
-
-### 2.3 `rg-training` — "Your training path" (Vanguard's real modules)
-
-Progress card "Tier 1 — Chaperone-ready · 3 of 4 done" (75% bar), then:
-
-- ❤️ **CPR + AED** — external certification · St. Luke's Hospital · half day — **Passed ✓**
-- 🦯 **Mobility assistance** — wheelchair, frames, safe transfers · half day, in-house — **Passed ✓**
-- 🗣️ **Working with seniors** — first introductions, dialects, when to call for help · SOPs — **Passed ✓**
-- 👥 **Shadow visit with Vanguard staff** — "your first real visit, alongside a care staff — Thu 16 Jul, 10am, Pasir Ris SCC" — **Booked** (marigold; this is the pre-relationship layer)
-- 🧠 **Dementia basics (Tier 2)** — greyed, "After Tier 1"
-- CTA "View my certification wallet".
-
-> FEEDBACK:
-
-### 2.4 `rg-wallet` — certification wallet
-
-- Her own kaki pass: "Mdm Tan Bee Lian — Respite giver · Pasir Ris sub-region", chips "Tier 1 · pending shadow visit / Chaperone / Companionship", note "One step left: your shadow visit on Thu 16 Jul. After that, you'll appear in family matches." Mono: "KAKI-PR04-0212 · SINGPASS VERIFIED · TRAINING BY VANGUARD".
-- Certificates with registry IDs: CPR + AED (STL-2026-8841 · expires Jul 2028) · Mobility (VGD-MOB-3307) · Seniors + SOPs (VGD-SOP-3308) — all "Valid".
-- CTA "See available visits".
-
-> FEEDBACK:
-
-### 2.5 `rg-jobs` — "Visits near you"
-
-Intro card: "**Your regulars** — families you've helped before see you first — seniors settle best with a face they know." Then offers (filtered by certs + language, stated at the bottom):
-
-1. ⚡ **Crisis · Chaperone, today 2–5pm — $36 + transport** · Mr Nathan, 78 · Pasir Ris Dr 4 · "**you've visited him 6 times**" · Tamil (marigold-tinted)
-2. **Polyclinic escort, Tue 9:30am — $24 + transport** · Mdm Chua, 81 · "first visit — paired with Vanguard staff"
-3. **Companionship, every Wed 3–5pm — $22 + transport** · Mr Silva, 76 · recurring weekly · mahjong kaki wanted · English
-
-> FEEDBACK:
-
-### 2.6 `rg-job` — visit detail + accept
-
-- "Why you were matched" card: 6 prior visits, helper-runaway context, Tamil match.
-- "The visit" card: market trip, 2pm diabetes meds against checklist, walks with a stick — take the lift, daughter Priya reachable in-app. Pills: Chaperone / Meds checklist / 3 hours.
-- Pay stack: 3 hrs × $12 = $36.00 + transport $3.20 = **you receive $39.20**.
-- CTA "Accept this visit" → morphs to "✓ Visit accepted — see you at 2pm", then auto-advances to My impact.
-
-> FEEDBACK:
-
-### 2.7 `rg-earnings` — "My impact"
-
-- Dark green header card: **$318.40 earned · 27 hours** (July).
-- Ledger leads with meaning, not money: "4 seniors, 11 visits (Mr Nathan 6, Mdm Chua 2, Mr Silva 2, Mdm Wong 1)" · "Consistency streak: 6 repeat visits — seniors do best with faces they know" · "2 crisis activations covered (a helper runaway and a post-discharge week)".
-- Nudge card: "Tier 2 within reach — complete dementia basics to unlock dementia-care visits — higher rate, and Pasir Ris needs 5 more Tier 2 kakis." + "Book the module".
-
-> FEEDBACK:
+*v2 target:* first screen inside the phone is the role-selection landing. Three large tappable cards (48px+ targets), warm copy, no jargon. The demo's persona tabs move out of the consumer frame: admin reachable only by deep link (`#admin`) or a small "ops" link in the demo shell's footer, clearly marked as not part of the consumer app. The demo-notes panel notes this mirrors "separate builds for ops" in production.
 
 ---
 
-## 3. Admin — agent console (persona: Wei Lin, ops lead, Vanguard Pasir Ris pilot)
+## B. Caregiver module (Priya)
 
-### 3.1 `ad-overview` — "Ops · Pasir Ris"
+### B1. Home / care circle
 
-- Header stats (dark card): **41 bookings this week · 92% consistency score · 3 for your review**.
-- **Three agent cards** (tap into each):
-  - **Onboarding agent** — "Verified 12 applicants against St. Luke's + Singpass records · **2 flagged for you**"
-  - **Matching agent** — "34 visits auto-matched, regulars preserved · **1 exception**: no Tamil-speaking kaki free Tue am"
-  - **Quality agent** — "Read 18 visit reports · overall positive · 1 senior showing repeat fatigue — suggests a check-in call"
-- "Why agents?" card: Vanguard's manual pattern (phone triage + WhatsApp rosters) works at 20–30 bookings/month; agents do the routine 90% so one coordinator can run 200+. Every agent action keeps its evidence trail; you approve, they execute.
+*v1:* greeting, two CTAs (Get help now / Book ahead), Papa's kakis (regular + backup), one upcoming visit, read-only care plan card.
 
-> FEEDBACK:
+*Feedback (Lara/Aditi):* works — regular vs backup, upcoming card, care-plan snippet. Gaps: care plan is read-only → make it **editable** (meds checklist, mobility, language, emergency contacts). No **add-kaki flow** → request a familiar kaki from the AAC/Vanguard pool after a first paired visit. Upcoming shows only one item.
 
-### 3.2 `ad-onboarding` — onboarding queue
+*v2 target:* care plan opens into an edit screen (meds ×2 daily with times, mobility, languages, emergency contacts — chip + field editing, Save confirmation). "Papa's kakis" gains a "+ Request a kaki" row → short flow: pick from "people Papa has met" (AAC/Vanguard pool, met-context shown) → request first paired visit. Upcoming becomes a 2–3 item list.
 
-- **Mdm Tan Bee Lian, 62** (needs decision) — agent's mono evidence trail: "✓ Singpass verified · ✓ CPR STL-2026-8841 matched St. Luke's registry · ✓ Mobility + SOP passed (Vanguard LMS) · ◐ Shadow visit booked, not yet done · ⚠ Dementia module not taken". **Agent recommends:** approve at Tier 1, chaperone + companionship only, dementia locked. Buttons: "Approve at Tier 1" (one tap) / "Hold for interview".
-- **Mr Rajesh Kumar, 58** (flagged) — ex-Grab driver via the GrabTask transition pool; CPR valid but the caregiving reference document looks reused from another application. **Agent recommends:** request original + video interview. Button: "Request documents".
-- Footer: "10 applicants auto-cleared this week — all records matched, auto-scheduled for shadow visits."
+### B2. Service-first entry (restructured, P0)
 
-> FEEDBACK:
+*v1:* binary "Get help now" (crisis picker) / "Book ahead" (details).
 
-### 3.3 `ad-matching` — matching weights + agent recommendation
+*Feedback (Lara/Aditi):* introduce the **range of services first**, each leading to a timing question: Chaperone (clinic, market, errands) · Companionship (conversation, games, walks) · Wellness check (meals, meds, safety drop-in) · Household help (light chores) · Medicine admin (Tier 2 only — locked/upsell). Then replace the binary with **three urgency tiers**: **Urgent** — need someone now (next 30–60 min) · **Soon** — within the next 2 hours · **Planned** — pick date / recurring.
 
-- **Four live sliders:** Consistency (same kaki, same senior) **45%** · Language match **20%** · Proximity (within sub-region) **20%** · Speed to fill **15%**.
-- **Agent recommendation card:** two Hokkien-speaking seniors got English-only kakis this week; both first visits went poorly. **Raise language to 30% (from speed).** Simulated on last month's 163 bookings: fill time +18 min, first-visit success 84% → 93%. Buttons: "Apply recommended weights" (updates the sliders) / "Dismiss".
-- **Hard rules no agent can override** (tinted card): first visit to a new senior → paired with Vanguard staff · no public ratings or rankings of care staff (MOH) · certification tier must cover the task — no exceptions · urgent triggers jump the queue.
+*v2 target:* Home's booking entry becomes "What does Papa need?" — five service cards (icon, name, examples, duration estimate: chaperone 2–3h, wellness 1h, companionship 1–3h, household 1–2h; medicine admin greyed with "Ask about Tier 2"). Selecting a service → "When?" screen with the three tiers. Urgent and Soon route through the "What happened?" trigger screen; Planned routes to calendar + recurring. Progress indicator "step 1 of 4" across the flow.
 
-> FEEDBACK:
+### B3. "What happened?" (triggers)
 
-### 3.4 `ad-quality` — quality patterns (never public ratings)
+*v1:* six equal-weight trigger cards, reachable only via Get help now; footer link to planned.
 
-- **This week's themes** (18 reports read): "Meds adherence strong (11)" · "Seniors greeting kakis by name (7)" · "Transport delays, Elias Rd (3)" · "Fatigue flags (1)".
-- **Flagged case — Mr Silva, 76:** three consecutive reports mention tiring quickly and skipping his walk; individually minor, together a pattern the family may not have connected. **Agent recommends:** care-coordinator check-in call + flag to the Vanguard nurse for the next PHV touchpoint. Buttons: "Schedule the check-in" / "Mark as noted".
-- Priya's private care note ("Papa seemed tired after the market trip") shown routed here and filed against the same pattern check.
-- "Why no stars?" card: MOH/AIC won't permit public rating of care staff — quality lives in structured reports, private notes, and patterns, reviewed by a human.
+*Feedback (Lara/Aditi):* also reachable from **Soon** ("Something's come up"). **Pin top 3 for Pasir Ris**: helper left, spouse hospitalised, caregiver emergency. Add **"Not sure — talk to someone"** → click-to-call ICCP coordinator. Add progress indicator.
 
-> FEEDBACK:
+*v2 target:* triggers reordered — top row pinned (helper left · spouse hospitalised · my own emergency), marked "most common in Pasir Ris"; remaining three below; seventh card "Not sure — talk to someone" with phone glyph → call sheet "Pasir Ris ICCP coordinator · 6XXX XXXX". Step indicator "2 of 4".
+
+### B4. Details (task/time/language)
+
+*v1:* task chips, when-chips including "Today 2–5pm" on all paths, language chips, free-text note.
+
+*Feedback (Lara/Aditi):* hide same-day slots on the planned path — show **calendar + recurring**; medicine admin greyed with "Ask about Tier 2"; add **duration estimates** per task; **auto-flag first visits** to a new senior (pair with Vanguard staff). Chips too small for stressed 70s+ users → larger type, 48px targets.
+
+*v2 target:* task selection already made at B2, so this screen is timing + language + notes. Planned path: mini month calendar + "repeats weekly" toggle; no same-day chips. Urgent/Soon: time window auto-set by tier (30–60 min / 2 hours), editable. Duration line under the chosen service. If the matched senior–kaki pair is new, an automatic banner: "First visit — a Vanguard care staff will come along." All chips restyled: ≥48px height, 1rem+ labels. Step "3 of 4".
+
+### B5. Matching
+
+*v1:* orb + three narration lines → single match (Halimah).
+
+*Feedback (Lara/Aditi):* show **primary + backup**; show an **unavailable path** (why + next best); show **expected confirmation ETA by tier** (urgent 15 min · soon 45 min · planned 24h).
+
+*v2 target:* result screen shows the primary kaki pass plus a compact backup card ("If Halimah can't make it: Mr Koh — Papa has met him twice"). A demo toggle shows the unavailable state: "Halimah is on another visit until 4pm — next best: Mr Koh (met Papa at the AAC) or wait for Halimah at 4:15." ETA line by tier on the confirmation. Step "4 of 4".
+
+### B6. Confirm + pay
+
+*v1:* price stack ($84 − $45 − $12 = $27), confirm button. No payment method, no subsidy explanation, no cancellation policy.
+
+*Feedback (Lara/Aditi):* add **payment method** (PayNow / linked card / bill ICCP); **"Why this price?"** expandable explaining subsidy logic; **cancellation policy** (free cancel >2h; crisis-fee rules).
+
+*v2 target:* payment selector row (PayNow QR default · linked card · bill to ICCP account); "Why this price?" disclosure expanding to one plain-language paragraph per payer; cancellation line: "Free to cancel up to 2 hours before. Urgent bookings: $10 if cancelled after a kaki is on the way." **[ops]** exact subsidy-per-trigger rules pending Vanguard.
+
+### B7. Visit tracking
+
+*v1:* four-step timeline with live notes; single active visit.
+
+*Feedback (Lara/Aditi):* add **Call / message kaki** (masked number); **escalate to Vanguard coordinator** if late or no-show; Visits tab should hold **history + filters**, not just the active visit; map tracking optional — placeholder for Beta.
+
+*v2 target:* tracking screen gains a contact row ("Message Halimah · Call (masked)") and an "Escalate — running late?" link to the coordinator. Visits tab becomes two segments: Active / History (filterable list: month, kaki, service). A dashed "Live map — coming in Beta" placeholder block.
+
+### B8. Visit report + feedback
+
+*v1:* report in the kaki's voice, structured pills, private care note (free text only), "Book Halimah again."
+
+*Feedback (Lara/Aditi):* one-tap **"Add to regular kakis + schedule recurring"** [P1]; **prompt chips** for the care note: tired after walk · refused meds · fall concern [P1]; **share feedback with the organisations + star ratings**.
+
+*v2 target:* action row: "Make Halimah a regular + repeat every Tuesday" single tap. Care note gains prompt chips (tired after walk / refused meds / fall concern / new confusion / all fine) + free text. Feedback routing line: "Shared with Vanguard and the Kakis quality team." **[tension]** Public star ratings conflict with the MOH/AIC constraint recorded in [[../reframing/devils-advocate]] critique 14 (and Vanguard said it to us directly on Jul 8). v2 compromise pending a partner ruling: a private 1–5 "how did the visit go" signal visible to Vanguard and the quality agent only — never displayed on kaki profiles, never used for consumer-facing ranking. Flagged as an open question for Vanguard (G5).
 
 ---
 
-## 4. Cross-cutting behaviours
+## C. Elderly self-book module (new, P0)
 
-- **Consistency-first matching** everywhere: regulars ranked first, reasons stated, first-visit-with-staff for new pairs.
-- **Certification gates tasks** — locked states are visible, never hidden (the path up is the point).
-- **Multi-payer stack shown openly** on every price ($84 → $27 example).
-- **No public ratings anywhere**; feedback = private care notes → quality agent → human.
-- **The senior never installs anything**; trust reaches them as a person + the kaki pass artifact.
-- **Language is a first-class matching field** (incl. Hokkien, Teochew via "Mandarin/Hokkien/Malay/Tamil/English" chips).
-- Deliberate scope cuts: no real algorithm, no payments, no senior-facing surface, agents scripted (see [[kakis-design-brief]]).
+*Feedback (Lara/Aditi):* split caregiver mode vs **elderly self-book** mode — different UX density, language, and payment paths.
 
-> FEEDBACK:
+*v2 target (first cut):* entered from the landing screen ("I'm an elderly person booking for myself"). Three screens, radically simpler than the caregiver flow: (1) "What do you need?" — four oversized cards (Someone to go with me / Someone to visit me / Help at home / I'm not sure — call me), ≥64px targets, 1.15rem+ type, minimal text, no English idioms; (2) "When?" — Today / Tomorrow / Pick a day, three big buttons; (3) confirmation with the kaki's face, name, and a phone-sized "they will call you before coming" line. Payment defaults to "bill my ICCP account / my family" — no card entry in this mode. A persistent "Call the centre instead · 6XXX XXXX" footer on every screen. Language toggle (EN / 中文 / Melayu / தமிழ்) top-right — static in prototype, real in Beta. Grounded in [[../evidence/marsiling-aac-grab-interviews]] (transaction fear, dialect, vision).
 
 ---
 
-## 5. Open design questions we'd most value feedback on
+## D. Respite giver module (Mdm Tan) — restructured per Shobhit/Aditi
 
-1. Should **planned bookings** get their own confirmation flow (calendar-style) instead of sharing the urgent flow's matching screen?
-2. Is the **kaki pass** the right trust artifact — and should it be printable/physical for the senior?
-3. Pricing display: is showing the full **multi-payer breakdown** reassuring or confusing for a stressed caregiver?
-4. Respite-giver framing: does "**My impact**" (contribution-first) land, or should earnings lead?
-5. Admin: is **one coordinator + three agents** the right shape, or should the matching-weights screen be hidden behind an "advanced" flap?
-6. What's missing for the **Aug 20 pressure test** — which screen would Vanguard poke first?
+### D1. Start page
 
-> FEEDBACK:
+*v1:* single welcome screen with "Start onboarding"; bottom tabs (Training / My impact) visible pre-signup.
+
+*Feedback:* tighten copy; two CTAs — **"Already a member: Sign in"** and **"New member: Sign up"**; bottom tabs must not appear on the start page.
+
+*v2 target:* clean start screen — wordmark, one line ("Help a Pasir Ris family. Train free with Vanguard. Choose your own hours."), two buttons: Sign in / Sign up. No bottom nav until authenticated.
+
+### D2. Sign-up flow
+
+*v1:* skills → training → wallet; Singpass mentioned in fine print only.
+
+*Feedback:* **phone number as unique identifier**; **show the Singpass verification flow** in the prototype, including a **consent/approval step** for using Singpass info; services able to provide should **mirror the caregiver service set**; capture preferences — languages, time/day, origination location (low priority in a small pilot), destination preference, email (Singpass doesn't provide it); all preferences editable later in Profile.
+
+*v2 target:* sign-up becomes: (1) phone number + OTP → (2) Singpass screen — mock Myinfo consent listing exactly what's pulled (name, NRIC-verified identity, DOB, address) with "Allow" / "Decline", styled like the real thing → (3) email capture ("Singpass doesn't share this") → (4) services (Chaperone / Companionship / Wellness check / Household help / Medicine admin 🔒 Tier 2 — mirroring B2's set) → (5) preferences: languages (multi), days/times (chips), area (default Pasir Ris), destination preference → (6) then the training path (unchanged in substance: CPR at St. Luke's, mobility, seniors+SOPs, shadow visit).
+
+### D3. Home page (post-login)
+
+*v1:* jobs list, training tab, impact tab.
+
+*Feedback:* home = **upcoming scheduled tasks** (naming TBD — "tasks" feels cold); a tab for **available asks** split **Now (next 30 min, geofenced)** / **In future**; bottom of page: impact summary (hours + money), training, profile.
+
+*v2 target:* home screen: "Your upcoming visits" (renamed from tasks — carried from the kaki vocabulary) as list, each with date, time + duration, and $. Below: compact impact strip (hours · earned MTD). Bottom nav: Visits · Available · Impact · Profile (Training folds into Profile → Training, per D7). "Available" tab: two segments — "Now" (within 30 min, "near you" geofence badge — scripted in prototype) and "Coming up"; a filter row at top reflecting her stored preferences (editable dropdown, multi-select).
+
+### D4. Task (visit) detail
+
+*Feedback:* each item shows date, time incl. duration, $$; detail view: person's name, start/end time, start location + destination, fee, cash or cashless (suggest cashless-only at start, settlement via Vanguard), **cancel option** (allowed up to a cutoff), **Start Task CTA with OTP exchange**, **End Task CTA → feedback/ratings**.
+
+*v2 target:* visit detail screen: who (name + "you've met him 6 times"), when (start–end), where (from → to), fee, payment badge "Cashless · settled weekly via Vanguard" **[ops: confirm cashless-only]**, "Cancel visit" (enabled until 2h before, then greyed with reason), **"Start visit — exchange OTP"** (senior/caregiver reads a 4-digit code, kaki enters it; mocked), **"End visit"** → structured feedback (how did it go chips + note). Rating element subject to the same [tension] ruling as B8 — v2 shows a private "flag a concern" rather than stars.
+
+### D5. Impact
+
+*v1:* earnings card + meaning-led ledger.
+
+*Feedback:* kudos summary; hours contributed (click → task-level detail); money earned MTD (click → detail); **withdraw to linked PayNow**.
+
+*v2 target:* impact screen keeps the kudos framing, adds tappable rows: Hours (27 → per-visit list), Earned MTD ($318.40 → per-visit list), and "Withdraw to PayNow" (mock balance → confirmation). Consistency streak stays — it's the product.
+
+### D6. Training
+
+*Feedback:* trainings done / in progress / certification corner.
+
+*v2 target:* three segments: Done (CPR, mobility, seniors+SOPs with registry IDs), In progress (shadow visit — booked), Certification corner (wallet view + Tier 2 upsell). Substantively v1's content, reorganised.
+
+### D7. Profile
+
+*Feedback:* name **with rating**, contact details, editable preferences, PayNow link, log out, delete/suspend account.
+
+*v2 target:* profile screen: photo + name + Tier badge (+ private quality standing shown as "Good standing · Vanguard-verified" rather than a public star number — same [tension] ruling), phone/email (editable), preferences (languages, days, services — editable, mirrors D2 step 5), PayNow account (masked, relink), Log out, and "Suspend or delete my account" (two-step confirm).
+
+---
+
+## E. Admin module (Wei Lin) — restructured per Zheng Wei/Aditi
+
+### E1. "Agents" → "Today"
+
+*v1:* header stats (41 bookings · 92% consistency · "3 for your review") + three agent cards (badges 2 + 1 + 1 = 4 — tally bug).
+
+*Feedback:* review count doesn't tally (3 vs 4); "consistency score" unclear; rename the page — suggest **"Today"**; unsure bookings/consistency numbers help ops (needs a focus group).
+
+*v2 target:* page renamed **Today**. Tally fixed: "4 items need you" matching the badges. "Consistency score" replaced with a plain label + tooltip: "Repeat-pair rate — % of this week's visits where the senior saw a kaki they already knew (target ≥90%)." Header stats trimmed to what ops acts on: items needing review · unfilled visits today · repeat-pair rate. A demo-note records the open question: validate which numbers ops actually wants with a focus group before pilot.
+
+### E2. Matching — two levels
+
+*v1:* one screen of four toggleable weight sliders + an agent recommendation.
+
+*Feedback (Zheng Wei):* split into **broad base** and **case-by-case**. Broad base: ops shouldn't toggle factor sliders across all cases — confusing. Instead offer **states**: High demand/low supply (reduce consistency weight, favour proximity, fill faster) · Low demand/high supply (favour consistency + language). Algorithm **displayed but not toggleable** at broad base. Case-by-case: per-elderly, agent recommendation shown, **custom weights only here**.
+
+*v2 target:* Matching becomes two screens. **(1) Broad base:** a mode selector with three named states — "Balanced (default)", "High demand / low supply — fill fast: proximity first, consistency relaxed", "Low demand / high supply — deepen bonds: consistency + language first" — each showing its (read-only) weight profile; the matching agent recommends a state ("demand up 40% this week — suggest High-demand mode") and ops confirms. **(2) Case-by-case:** a queue of exceptions by senior (e.g. "Mdm Lee — no Tamil speaker free Tue am"), each opening a detail with the agent's recommendation and — only here — custom weight override for that senior. Hard-rules card unchanged (staff-paired first visits, no public ratings, cert gates, urgent jumps queue).
+
+### E3. Quality — categorised + retrievable
+
+*v1:* weekly theme chips + one flagged case + private-note routing.
+
+*Feedback (Zheng Wei):* categorise into **(a) elderly quality of life** (mental/physical health, living conditions), **(b) respite-giver quality of service** (caregiver feedback about the kaki), **(c) respite-giver quality of life** (volunteering conditions, how caregivers/elderly treat the kaki). Past cases must be **retrievable** — add an **archive**.
+
+*v2 target:* Quality screen gains three category tabs matching (a)/(b)/(c) — note (c) is new ground: the kaki is also a person the platform protects; the quality agent reads visit reports both ways. Each tab: open flags + themes. An **Archive** segment lists resolved cases (searchable by senior, kaki, month) with outcome notes — quality control requires follow-up context. Mr Silva's fatigue case files under (a); a new demo case under (c): "Kaki reports a family member repeatedly cancels on arrival — coordinator to call."
+
+### E4. Settings / profile (new)
+
+*Feedback (Zheng Wei):* profile icon top-right; track which caregiver/respite giver is tagged to cases; app feedback; FAQs/resources/agent for the user.
+
+*v2 target:* avatar icon top-right of the admin frame → sheet: Wei Lin's profile (role, sub-region), "My cases" (items she's touched, with the caregiver/kaki tagged on each), "Send feedback on Kakis", and "Help — FAQs, resources, ask the assistant."
+
+---
+
+## F. Cross-cutting v2 rules
+
+- **48px minimum tap targets and ≥1rem labels** on all consumer pickers; contrast re-checked at AA after the restyle.
+- **"Need help booking? Call Pasir Ris ICCP · 6XXX XXXX"** footer on every caregiver/elderly screen.
+- **Progress indicators** (step n of 4) across the caregiver booking flow.
+- **Ratings stay non-public everywhere** pending the Vanguard/AIC ruling — private quality signals only ([tension], G5).
+- Everything else from v1 stands: consistency-first matching, visible cert locks, open multi-payer pricing, senior never installs anything, language as a first-class field.
+
+## G. Open questions for pilot ops / Vanguard
+
+1. **SLA by tier** — can ops commit to <1h (urgent) / <2h (soon) / 24h (planned) for Pasir Ris? (Lara/Aditi)
+2. **Pricing & subsidy rules** — is crisis activation always −$45, or trigger-specific? (Lara/Aditi)
+3. **Payment rail** — PayNow to Vanguard vs in-app vs invoice? Cashless-only for kakis at launch, settlement via Vanguard? (Lara/Aditi; Shobhit)
+4. **Volume** — demo shows 41 bookings/week; what's a realistic month-1 cap? (Lara/Aditi)
+5. **Ratings** — the team wants feedback shared with organisations + star ratings; MOH/AIC hesitancy says no public rating of care staff. What exactly is permitted: private scores to Vanguard? Aggregate-only? Nothing numeric? (All → Vanguard/AIC)
+6. **Ops metrics** — which numbers does the coordinator actually act on? Focus group before pilot. (Zheng Wei)
+
+---
+
+*2026-07-21: v2 — integrated the three team reviews (Lara/Aditi caregiver+elderly, Shobhit/Aditi respite giver, Zheng Wei/Aditi admin) into a build target. v1 (the plain screen mirror with empty FEEDBACK slots) is preserved in git history. Prototype rebuild to follow on request.*

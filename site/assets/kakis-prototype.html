@@ -3,25 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kakis — prototype · trusted respite when a crisis hits</title>
+<title>Kakis — prototype v2 · trusted respite when a need arises</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#1A2420;
-  --paper:#F2F4EF;
-  --pandan:#14594A;
-  --pandan-deep:#0C3D33;
-  --mint:#DFEDE5;
-  --mint-soft:#EDF4EF;
-  --marigold:#F0A63C;
-  --marigold-soft:#FBEED6;
-  --clay:#C25438;
-  --clay-soft:#F6E3DC;
-  --slate:#5E6B65;
-  --line:#D8E0D9;
-  --white:#FFFFFF;
+  --ink:#1A2420; --paper:#F2F4EF;
+  --pandan:#14594A; --pandan-deep:#0C3D33;
+  --mint:#DFEDE5; --mint-soft:#EDF4EF;
+  --marigold:#F0A63C; --marigold-soft:#FBEED6;
+  --clay:#C25438; --clay-soft:#F6E3DC;
+  --slate:#5E6B65; --line:#D8E0D9; --white:#FFFFFF;
   --shadow:0 18px 40px rgba(12,61,51,.16);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -32,16 +25,15 @@ body{
     radial-gradient(1200px 600px at 80% -10%, #E7F0E8 0%, transparent 60%),
     radial-gradient(900px 500px at -10% 100%, #EAF1EA 0%, transparent 55%),
     var(--paper);
-  color:var(--ink);
-  min-height:100vh;
+  color:var(--ink); min-height:100vh;
 }
 button{font-family:inherit;cursor:pointer}
 ::selection{background:var(--marigold-soft)}
 
-/* ---------- top bar ---------- */
+/* ---------- top bar (demo shell) ---------- */
 .topbar{
-  display:flex;align-items:center;gap:28px;flex-wrap:wrap;
-  padding:20px 36px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  padding:18px 36px;border-bottom:1px solid var(--line);
   background:rgba(242,244,239,.85);backdrop-filter:blur(8px);
   position:sticky;top:0;z-index:40;
 }
@@ -49,84 +41,53 @@ button{font-family:inherit;cursor:pointer}
 .wordmark .dot{color:var(--marigold)}
 .tagline{font-size:.82rem;color:var(--slate);max-width:300px;line-height:1.35}
 .tagline strong{color:var(--pandan);font-weight:600}
-.personas{margin-left:auto;display:flex;gap:6px;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:5px}
-.personas button{
-  border:0;background:transparent;border-radius:999px;padding:9px 18px;
-  font-size:.88rem;font-weight:600;color:var(--slate);transition:all .18s ease;
-}
-.personas button:hover{color:var(--pandan-deep)}
-.personas button.active{background:var(--pandan);color:#fff}
-.personas button:focus-visible{outline:3px solid var(--marigold);outline-offset:2px}
+.shortcuts{margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.shortcuts .sc-label{font-family:'Spline Sans Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-right:4px}
+.shortcuts .tabs{display:flex;gap:6px;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:5px}
+.shortcuts button{border:0;background:transparent;border-radius:999px;padding:8px 15px;font-size:.85rem;font-weight:600;color:var(--slate);transition:all .18s ease}
+.shortcuts button:hover{color:var(--pandan-deep)}
+.shortcuts button.active{background:var(--pandan);color:#fff}
+.shortcuts button.ops{color:#8F3A24}
+.shortcuts button.ops.active{background:var(--clay);color:#fff}
+.shortcuts button:focus-visible{outline:3px solid var(--marigold);outline-offset:2px}
 
 /* ---------- stage ---------- */
-.stage{
-  display:flex;align-items:flex-start;justify-content:center;gap:48px;
-  padding:40px 32px 72px;max-width:1240px;margin:0 auto;
-}
-.scenario{
-  width:230px;flex:0 0 230px;padding-top:14px;
-}
-.scenario .eyebrow, .notes .eyebrow{
-  font-family:'Spline Sans Mono',monospace;font-size:.68rem;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--pandan);margin-bottom:10px;
-}
+.stage{display:flex;align-items:flex-start;justify-content:center;gap:48px;padding:40px 32px 72px;max-width:1240px;margin:0 auto}
+.scenario{width:230px;flex:0 0 230px;padding-top:14px}
+.scenario .eyebrow,.notes .eyebrow{font-family:'Spline Sans Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pandan);margin-bottom:10px}
 .scenario h2{font-family:'Fraunces',serif;font-size:1.28rem;font-weight:600;line-height:1.25;margin-bottom:10px}
 .scenario p{font-size:.85rem;color:var(--slate);line-height:1.55;margin-bottom:14px}
-.scenario .persona-chip{
-  display:flex;gap:10px;align-items:center;background:var(--white);
-  border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;
-}
-.scenario .persona-chip .face{width:34px;height:34px;border-radius:50%;background:var(--mint);
-  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;color:var(--pandan-deep);flex:0 0 34px}
+.scenario .persona-chip{display:flex;gap:10px;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.scenario .persona-chip .face{width:34px;height:34px;border-radius:50%;background:var(--mint);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;color:var(--pandan-deep);flex:0 0 34px}
 .scenario .persona-chip div b{display:block;font-size:.82rem}
 .scenario .persona-chip div span{font-size:.72rem;color:var(--slate)}
 
 /* ---------- phone ---------- */
-.phone{
-  width:390px;flex:0 0 390px;height:800px;background:var(--ink);
-  border-radius:48px;padding:12px;box-shadow:var(--shadow);position:relative;
-}
-.phone-inner{
-  background:var(--white);border-radius:38px;height:100%;overflow:hidden;
-  display:flex;flex-direction:column;position:relative;
-}
-.statusbar{
-  flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;
-  padding:14px 22px 6px;font-family:'Spline Sans Mono',monospace;font-size:.7rem;color:var(--slate);
-}
+.phone{width:390px;flex:0 0 390px;height:820px;background:var(--ink);border-radius:48px;padding:12px;box-shadow:var(--shadow);position:relative}
+.phone-inner{background:var(--white);border-radius:38px;height:100%;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.statusbar{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;padding:14px 22px 6px;font-family:'Spline Sans Mono',monospace;font-size:.7rem;color:var(--slate)}
 .statusbar .sb-brand{font-family:'Fraunces',serif;font-weight:700;font-size:.85rem;color:var(--pandan-deep)}
 .screens{flex:1;overflow:hidden;position:relative}
-.screen{
-  position:absolute;inset:0;overflow-y:auto;display:none;
-  flex-direction:column;padding:10px 20px 96px;scrollbar-width:thin;
-}
+.screen{position:absolute;inset:0;overflow-y:auto;display:none;flex-direction:column;padding:10px 20px 96px;scrollbar-width:thin}
 .screen.active{display:flex;animation:screenin .28s ease}
+.screen.nonav{padding-bottom:24px}
 @keyframes screenin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){
-  .screen.active{animation:none}
-  *{transition:none!important;animation-duration:.001s!important}
-}
+@media (prefers-reduced-motion:reduce){.screen.active{animation:none}*{transition:none!important;animation-duration:.001s!important}}
 
-/* ---------- shared app components ---------- */
+/* ---------- shared components ---------- */
 .appbar{display:flex;align-items:center;gap:10px;padding:8px 0 14px}
-.appbar .back{
-  border:1px solid var(--line);background:var(--white);width:38px;height:38px;border-radius:12px;
-  font-size:1rem;color:var(--pandan-deep);flex:0 0 38px;
-}
-.appbar .back:focus-visible,.btn:focus-visible,.trigger:focus-visible,.chip:focus-visible,button.li:focus-visible,.navbtn:focus-visible,input:focus-visible{outline:3px solid var(--marigold);outline-offset:2px}
+.appbar .back{border:1px solid var(--line);background:var(--white);width:44px;height:44px;border-radius:12px;font-size:1rem;color:var(--pandan-deep);flex:0 0 44px}
+.appbar .back:focus-visible,.btn:focus-visible,.trigger:focus-visible,.chip:focus-visible,button.li:focus-visible,.navbtn:focus-visible,input:focus-visible,.bigcard:focus-visible,.tier:focus-visible,.modecard:focus-visible,.seg button:focus-visible,.avatar-btn:focus-visible,summary:focus-visible{outline:3px solid var(--marigold);outline-offset:2px}
 .appbar h1{font-family:'Fraunces',serif;font-size:1.32rem;font-weight:600;letter-spacing:-.01em}
 .appbar .sub{font-size:.78rem;color:var(--slate);display:block;font-family:'Instrument Sans',sans-serif;font-weight:400;margin-top:2px}
+.appbar .avatar-btn{margin-left:auto;width:40px;height:40px;border-radius:50%;background:var(--mint);border:1px solid var(--line);color:var(--pandan-deep);font-weight:700;font-size:.8rem;flex:0 0 40px}
+.stepper{font-family:'Spline Sans Mono',monospace;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--marigold);background:var(--ink);display:inline-block;border-radius:999px;padding:4px 12px;margin:0 0 10px}
 .eyebrow-sm{font-family:'Spline Sans Mono',monospace;font-size:.64rem;letter-spacing:.13em;text-transform:uppercase;color:var(--pandan);margin:16px 0 8px}
 .card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
 .card.tint{background:var(--mint-soft);border-color:#CBDECF}
 .card h3{font-size:.95rem;font-weight:700;margin-bottom:4px}
 .card p{font-size:.83rem;color:var(--slate);line-height:1.5}
-.btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
-  border:0;border-radius:16px;padding:16px;font-size:.95rem;font-weight:700;
-  background:var(--pandan);color:#fff;margin-top:6px;transition:transform .12s ease, background .15s;
-  min-height:52px;
-}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:16px;padding:16px;font-size:.98rem;font-weight:700;background:var(--pandan);color:#fff;margin-top:6px;transition:transform .12s ease,background .15s;min-height:54px}
 .btn:hover{background:var(--pandan-deep)}
 .btn:active{transform:scale(.985)}
 .btn.gold{background:var(--marigold);color:var(--ink)}
@@ -135,7 +96,8 @@ button{font-family:inherit;cursor:pointer}
 .btn.ghost:hover{border-color:var(--pandan)}
 .btn.quiet{background:var(--mint);color:var(--pandan-deep)}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
-.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 10px;font-size:.7rem;font-weight:600}
+.btn.done{background:var(--pandan);color:#fff;opacity:1}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 11px;font-size:.72rem;font-weight:600}
 .pill.green{background:var(--mint);color:var(--pandan-deep)}
 .pill.gold{background:var(--marigold-soft);color:#8A5E14}
 .pill.clay{background:var(--clay-soft);color:#8F3A24}
@@ -144,64 +106,72 @@ button{font-family:inherit;cursor:pointer}
 .row{display:flex;align-items:center;gap:10px}
 .row .grow{flex:1}
 .divider{height:1px;background:var(--line);margin:14px 0}
+.helpline{margin-top:auto;padding-top:14px;text-align:center;font-size:.78rem;color:var(--slate)}
+.helpline b{color:var(--pandan)}
 
 /* bottom nav */
-.bottomnav{
-  position:absolute;left:0;right:0;bottom:0;display:none;
-  gap:4px;padding:10px 14px 22px;background:linear-gradient(transparent, var(--white) 28%);
-}
+.bottomnav{position:absolute;left:0;right:0;bottom:0;display:none;gap:4px;padding:10px 14px 22px;background:linear-gradient(transparent,var(--white) 28%)}
 .bottomnav.active{display:flex}
-.navbtn{
-  flex:1;border:0;background:transparent;border-radius:14px;padding:8px 4px;
-  font-size:.68rem;font-weight:600;color:var(--slate);display:flex;flex-direction:column;gap:4px;align-items:center;
-}
+.navbtn{flex:1;border:0;background:transparent;border-radius:14px;padding:10px 4px;font-size:.7rem;font-weight:600;color:var(--slate);display:flex;flex-direction:column;gap:4px;align-items:center;min-height:48px}
 .navbtn .ico{font-size:1.05rem;line-height:1}
 .navbtn.on{color:var(--pandan-deep);background:var(--mint)}
 
-/* triggers — signature element */
+/* landing / elderly big cards */
+.bigcard{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--white);border:2px solid var(--line);border-radius:20px;padding:20px 18px;margin-bottom:12px;min-height:84px;transition:all .15s}
+.bigcard:hover{border-color:var(--pandan);transform:translateY(-1px)}
+.bigcard .bc-ico{font-size:1.7rem;flex:0 0 auto}
+.bigcard b{display:block;font-size:1.05rem;line-height:1.3}
+.bigcard span{display:block;font-size:.82rem;color:var(--slate);margin-top:3px;line-height:1.35}
+.bigcard.xl b{font-size:1.18rem}
+.bigcard.xl{min-height:96px}
+
+/* urgency tiers */
+.tier{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--white);border:2px solid var(--line);border-radius:20px;padding:18px;margin-bottom:12px;min-height:78px;transition:all .15s}
+.tier:hover{transform:translateY(-1px)}
+.tier b{display:block;font-size:1.02rem}
+.tier span{display:block;font-size:.8rem;color:var(--slate);margin-top:2px}
+.tier .t-eta{margin-left:auto;font-family:'Spline Sans Mono',monospace;font-size:.68rem;color:var(--slate);text-align:right;flex:0 0 auto}
+.tier.urgent{border-color:var(--marigold);background:var(--marigold-soft)}
+.tier.urgent:hover{box-shadow:0 6px 18px rgba(240,166,60,.25)}
+.tier.soon:hover{border-color:var(--marigold)}
+.tier.planned:hover{border-color:var(--pandan)}
+
+/* triggers */
 .trigger-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
-.trigger{
-  border:1.5px solid var(--line);background:var(--white);border-radius:18px;
-  padding:14px 12px;text-align:left;transition:all .15s ease;min-height:104px;
-  display:flex;flex-direction:column;gap:6px;
-}
+.trigger{border:1.5px solid var(--line);background:var(--white);border-radius:18px;padding:14px 12px;text-align:left;transition:all .15s ease;min-height:104px;display:flex;flex-direction:column;gap:6px}
 .trigger .t-ico{font-size:1.3rem}
-.trigger b{font-size:.84rem;line-height:1.25;display:block}
-.trigger span{font-size:.7rem;color:var(--slate);line-height:1.35}
+.trigger b{font-size:.86rem;line-height:1.25;display:block}
+.trigger span{font-size:.72rem;color:var(--slate);line-height:1.35}
 .trigger:hover{border-color:var(--marigold);transform:translateY(-1px)}
 .trigger.sel{border-color:var(--marigold);background:var(--marigold-soft);box-shadow:0 6px 18px rgba(240,166,60,.25)}
+.trigger.pinned{border-color:#E8C892}
 
-/* chips */
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.chip{
-  border:1.5px solid var(--line);background:var(--white);border-radius:999px;
-  padding:9px 14px;font-size:.8rem;font-weight:600;color:var(--ink);transition:all .15s;
-}
+/* chips — 48px targets per feedback */
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:4px}
+.chip{border:1.5px solid var(--line);background:var(--white);border-radius:999px;padding:13px 17px;font-size:.95rem;font-weight:600;color:var(--ink);transition:all .15s;min-height:48px}
 .chip:hover{border-color:var(--pandan)}
 .chip.sel{background:var(--pandan);border-color:var(--pandan);color:#fff}
-.chip.locked{color:#A9B3AC;background:#F4F6F2;position:relative}
-label.f-label{display:block;font-size:.78rem;font-weight:700;margin:16px 0 6px}
+.chip.locked{color:#A9B3AC;background:#F4F6F2}
+label.f-label{display:block;font-size:.84rem;font-weight:700;margin:16px 0 6px}
 label.f-label small{font-weight:400;color:var(--slate)}
-.f-input{
-  width:100%;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;
-  font-family:inherit;font-size:.88rem;background:var(--white);color:var(--ink);
-}
+.f-input{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14px;font-family:inherit;font-size:.95rem;background:var(--white);color:var(--ink);min-height:48px}
 .f-input:focus{outline:3px solid var(--mint);border-color:var(--pandan)}
 
-/* kaki pass — signature match card */
-.kakipass{
-  background:linear-gradient(150deg,var(--pandan) 0%,var(--pandan-deep) 78%);
-  color:#fff;border-radius:22px;padding:20px;margin:6px 0 12px;position:relative;overflow:hidden;
-}
-.kakipass::after{
-  content:"";position:absolute;left:18px;right:18px;top:96px;
-  border-top:2px dashed rgba(255,255,255,.28);
-}
+/* mini calendar */
+.cal{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:4px}
+.cal .cal-head{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.85rem;padding:2px 6px 8px}
+.cal .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .cal-grid span{font-family:'Spline Sans Mono',monospace;font-size:.6rem;color:var(--slate);text-align:center;padding:4px 0}
+.cal .cal-grid button{border:0;background:transparent;border-radius:10px;padding:9px 0;font-size:.82rem;font-weight:600;min-height:36px}
+.cal .cal-grid button:hover{background:var(--mint)}
+.cal .cal-grid button.sel{background:var(--pandan);color:#fff}
+.cal .cal-grid button.dim{color:#B9C2BC}
+
+/* kaki pass */
+.kakipass{background:linear-gradient(150deg,var(--pandan) 0%,var(--pandan-deep) 78%);color:#fff;border-radius:22px;padding:20px;margin:6px 0 12px;position:relative;overflow:hidden}
+.kakipass::after{content:"";position:absolute;left:18px;right:18px;top:96px;border-top:2px dashed rgba(255,255,255,.28)}
 .kakipass .kp-top{display:flex;gap:14px;align-items:center;margin-bottom:26px}
-.kakipass .kp-face{
-  width:56px;height:56px;border-radius:50%;background:var(--marigold);color:var(--ink);
-  display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Fraunces',serif;font-size:1.15rem;flex:0 0 56px;
-}
+.kakipass .kp-face{width:56px;height:56px;border-radius:50%;background:var(--marigold);color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Fraunces',serif;font-size:1.15rem;flex:0 0 56px}
 .kakipass h3{font-family:'Fraunces',serif;font-size:1.25rem;font-weight:600}
 .kakipass .kp-sub{font-size:.76rem;opacity:.85;margin-top:2px}
 .kakipass .kp-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -220,16 +190,16 @@ label.f-label small{font-weight:400;color:var(--slate)}
 .stack .s-row.total .amt{color:var(--pandan-deep);font-size:1.05rem}
 .stack .s-row.minus .amt{color:var(--pandan)}
 
+/* disclosure */
+details.disc{background:var(--mint-soft);border:1px solid #CBDECF;border-radius:14px;padding:12px 14px;margin-bottom:12px}
+details.disc summary{font-size:.85rem;font-weight:700;color:var(--pandan-deep);cursor:pointer;min-height:24px}
+details.disc p{font-size:.8rem;color:var(--slate);line-height:1.5;margin-top:8px}
+
 /* timeline */
 .tl{list-style:none;margin:4px 0 12px}
 .tl li{display:flex;gap:12px;padding:0 0 20px;position:relative}
-.tl li::before{
-  content:"";width:12px;height:12px;border-radius:50%;background:var(--line);
-  flex:0 0 12px;margin-top:4px;z-index:1;
-}
-.tl li::after{
-  content:"";position:absolute;left:5px;top:18px;bottom:0;width:2px;background:var(--line);
-}
+.tl li::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--line);flex:0 0 12px;margin-top:4px;z-index:1}
+.tl li::after{content:"";position:absolute;left:5px;top:18px;bottom:0;width:2px;background:var(--line)}
 .tl li:last-child::after{display:none}
 .tl li.done::before{background:var(--pandan)}
 .tl li.now::before{background:var(--marigold);box-shadow:0 0 0 5px var(--marigold-soft)}
@@ -239,49 +209,65 @@ label.f-label small{font-weight:400;color:var(--slate)}
 
 /* matching loader */
 .matchload{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:30px}
-.matchload .orb{
-  width:86px;height:86px;border-radius:50%;margin-bottom:22px;
-  background:radial-gradient(circle at 35% 30%, var(--marigold) 0%, var(--pandan) 70%);
-  animation:pulse 1.3s ease-in-out infinite;
-}
+.matchload .orb{width:86px;height:86px;border-radius:50%;margin-bottom:22px;background:radial-gradient(circle at 35% 30%,var(--marigold) 0%,var(--pandan) 70%);animation:pulse 1.3s ease-in-out infinite}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.08);opacity:1}}
 .matchload h3{font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:8px}
 .matchload p{font-size:.82rem;color:var(--slate);line-height:1.5;max-width:250px}
 
 /* list items */
-.li{display:flex;gap:12px;align-items:flex-start;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:13px 14px;margin-bottom:10px;width:100%;text-align:left}
+.li{display:flex;gap:12px;align-items:flex-start;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;width:100%;text-align:left;min-height:48px}
 button.li{transition:border-color .15s}
 button.li:hover{border-color:var(--pandan)}
 .li .face{width:40px;height:40px;border-radius:50%;background:var(--mint);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;color:var(--pandan-deep);flex:0 0 40px}
 .li .face.gold{background:var(--marigold-soft);color:#8A5E14}
 .li .body{flex:1}
-.li b{font-size:.86rem;display:block}
-.li span{font-size:.74rem;color:var(--slate);line-height:1.4;display:block;margin-top:2px}
+.li b{font-size:.88rem;display:block}
+.li span{font-size:.75rem;color:var(--slate);line-height:1.4;display:block;margin-top:2px}
 .li .end{margin-left:auto;text-align:right;flex:0 0 auto}
 
 /* progress */
 .progress{height:8px;border-radius:99px;background:var(--mint);overflow:hidden;margin:8px 0 4px}
 .progress i{display:block;height:100%;background:var(--pandan);border-radius:99px}
 
+/* segmented control */
+.seg{display:flex;background:var(--mint-soft);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin:4px 0 14px}
+.seg button{flex:1;border:0;background:transparent;border-radius:11px;padding:11px 8px;font-size:.84rem;font-weight:600;color:var(--slate);min-height:44px}
+.seg button.on{background:var(--white);color:var(--pandan-deep);box-shadow:0 1px 4px rgba(12,61,51,.12)}
+.segpane{display:none}
+.segpane.on{display:block}
+
+/* mode cards (admin broad-base) */
+.modecard{width:100%;text-align:left;background:var(--white);border:2px solid var(--line);border-radius:18px;padding:15px;margin-bottom:10px;transition:all .15s}
+.modecard:hover{border-color:var(--pandan)}
+.modecard.sel{border-color:var(--pandan);background:var(--mint-soft)}
+.modecard b{font-size:.92rem;display:block}
+.modecard span{font-size:.76rem;color:var(--slate);display:block;margin-top:3px;line-height:1.4}
+.modecard .weights{font-family:'Spline Sans Mono',monospace;font-size:.68rem;color:var(--pandan);margin-top:8px;display:block}
+
+/* otp boxes */
+.otp{display:flex;gap:10px;justify-content:center;margin:14px 0}
+.otp span{width:52px;height:60px;border:2px solid var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Spline Sans Mono',monospace;font-size:1.5rem;background:var(--white)}
+.otp span.fill{border-color:var(--pandan);background:var(--mint-soft)}
+
+/* language toggle (elderly) */
+.langrow{display:flex;gap:6px;justify-content:flex-end;margin-bottom:6px}
+.langrow button{border:1px solid var(--line);background:var(--white);border-radius:999px;padding:8px 12px;font-size:.78rem;font-weight:600;color:var(--slate);min-height:40px}
+.langrow button.on{background:var(--pandan);border-color:var(--pandan);color:#fff}
+
+/* map placeholder */
+.mapph{border:2px dashed var(--line);border-radius:16px;padding:22px;text-align:center;color:var(--slate);font-size:.8rem;background:repeating-linear-gradient(45deg,#F7F9F5,#F7F9F5 12px,#F2F4EF 12px,#F2F4EF 24px);margin-bottom:12px}
+
 /* notes panel */
-.notes{
-  width:270px;flex:0 0 270px;position:sticky;top:104px;
-  background:var(--white);border:1px solid var(--line);border-radius:22px;padding:22px;
-}
+.notes{width:270px;flex:0 0 270px;position:sticky;top:104px;background:var(--white);border:1px solid var(--line);border-radius:22px;padding:22px}
 .notes h2{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;margin-bottom:10px}
 .notes .n-body{font-size:.82rem;color:var(--ink);line-height:1.6;margin-bottom:14px}
 .notes .n-body b{color:var(--pandan-deep)}
 .notes .n-ev{border-top:1px solid var(--line);padding-top:12px}
-.notes .n-ev .ev{
-  font-family:'Spline Sans Mono',monospace;font-size:.66rem;color:var(--slate);
-  display:block;padding:4px 0;letter-spacing:.02em;
-}
+.notes .n-ev .ev{font-family:'Spline Sans Mono',monospace;font-size:.66rem;color:var(--slate);display:block;padding:4px 0;letter-spacing:.02em}
 .notes .n-ev .ev::before{content:"⌁ ";color:var(--marigold)}
 .notes .n-ev-label{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pandan);font-family:'Spline Sans Mono',monospace;margin-bottom:6px}
 
-@media (max-width:1120px){
-  .scenario{display:none}
-}
+@media (max-width:1120px){.scenario{display:none}}
 @media (max-width:820px){
   .stage{flex-direction:column;align-items:center;gap:28px;padding:24px 12px 60px}
   .notes{position:static;width:390px;max-width:100%}
@@ -295,102 +281,181 @@ button.li:hover{border-color:var(--pandan)}
 
 <header class="topbar">
   <div class="wordmark">Kakis<span class="dot">.</span></div>
-  <div class="tagline"><strong>Trusted respite when a need arises.</strong> Prototype · Pasir Ris ICCP pilot · SGLN TECH 2026</div>
-  <nav class="personas" aria-label="Switch persona">
-    <button data-persona="cg" class="active">Caregiver</button>
-    <button data-persona="rg">Respite giver</button>
-    <button data-persona="ad">Admin</button>
-  </nav>
+  <div class="tagline"><strong>Trusted respite when a need arises.</strong> Prototype v2 · Pasir Ris ICCP pilot · SGLN TECH 2026</div>
+  <div class="shortcuts">
+    <span class="sc-label">Demo shortcuts</span>
+    <nav class="tabs" aria-label="Demo shortcuts">
+      <button data-jump="land" class="active">Landing</button>
+      <button data-jump="cg-home">Caregiver</button>
+      <button data-jump="eb-need">Elderly</button>
+      <button data-jump="rg-start">Kaki</button>
+      <button data-jump="ad-today" class="ops">Ops (internal)</button>
+    </nav>
+  </div>
 </header>
 
 <main class="stage">
 
-  <!-- left: scenario context -->
-  <aside class="scenario" id="scenarioPanel">
-    <!-- filled by JS -->
-  </aside>
+  <aside class="scenario" id="scenarioPanel"></aside>
 
-  <!-- centre: the phone -->
-  <div class="phone" role="region" aria-label="Kakis app prototype">
+  <div class="phone" role="region" aria-label="Kakis app prototype v2">
     <div class="phone-inner">
       <div class="statusbar"><span>09:41</span><span class="sb-brand">Kakis.</span><span>PASIR RIS</span></div>
       <div class="screens">
 
       <!-- ============================================================
-           CAREGIVER JOURNEY  (Priya, 41 — father Mr Nathan, 78)
+           LANDING (consumer entry — replaces persona switcher)
+           ============================================================ -->
+      <section class="screen nonav" id="land">
+        <div style="text-align:center;padding:26px 0 10px">
+          <div style="font-family:'Fraunces',serif;font-weight:700;font-size:2rem;color:var(--pandan-deep)">Kakis<span style="color:var(--marigold)">.</span></div>
+          <p style="font-size:.9rem;color:var(--slate);margin-top:4px">Trusted respite when a need arises</p>
+        </div>
+        <h1 style="font-family:'Fraunces',serif;font-size:1.45rem;font-weight:600;margin:14px 0 16px">Who needs help today?</h1>
+        <button class="bigcard" data-go="cg-home"><span class="bc-ico">👨‍👩‍👧</span><div><b>I'm booking for a parent or loved one</b><span>Arrange a trusted visit — urgent or planned</span></div></button>
+        <button class="bigcard" data-go="eb-need"><span class="bc-ico">🧓</span><div><b>I'm an elderly person booking for myself</b><span>Simple booking, in your language</span></div></button>
+        <button class="bigcard" data-go="rg-start"><span class="bc-ico">🤝</span><div><b>I want to help as a kaki</b><span>Train free with Vanguard, choose your hours</span></div></button>
+        <div class="helpline">Need help booking? Call <b>Pasir Ris ICCP · 6XXX XXXX</b></div>
+      </section>
+
+      <!-- ============================================================
+           CAREGIVER (Priya) — service-first, three urgency tiers
            ============================================================ -->
 
       <section class="screen" id="cg-home">
         <div class="appbar">
           <h1>Morning, Priya<span class="sub">Caring for Mr Nathan · Pasir Ris Dr 4</span></h1>
         </div>
-
-        <button class="btn gold" data-go="cg-crisis" style="min-height:62px;font-size:1.02rem;flex-direction:column;gap:2px">⚡ Get help now<span style="font-weight:400;font-size:.74rem;display:block">urgent — matched within hours</span></button>
-        <button class="btn" data-go="cg-details" data-mode="planned" style="min-height:62px;font-size:1.02rem;flex-direction:column;gap:2px">Book ahead<span style="font-weight:400;font-size:.74rem;display:block">planned visits, appointments, vacations</span></button>
+        <button class="btn gold" data-go="cg-service" style="min-height:60px;font-size:1.05rem">Book a visit for Papa</button>
 
         <div class="eyebrow-sm">Papa's kakis</div>
-        <div class="li">
-          <div class="face">HM</div>
-          <div class="body"><b>Mdm Halimah, 63</b><span>Chaperone & companionship · 6 visits with Papa · speaks Tamil + English</span></div>
-          <span class="pill green">Regular</span>
-        </div>
-        <div class="li">
-          <div class="face">KT</div>
-          <div class="body"><b>Mr Koh Teck Seng, 61</b><span>Wellness checks · 2 visits · met Papa at the AAC</span></div>
-          <span class="pill grey">Backup</span>
-        </div>
+        <div class="li"><div class="face">HM</div><div class="body"><b>Mdm Halimah, 63</b><span>Chaperone & companionship · 6 visits with Papa · Tamil + English</span></div><span class="pill green">Regular</span></div>
+        <div class="li"><div class="face">KT</div><div class="body"><b>Mr Koh Teck Seng, 61</b><span>Wellness checks · 2 visits · met Papa at the AAC</span></div><span class="pill grey">Backup</span></div>
+        <button class="li" data-go="cg-addkaki"><div class="face gold">+</div><div class="body"><b>Request a kaki</b><span>Ask for someone Papa has already met at the AAC or with Vanguard</span></div></button>
 
         <div class="eyebrow-sm">Upcoming</div>
-        <div class="li">
-          <div class="face gold">Tu</div>
-          <div class="body"><b>Polyclinic escort — Tue 14 Jul, 9:30am</b><span>Halimah accompanies Papa to Pasir Ris Polyclinic · 2 hrs</span></div>
-        </div>
+        <div class="li"><div class="face gold">Tu</div><div class="body"><b>Polyclinic escort — Tue, 9:30am</b><span>Halimah accompanies Papa · 2 hrs</span></div></div>
+        <div class="li"><div class="face">We</div><div class="body"><b>Wellness check — Wed, 3pm</b><span>Mr Koh drops in · 1 hr</span></div></div>
+        <div class="li"><div class="face">Fr</div><div class="body"><b>Companionship — Fri, 2pm</b><span>Halimah · mahjong afternoon · 2 hrs</span></div></div>
 
-        <div class="card tint">
-          <h3>Papa's care plan</h3>
-          <p>Diabetes meds 2pm daily · walks with a stick · prefers Tamil · Tuesdays: physio. Kept up to date so any kaki arrives prepared.</p>
-          <button class="btn quiet" style="margin-top:10px" data-go="cg-report">View last visit report</button>
+        <button class="li" data-go="cg-careplan"><div class="face">📋</div><div class="body"><b>Papa's care plan</b><span>Meds 2pm daily · walks with a stick · Tamil · tap to view or edit</span></div><span class="pill green">Edit</span></button>
+        <div class="helpline">Need help booking? Call <b>Pasir Ris ICCP · 6XXX XXXX</b></div>
+      </section>
+
+      <section class="screen" id="cg-careplan">
+        <div class="appbar">
+          <button class="back" data-go="cg-home" aria-label="Back">←</button>
+          <h1>Papa's care plan<span class="sub">Any kaki who visits sees this — keep it current</span></h1>
         </div>
+        <label class="f-label">Medication checklist</label>
+        <div class="li"><div class="body"><b>Metformin — 2:00pm daily</b><span>With food · tick off in visit report</span></div><span class="pill green">Active</span></div>
+        <button class="btn quiet" style="min-height:48px">+ Add a medication</button>
+        <label class="f-label">Mobility</label>
+        <div class="chips" data-single>
+          <button class="chip sel">Walks with a stick</button>
+          <button class="chip">Wheelchair</button>
+          <button class="chip">Independent</button>
+        </div>
+        <label class="f-label">Languages Papa speaks</label>
+        <div class="chips">
+          <button class="chip sel">Tamil</button>
+          <button class="chip sel">English</button>
+          <button class="chip">Malay</button>
+        </div>
+        <label class="f-label">Emergency contacts</label>
+        <input class="f-input" value="Priya (daughter) · 9XXX XXXX" style="margin-bottom:8px">
+        <input class="f-input" value="Dr Menon, Pasir Ris Polyclinic · 6XXX XXXX">
+        <label class="f-label">Notes for any kaki</label>
+        <input class="f-input" value="Gets anxious with new faces — introduce slowly. Take the lift.">
+        <button class="btn" id="carePlanSave" data-done="✓ Care plan saved">Save care plan</button>
+      </section>
+
+      <section class="screen" id="cg-addkaki">
+        <div class="appbar">
+          <button class="back" data-go="cg-home" aria-label="Back">←</button>
+          <h1>Request a kaki<span class="sub">People Papa has already met — familiarity first</span></h1>
+        </div>
+        <div class="card tint"><p>After a first paired visit, you can ask for someone to join Papa's regulars. Seniors settle best with faces they know.</p></div>
+        <div class="li"><div class="face">RS</div><div class="body"><b>Mdm Rosnah, 64</b><span>Met Papa at the AAC craft morning · companionship, wellness · Malay + English</span></div><button class="chip" data-done="Requested ✓" style="min-height:44px">Request</button></div>
+        <div class="li"><div class="face">LW</div><div class="body"><b>Mr Lim Wee Kiat, 66</b><span>Vanguard chaperone pool · assisted Papa's discharge in May · Hokkien + English</span></div><button class="chip" data-done="Requested ✓" style="min-height:44px">Request</button></div>
+        <p style="font-size:.75rem;color:var(--slate);text-align:center;margin-top:10px">Requests go to the Kakis coordinator — first visit comes paired with Vanguard staff.</p>
+      </section>
+
+      <section class="screen" id="cg-service">
+        <div class="appbar">
+          <button class="back" data-go="cg-home" aria-label="Back">←</button>
+          <h1>What does Papa need?<span class="sub">Pick a service — timing comes next</span></h1>
+        </div>
+        <span class="stepper">Step 1 of 4</span>
+        <button class="bigcard" data-go="cg-when" data-svc="Chaperone"><span class="bc-ico">🚶</span><div><b>Chaperone</b><span>Clinic, market, errands · usually 2–3 hours</span></div></button>
+        <button class="bigcard" data-go="cg-when" data-svc="Companionship"><span class="bc-ico">☕</span><div><b>Companionship</b><span>Conversation, games, walks · 1–3 hours</span></div></button>
+        <button class="bigcard" data-go="cg-when" data-svc="Wellness check"><span class="bc-ico">🩺</span><div><b>Wellness check</b><span>Meals, meds, safety drop-in · about 1 hour</span></div></button>
+        <button class="bigcard" data-go="cg-when" data-svc="Household help"><span class="bc-ico">🧺</span><div><b>Household help</b><span>Light chores · 1–2 hours</span></div></button>
+        <div class="bigcard" style="opacity:.6;cursor:default"><span class="bc-ico">💊</span><div><b>Medicine administration</b><span>Tier 2 certified kakis only — <b style="color:var(--pandan)">ask about Tier 2</b></span></div></div>
+        <div class="helpline">Need help booking? Call <b>Pasir Ris ICCP · 6XXX XXXX</b></div>
+      </section>
+
+      <section class="screen" id="cg-when">
+        <div class="appbar">
+          <button class="back" data-go="cg-service" aria-label="Back">←</button>
+          <h1>When do you need it?<span class="sub" id="svcEcho">Chaperone · usually 2–3 hours</span></h1>
+        </div>
+        <span class="stepper">Step 2 of 4</span>
+        <button class="tier urgent" data-go="cg-crisis" data-tier="urgent"><div><b>Urgent — need someone now</b><span>A crisis or something sudden</span></div><span class="t-eta">next<br>30–60 min</span></button>
+        <button class="tier soon" data-go="cg-crisis" data-tier="soon"><div><b>Soon — something's come up</b><span>Within the next 2 hours</span></div><span class="t-eta">within<br>2 hrs</span></button>
+        <button class="tier planned" data-go="cg-details" data-tier="planned"><div><b>Planned — book ahead</b><span>Pick a date, or make it repeat</span></div><span class="t-eta">this week<br>or later</span></button>
+        <div class="helpline">Need help booking? Call <b>Pasir Ris ICCP · 6XXX XXXX</b></div>
       </section>
 
       <section class="screen" id="cg-crisis">
         <div class="appbar">
-          <button class="back" data-go="cg-home" aria-label="Back">←</button>
-          <h1>What happened?<span class="sub">Kakis is built for the moments care plans break</span></h1>
+          <button class="back" data-go="cg-when" aria-label="Back">←</button>
+          <h1>What happened?<span class="sub">So the right help comes ready</span></h1>
         </div>
+        <span class="stepper">Step 2 of 4 · urgent</span>
+        <div class="eyebrow-sm">Most common in Pasir Ris</div>
         <div class="trigger-grid" id="triggerGrid">
-          <button class="trigger" data-trig="Helper left suddenly"><span class="t-ico">🧳</span><b>Helper left suddenly</b><span>Bridging care for 1–2 weeks while you find a replacement</span></button>
-          <button class="trigger" data-trig="Spouse hospitalised"><span class="t-ico">🏥</span><b>Spouse hospitalised</b><span>One parent in hospital, the other now alone at home</span></button>
-          <button class="trigger" data-trig="Discharge, no plan"><span class="t-ico">🛏️</span><b>Discharge, no plan</b><span>Coming home from hospital and nobody's ready</span></button>
-          <button class="trigger" data-trig="Sudden decline"><span class="t-ico">📉</span><b>Sudden decline</b><span>A fall, surgery or illness — weeks of extra help needed</span></button>
-          <button class="trigger" data-trig="Loss of a spouse"><span class="t-ico">🕊️</span><b>Loss of a spouse</b><span>Steady presence through the hardest months</span></button>
-          <button class="trigger" data-trig="My own emergency"><span class="t-ico">🆘</span><b>My own emergency</b><span>You're unwell or called away — someone trusted steps in</span></button>
+          <button class="trigger pinned" data-trig="Helper left suddenly"><span class="t-ico">🧳</span><b>Helper left suddenly</b><span>Bridging care while you find a replacement</span></button>
+          <button class="trigger pinned" data-trig="Spouse hospitalised"><span class="t-ico">🏥</span><b>Spouse hospitalised</b><span>One parent in hospital, the other alone</span></button>
+          <button class="trigger pinned" data-trig="My own emergency"><span class="t-ico">🆘</span><b>My own emergency</b><span>You're unwell or called away</span></button>
+          <button class="trigger" data-trig="Discharge, no plan"><span class="t-ico">🛏️</span><b>Discharge, no plan</b><span>Coming home and nobody's ready</span></button>
+          <button class="trigger" data-trig="Sudden decline"><span class="t-ico">📉</span><b>Sudden decline</b><span>A fall, surgery or illness</span></button>
+          <button class="trigger" data-trig="Loss of a spouse"><span class="t-ico">🕊️</span><b>Loss of a spouse</b><span>Steady presence through hard months</span></button>
         </div>
+        <button class="li" id="notSure" style="margin-top:10px"><div class="face gold">📞</div><div class="body"><b>Not sure — talk to someone</b><span>Call the Pasir Ris ICCP coordinator · 6XXX XXXX</span></div></button>
         <button class="btn gold" id="crisisNext" data-go="cg-details" disabled>Continue</button>
-        <p style="font-size:.72rem;color:var(--slate);text-align:center;margin-top:10px">Not urgent? <button data-go="cg-details" data-mode="planned" style="border:0;background:none;color:var(--pandan);font-weight:700;font-size:.72rem;text-decoration:underline">Book a planned visit instead</button></p>
       </section>
 
       <section class="screen" id="cg-details">
         <div class="appbar">
-          <button class="back" data-go="cg-crisis" aria-label="Back">←</button>
-          <h1>What does Papa need?<span class="sub" id="trigEcho">Helper left suddenly · bridging care</span></h1>
+          <button class="back" data-go="cg-when" aria-label="Back">←</button>
+          <h1>The details<span class="sub" id="trigEcho">Chaperone · Helper left suddenly</span></h1>
+        </div>
+        <span class="stepper">Step 3 of 4</span>
+
+        <div id="urgentWhen">
+          <label class="f-label">Arrival window <small>· set by urgency, tap to adjust</small></label>
+          <div class="chips" data-single>
+            <button class="chip sel" id="urgentWindow">Today, within the hour</button>
+            <button class="chip">Today, 2–5pm</button>
+          </div>
         </div>
 
-        <label class="f-label">Task type</label>
-        <div class="chips" data-single>
-          <button class="chip sel">Chaperone</button>
-          <button class="chip">Wellness check</button>
-          <button class="chip">Companionship</button>
-          <button class="chip">Household help</button>
-          <button class="chip locked">Medicine admin 🔒</button>
-        </div>
-
-        <label class="f-label">When</label>
-        <div class="chips" data-single>
-          <button class="chip sel">Today, 2–5pm</button>
-          <button class="chip">Tomorrow am</button>
-          <button class="chip">Pick a date…</button>
-          <button class="chip">Every Wednesday</button>
+        <div id="plannedWhen" style="display:none">
+          <label class="f-label">Pick a date</label>
+          <div class="cal">
+            <div class="cal-head"><span>July 2026</span><span class="mono" style="font-size:.7rem;color:var(--slate)">‹ ›</span></div>
+            <div class="cal-grid">
+              <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+              <button class="dim">13</button><button>14</button><button>15</button><button>16</button><button>17</button><button>18</button><button>19</button>
+              <button>20</button><button class="sel">21</button><button>22</button><button>23</button><button>24</button><button>25</button><button>26</button>
+              <button>27</button><button>28</button><button>29</button><button>30</button><button>31</button><button class="dim">1</button><button class="dim">2</button>
+            </div>
+          </div>
+          <div class="chips" style="margin-top:10px" data-single>
+            <button class="chip sel">One time</button>
+            <button class="chip">Repeats weekly</button>
+          </div>
         </div>
 
         <label class="f-label">Language with Papa <small>· seniors settle faster in their own language</small></label>
@@ -404,6 +469,8 @@ button.li:hover{border-color:var(--pandan)}
 
         <label class="f-label">Anything the kaki should know?</label>
         <input class="f-input" value="Walks with a stick. Gets anxious with new faces — introduce slowly.">
+
+        <div class="card tint" style="margin-top:14px"><p><b>From Papa's care plan:</b> Metformin at 2pm · take the lift, not the stairs. If this visit is with someone new to Papa, a Vanguard care staff comes along automatically.</p></div>
 
         <button class="btn gold" data-go="cg-matching">Find Papa's kaki</button>
       </section>
@@ -419,37 +486,76 @@ button.li:hover{border-color:var(--pandan)}
       <section class="screen" id="cg-matched">
         <div class="appbar">
           <button class="back" data-go="cg-details" aria-label="Back">←</button>
-          <h1>Halimah can come<span class="sub">Today, 2:00–5:00pm · confirmed availability</span></h1>
+          <h1 id="matchHead">Halimah can come<span class="sub">Confirmation expected in ~15 minutes (urgent)</span></h1>
         </div>
+        <span class="stepper">Step 4 of 4</span>
 
-        <div class="kakipass">
-          <div class="kp-top">
-            <div class="kp-face">HM</div>
-            <div>
-              <h3>Mdm Halimah</h3>
-              <div class="kp-sub">Chaperone & companionship · Pasir Ris</div>
-              <div class="kp-meta"><span>Tier 1 · Chaperone-ready</span><span>Speaks Tamil</span><span>CPR certified</span></div>
+        <div id="matchAvail">
+          <div class="kakipass">
+            <div class="kp-top">
+              <div class="kp-face">HM</div>
+              <div>
+                <h3>Mdm Halimah</h3>
+                <div class="kp-sub">Chaperone & companionship · Pasir Ris</div>
+                <div class="kp-meta"><span>Tier 1 · Chaperone-ready</span><span>Speaks Tamil</span><span>CPR certified</span></div>
+              </div>
             </div>
+            <div class="kp-consist">Papa knows her — <b>6 visits together</b> since May. No re-introduction needed.</div>
+            <div class="kp-id">KAKI-PR04-0117 · CERT VERIFIED BY VANGUARD · SHOW THIS PASS TO PAPA</div>
           </div>
-          <div class="kp-consist">Papa knows her — <b>6 visits together</b> since May. No re-introduction needed.</div>
-          <div class="kp-id">KAKI-PR04-0117 · CERT VERIFIED BY VANGUARD · SHOW THIS PASS TO PAPA</div>
+          <div class="li"><div class="face">KT</div><div class="body"><b>Backup: Mr Koh Teck Seng</b><span>If Halimah can't make it — Papa has met him twice at the AAC</span></div><span class="pill grey">Standby</span></div>
         </div>
 
-        <div class="eyebrow-sm">What you pay</div>
+        <div id="matchUnavail" style="display:none">
+          <div class="card" style="border-color:var(--marigold)">
+            <h3>Halimah is on another visit until 4pm</h3>
+            <p>Next best: <b>Mr Koh Teck Seng</b> — Papa has met him twice at the AAC. Or wait for Halimah at 4:15pm.</p>
+            <button class="btn quiet" style="margin-top:10px;min-height:48px">Choose Mr Koh</button>
+            <button class="btn ghost" style="min-height:48px">Wait for Halimah, 4:15pm</button>
+          </div>
+        </div>
+
+        <button class="btn" data-go="cg-confirm">Continue to payment</button>
+        <button class="btn ghost" id="unavailToggle">Demo: show the unavailable path</button>
+      </section>
+
+      <section class="screen" id="cg-confirm">
+        <div class="appbar">
+          <button class="back" data-go="cg-matched" aria-label="Back">←</button>
+          <h1>Confirm & pay<span class="sub">Halimah · today, 3 hours · chaperone</span></h1>
+        </div>
+
         <div class="stack">
           <div class="s-row"><span>Visit rate · 3 hrs × $28<span class="who">Standard chaperone rate</span></span><span class="amt">$84.00</span></div>
-          <div class="s-row minus"><span>Community care subsidy<span class="who">Vanguard healthcare fund · crisis activation</span></span><span class="amt">− $45.00</span></div>
+          <div class="s-row minus"><span>Community care subsidy<span class="who">Vanguard healthcare fund · urgent activation</span></span><span class="amt">− $45.00</span></div>
           <div class="s-row minus"><span>Foundation top-up<span class="who">Philanthropic pool · means-tested</span></span><span class="amt">− $12.00</span></div>
           <div class="s-row total"><span>You pay</span><span class="amt">$27.00</span></div>
         </div>
 
-        <button class="btn" data-go="cg-tracking">Confirm booking</button>
-        <button class="btn ghost" data-go="cg-details">Change details</button>
+        <details class="disc">
+          <summary>Why this price?</summary>
+          <p>The full visit costs $84. Vanguard's community healthcare fund covers $45 because this is an urgent activation. A philanthropic foundation adds $12 based on the household's means-test band. You pay the remainder. Nothing is hidden — every payer is on the receipt.</p>
+        </details>
+
+        <label class="f-label">Pay with</label>
+        <div class="chips" data-single>
+          <button class="chip sel">PayNow</button>
+          <button class="chip">Linked card ··4471</button>
+          <button class="chip">Bill my ICCP account</button>
+        </div>
+
+        <div class="card tint" style="margin-top:14px"><p><b>Cancellation:</b> free up to 2 hours before the visit. Urgent bookings: $10 if cancelled after a kaki is on the way.</p></div>
+
+        <button class="btn gold" data-go="cg-tracking">Confirm booking · $27.00</button>
       </section>
 
       <section class="screen" id="cg-tracking">
         <div class="appbar">
           <h1>Today's visit<span class="sub">Halimah with Papa · 2:00–5:00pm</span></h1>
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <button class="btn quiet" style="margin:0;min-height:48px">💬 Message Halimah</button>
+          <button class="btn quiet" style="margin:0;min-height:48px">📞 Call (masked)</button>
         </div>
         <ul class="tl">
           <li class="done"><div><b>Booking confirmed</b><span>Halimah accepted. Papa's care plan shared with her.</span><span class="t-time">11:02</span></div></li>
@@ -457,16 +563,36 @@ button.li:hover{border-color:var(--pandan)}
           <li class="now"><div><b>With Papa now</b><span>"Uncle recognised me straight away lah. We're off to the market, then his 2pm meds."</span><span class="t-time">14:07</span></div></li>
           <li><div><b>Visit report</b><span>You'll get a written note when the visit ends.</span></div></li>
         </ul>
-        <div class="card tint">
-          <h3>2pm medication reminder</h3>
-          <p>Halimah has Papa's medication checklist. She'll confirm in the visit report — you don't need to call.</p>
-        </div>
+        <div class="mapph">Live map tracking — coming in Beta</div>
+        <button class="li"><div class="face gold">⚠</div><div class="body"><b>Running late or a problem?</b><span>Escalate to the Vanguard coordinator — they'll call you back in minutes</span></div></button>
         <button class="btn ghost" data-go="cg-report">Skip ahead: see the visit report →</button>
+      </section>
+
+      <section class="screen" id="cg-visits">
+        <div class="appbar">
+          <h1>Visits<span class="sub">Active and past visits for Papa</span></h1>
+        </div>
+        <div class="seg" data-seggroup="visits">
+          <button class="on" data-pane="visits-active">Active</button>
+          <button data-pane="visits-history">History</button>
+        </div>
+        <div class="segpane on" id="visits-active">
+          <button class="li" data-go="cg-tracking"><div class="face gold">●</div><div class="body"><b>Chaperone — happening now</b><span>Halimah with Papa · 2:00–5:00pm · market + meds</span></div><span class="pill gold">Live</span></button>
+          <div class="li"><div class="face">Tu</div><div class="body"><b>Polyclinic escort — Tue 9:30am</b><span>Halimah · 2 hrs · confirmed</span></div><span class="pill green">Booked</span></div>
+        </div>
+        <div class="segpane" id="visits-history">
+          <div class="chips" style="margin-bottom:10px">
+            <button class="chip sel">All</button><button class="chip">Halimah</button><button class="chip">This month</button>
+          </div>
+          <button class="li" data-go="cg-report"><div class="face">HM</div><div class="body"><b>Chaperone — Fri 4 Jul</b><span>Halimah · market trip · meds ✓ · report available</span></div></button>
+          <div class="li"><div class="face">KT</div><div class="body"><b>Wellness check — Wed 2 Jul</b><span>Mr Koh · meals ✓ meds ✓ · report available</span></div></div>
+          <div class="li"><div class="face">HM</div><div class="body"><b>Companionship — Fri 27 Jun</b><span>Halimah · mahjong afternoon · report available</span></div></div>
+        </div>
       </section>
 
       <section class="screen" id="cg-report">
         <div class="appbar">
-          <button class="back" data-go="cg-home" aria-label="Back">←</button>
+          <button class="back" data-go="cg-visits" aria-label="Back">←</button>
           <h1>Visit report<span class="sub">Halimah · today, 2:00–5:05pm</span></h1>
         </div>
         <div class="card">
@@ -476,139 +602,257 @@ button.li:hover{border-color:var(--pandan)}
           <div class="row"><span class="pill green">Meds taken ✓</span><span class="pill green">Meal eaten ✓</span><span class="pill grey">Mood: cheerful</span></div>
         </div>
         <div class="card tint">
-          <h3>Private care note to Kakis</h3>
-          <p>Anything our care team should know? This goes to a care coordinator — <b>never</b> to a public rating.</p>
-          <input class="f-input" style="margin-top:10px" placeholder="e.g. Papa seemed tired after the walk…">
+          <h3>Private care note</h3>
+          <p>Goes to the Kakis care team and Vanguard — never a public rating.</p>
+          <div class="chips" style="margin-top:10px">
+            <button class="chip">Tired after walk</button>
+            <button class="chip">Refused meds</button>
+            <button class="chip">Fall concern</button>
+            <button class="chip">New confusion</button>
+            <button class="chip sel">All fine</button>
+          </div>
+          <input class="f-input" style="margin-top:10px" placeholder="Anything else the care team should know…">
         </div>
-        <button class="btn" data-go="cg-details">Book Halimah again</button>
+        <button class="btn" id="makeRegular" data-done="✓ Halimah is a regular · repeats Tuesdays">Make Halimah a regular + repeat every Tuesday</button>
         <button class="btn ghost" data-go="cg-home">Done</button>
       </section>
 
       <!-- ============================================================
-           RESPITE GIVER JOURNEY  (Mdm Tan Bee Lian, 62 — early retiree)
+           ELDERLY SELF-BOOK (Mr Nathan) — low density, large targets
            ============================================================ -->
 
-      <section class="screen" id="rg-welcome">
+      <section class="screen nonav" id="eb-need">
+        <div class="langrow" role="group" aria-label="Language">
+          <button class="on">EN</button><button>中文</button><button>Melayu</button><button>தமிழ்</button>
+        </div>
+        <div class="appbar">
+          <button class="back" data-go="land" aria-label="Back">←</button>
+          <h1 style="font-size:1.5rem">What do you need?</h1>
+        </div>
+        <button class="bigcard xl" data-go="eb-when"><span class="bc-ico">🚶</span><div><b>Someone to go with me</b><span>Clinic, market, or an outing</span></div></button>
+        <button class="bigcard xl" data-go="eb-when"><span class="bc-ico">🏠</span><div><b>Someone to visit me</b><span>Company at home</span></div></button>
+        <button class="bigcard xl" data-go="eb-when"><span class="bc-ico">🧺</span><div><b>Help at home</b><span>Small chores</span></div></button>
+        <button class="bigcard xl" id="ebCall"><span class="bc-ico">📞</span><div><b>I'm not sure — call me</b><span>The centre will ring you today</span></div></button>
+        <div class="helpline">Or call the centre: <b>6XXX XXXX</b></div>
+      </section>
+
+      <section class="screen nonav" id="eb-when">
+        <div class="appbar">
+          <button class="back" data-go="eb-need" aria-label="Back">←</button>
+          <h1 style="font-size:1.5rem">When?</h1>
+        </div>
+        <button class="bigcard xl" data-go="eb-done"><span class="bc-ico">☀️</span><div><b>Today</b></div></button>
+        <button class="bigcard xl" data-go="eb-done"><span class="bc-ico">🌤️</span><div><b>Tomorrow</b></div></button>
+        <button class="bigcard xl" data-go="eb-done"><span class="bc-ico">🗓️</span><div><b>Pick a day</b></div></button>
+        <div class="helpline">Or call the centre: <b>6XXX XXXX</b></div>
+      </section>
+
+      <section class="screen nonav" id="eb-done">
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center">
+          <div style="width:92px;height:92px;border-radius:50%;background:var(--marigold);color:var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:1.8rem;margin:0 auto 16px">HM</div>
+          <h1 style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;margin-bottom:10px">Halimah is coming</h1>
+          <p style="font-size:1.05rem;color:var(--slate);line-height:1.6;max-width:280px;margin:0 auto">You know her — she has visited you before.<br><b style="color:var(--pandan)">She will call you before she comes.</b></p>
+          <p style="font-size:.9rem;color:var(--slate);margin-top:18px">The cost goes to your family / ICCP account.<br>You don't need to pay anything now.</p>
+        </div>
+        <button class="btn" data-go="eb-need" style="min-height:56px;font-size:1.05rem">Done</button>
+        <div class="helpline">Questions? Call the centre: <b>6XXX XXXX</b></div>
+      </section>
+
+      <!-- ============================================================
+           RESPITE GIVER (Mdm Tan) — auth, prefs, tasks, OTP, profile
+           ============================================================ -->
+
+      <section class="screen nonav" id="rg-start">
         <div style="flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:0 8px">
           <div style="font-size:3rem;margin-bottom:14px">🤝</div>
           <h1 style="font-family:'Fraunces',serif;font-size:1.7rem;font-weight:600;line-height:1.2;margin-bottom:12px">Be somebody's kaki</h1>
-          <p style="font-size:.9rem;color:var(--slate);line-height:1.6;margin-bottom:8px">Families in Pasir Ris need a trusted hand when a crisis hits — a hospital visit, a helper gone, a spouse in decline.</p>
-          <p style="font-size:.9rem;color:var(--slate);line-height:1.6">Train free with Vanguard. Help on your own schedule. Earn while you're at it.</p>
-          <div class="chips" style="justify-content:center;margin-top:18px">
-            <span class="pill green">Free certified training</span>
-            <span class="pill gold">$10–12/hr + transport</span>
-            <span class="pill green">You choose your hours</span>
-          </div>
+          <p style="font-size:.95rem;color:var(--slate);line-height:1.6">Help a Pasir Ris family. Train free with Vanguard.<br>Choose your own hours.</p>
         </div>
-        <button class="btn" data-go="rg-skills">Start onboarding</button>
-        <p style="font-size:.7rem;color:var(--slate);text-align:center;margin-top:10px">Identity is verified with Singpass. Training is run by Vanguard, certified at St. Luke's Hospital.</p>
+        <button class="btn" data-go="rg-phone">New member — Sign up</button>
+        <button class="btn ghost" data-go="rg-home">Already a member — Sign in</button>
+        <p style="font-size:.72rem;color:var(--slate);text-align:center;margin-top:10px">Identity verified with Singpass · training certified at St. Luke's Hospital</p>
       </section>
 
-      <section class="screen" id="rg-skills">
+      <section class="screen nonav" id="rg-phone">
         <div class="appbar">
-          <button class="back" data-go="rg-welcome" aria-label="Back">←</button>
-          <h1>What can you help with?<span class="sub">Pick what suits you — each skill has its own short training</span></h1>
+          <button class="back" data-go="rg-start" aria-label="Back">←</button>
+          <h1>Your mobile number<span class="sub">This is your Kakis ID — we'll send a code</span></h1>
         </div>
-        <div class="li" style="border-color:var(--pandan);"><div class="face">🚶</div><div class="body"><b>Chaperone</b><span>Accompany a senior to the polyclinic, market or a meal out</span></div><span class="pill green">Selected ✓</span></div>
-        <div class="li" style="border-color:var(--pandan);"><div class="face">☕</div><div class="body"><b>Companionship</b><span>Conversation, games, a walk — steady presence for 1–3 hours</span></div><span class="pill green">Selected ✓</span></div>
-        <button class="li" id="skillToggle"><div class="face">🩺</div><div class="body"><b>Wellness checks</b><span>Drop in to confirm meals, meds and safety</span></div><span class="pill grey">Tap to add</span></button>
-        <div class="li" style="opacity:.7"><div class="face">💊</div><div class="body"><b>Medicine administration</b><span>Needs the clinical module — unlocks after Tier 1</span></div><span class="pill clay">🔒 Tier 2</span></div>
-        <div class="li" style="opacity:.7"><div class="face">🧠</div><div class="body"><b>Dementia care</b><span>Needs Vanguard's dementia module — unlocks after Tier 1</span></div><span class="pill clay">🔒 Tier 2</span></div>
+        <input class="f-input" value="+65 9XXX XXXX" style="font-size:1.1rem;text-align:center">
+        <div class="otp" id="otpBoxes" aria-label="One-time code"><span></span><span></span><span></span><span></span></div>
+        <button class="btn" id="otpBtn">Send code</button>
+        <p style="font-size:.75rem;color:var(--slate);text-align:center;margin-top:8px">Demo: the code fills itself.</p>
+      </section>
+
+      <section class="screen nonav" id="rg-singpass">
+        <div class="appbar">
+          <button class="back" data-go="rg-phone" aria-label="Back">←</button>
+          <h1>Verify with Singpass<span class="sub">Kakis asks Myinfo for exactly this — nothing more</span></h1>
+        </div>
+        <div class="card" style="border-color:#B0322B;border-width:2px">
+          <div class="row"><h3 class="grow" style="color:#B0322B">Singpass · Myinfo</h3><span class="mono" style="font-size:.68rem;color:var(--slate)">MOCK</span></div>
+          <p style="margin-top:6px"><b>Kakis (Vanguard Pasir Ris pilot)</b> requests:</p>
+          <div class="divider"></div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:.78rem;line-height:2.1">
+            ✓ Name (NRIC-verified)<br>
+            ✓ Date of birth<br>
+            ✓ Registered address<br>
+            ✗ Income, CPF, health records — <b>not requested</b>
+          </div>
+          <div class="divider"></div>
+          <p style="font-size:.78rem">Used only to verify who you are before you visit seniors. Never shared with families.</p>
+        </div>
+        <button class="btn" data-go="rg-email">Allow and continue</button>
+        <button class="btn ghost" data-go="rg-start">Decline</button>
+      </section>
+
+      <section class="screen nonav" id="rg-email">
+        <div class="appbar">
+          <button class="back" data-go="rg-singpass" aria-label="Back">←</button>
+          <h1>Your email<span class="sub">Singpass doesn't share this — we need it for receipts and training letters</span></h1>
+        </div>
+        <input class="f-input" value="beelian.tan@gmail.com" type="email">
+        <button class="btn" data-go="rg-services">Continue</button>
+      </section>
+
+      <section class="screen nonav" id="rg-services">
+        <div class="appbar">
+          <button class="back" data-go="rg-email" aria-label="Back">←</button>
+          <h1>What can you help with?<span class="sub">Same services families book — each has short training</span></h1>
+        </div>
+        <div class="li" style="border-color:var(--pandan)"><div class="face">🚶</div><div class="body"><b>Chaperone</b><span>Clinic, market, errands · 2–3 hrs</span></div><span class="pill green">Selected ✓</span></div>
+        <div class="li" style="border-color:var(--pandan)"><div class="face">☕</div><div class="body"><b>Companionship</b><span>Conversation, games, walks · 1–3 hrs</span></div><span class="pill green">Selected ✓</span></div>
+        <button class="li" id="skillToggle"><div class="face">🩺</div><div class="body"><b>Wellness checks</b><span>Meals, meds, safety drop-ins · ~1 hr</span></div><span class="pill grey">Tap to add</span></button>
+        <button class="li"><div class="face">🧺</div><div class="body"><b>Household help</b><span>Light chores · 1–2 hrs</span></div><span class="pill grey">Tap to add</span></button>
+        <div class="li" style="opacity:.7"><div class="face">💊</div><div class="body"><b>Medicine administration</b><span>Clinical module required</span></div><span class="pill clay">🔒 Tier 2</span></div>
+        <button class="btn" data-go="rg-prefs">Continue</button>
+      </section>
+
+      <section class="screen nonav" id="rg-prefs">
+        <div class="appbar">
+          <button class="back" data-go="rg-services" aria-label="Back">←</button>
+          <h1>Your preferences<span class="sub">Editable any time in your profile</span></h1>
+        </div>
+        <label class="f-label">Languages you speak</label>
+        <div class="chips">
+          <button class="chip sel">English</button><button class="chip sel">Tamil</button><button class="chip">Mandarin</button><button class="chip">Hokkien</button><button class="chip">Malay</button>
+        </div>
+        <label class="f-label">Days & times</label>
+        <div class="chips">
+          <button class="chip sel">Weekday mornings</button><button class="chip sel">Weekday afternoons</button><button class="chip">Evenings</button><button class="chip">Weekends</button>
+        </div>
+        <label class="f-label">Your area <small>· pilot covers Pasir Ris</small></label>
+        <div class="chips" data-single>
+          <button class="chip sel">Pasir Ris (near Blk 400s)</button><button class="chip">Anywhere in Pasir Ris</button>
+        </div>
+        <label class="f-label">Willing to travel to</label>
+        <div class="chips" data-single>
+          <button class="chip sel">Within Pasir Ris</button><button class="chip">Neighbouring estates</button>
+        </div>
         <button class="btn" data-go="rg-training">Continue to training</button>
       </section>
 
       <section class="screen" id="rg-training">
         <div class="appbar">
-          <button class="back" data-go="rg-skills" aria-label="Back">←</button>
-          <h1>Your training path<span class="sub">Run by Vanguard · free of charge · Tier 1 unlocks visits</span></h1>
+          <button class="back" data-go="rg-profile" aria-label="Back">←</button>
+          <h1>Training<span class="sub">Run by Vanguard · free · Tier 1 unlocks visits</span></h1>
         </div>
-        <div class="card tint">
-          <div class="row"><h3 class="grow">Tier 1 — Chaperone-ready</h3><span class="mono" style="font-size:.72rem">3 of 4 done</span></div>
-          <div class="progress"><i style="width:75%"></i></div>
+        <div class="seg" data-seggroup="train">
+          <button class="on" data-pane="train-done">Done</button>
+          <button data-pane="train-prog">In progress</button>
+          <button data-pane="train-cert">Certificates</button>
         </div>
-        <div class="li"><div class="face">❤️</div><div class="body"><b>CPR + AED</b><span>External certification · St. Luke's Hospital · half day</span></div><span class="pill green">Passed ✓</span></div>
-        <div class="li"><div class="face">🦯</div><div class="body"><b>Mobility assistance</b><span>Wheelchair, walking frames, safe transfers · half day, in-house</span></div><span class="pill green">Passed ✓</span></div>
-        <div class="li"><div class="face">🗣️</div><div class="body"><b>Working with seniors</b><span>First introductions, dialects, when to call for help · SOPs</span></div><span class="pill green">Passed ✓</span></div>
-        <div class="li" style="border-color:var(--marigold)"><div class="face gold">👥</div><div class="body"><b>Shadow visit with Vanguard staff</b><span>Your first real visit, alongside a care staff — Thu 16 Jul, 10am, Pasir Ris SCC</span></div><span class="pill gold">Booked</span></div>
-        <div class="li" style="opacity:.7"><div class="face">🧠</div><div class="body"><b>Dementia basics (Tier 2)</b><span>Typical behaviours, interaction techniques · unlocks dementia visits</span></div><span class="pill grey">After Tier 1</span></div>
-        <button class="btn" data-go="rg-wallet">View my certification wallet</button>
+        <div class="segpane on" id="train-done">
+          <div class="li"><div class="face">❤</div><div class="body"><b>CPR + AED</b><span>External cert · St. Luke's Hospital · half day</span></div><span class="pill green">Passed ✓</span></div>
+          <div class="li"><div class="face">🦽</div><div class="body"><b>Mobility assistance</b><span>Wheelchair, frames, safe transfers · half day, in-house</span></div><span class="pill green">Passed ✓</span></div>
+          <div class="li"><div class="face">💬</div><div class="body"><b>Working with seniors</b><span>First introductions, dialects, SOPs</span></div><span class="pill green">Passed ✓</span></div>
+        </div>
+        <div class="segpane" id="train-prog">
+          <div class="li" style="border-color:var(--marigold)"><div class="face gold">👥</div><div class="body"><b>Shadow visit with Vanguard staff</b><span>Your first real visit, alongside care staff — Thu, 10am, Pasir Ris SCC</span></div><span class="pill gold">Booked</span></div>
+        </div>
+        <div class="segpane" id="train-cert">
+          <div class="li"><div class="body"><b>CPR + AED (VCRF EAD)</b><span class="mono">STL-2026-8841 · expires Jul 2028</span></div><span class="pill green">Valid</span></div>
+          <div class="li"><div class="body"><b>Mobility assistance</b><span class="mono">VGD-MOB-3307 · Vanguard in-house</span></div><span class="pill green">Valid</span></div>
+          <div class="li"><div class="body"><b>Working with seniors + SOPs</b><span class="mono">VGD-SOP-3308 · Vanguard in-house</span></div><span class="pill green">Valid</span></div>
+          <div class="card tint" style="margin-top:8px"><h3>Tier 2 within reach</h3><p>Complete dementia basics to unlock dementia-care visits — higher rate. Pasir Ris needs 5 more Tier 2 kakis.</p></div>
+        </div>
+        <button class="btn" data-go="rg-home">Go to my visits</button>
       </section>
 
-      <section class="screen" id="rg-wallet">
+      <section class="screen" id="rg-home">
         <div class="appbar">
-          <button class="back" data-go="rg-training" aria-label="Back">←</button>
-          <h1>Certification wallet<span class="sub">What families and Vanguard see about you</span></h1>
+          <h1>Your upcoming visits<span class="sub">Bee Lian · Pasir Ris · Tier 1</span></h1>
+          <button class="avatar-btn" data-go="rg-profile" aria-label="Profile">TB</button>
         </div>
-        <div class="kakipass">
-          <div class="kp-top">
-            <div class="kp-face">TB</div>
-            <div>
-              <h3>Mdm Tan Bee Lian</h3>
-              <div class="kp-sub">Respite giver · Pasir Ris sub-region</div>
-              <div class="kp-meta"><span>Tier 1 · pending shadow visit</span><span>Chaperone</span><span>Companionship</span></div>
-            </div>
-          </div>
-          <div class="kp-consist">One step left: your <b>shadow visit</b> on Thu 16 Jul. After that, you'll appear in family matches.</div>
-          <div class="kp-id">KAKI-PR04-0212 · SINGPASS VERIFIED · TRAINING BY VANGUARD</div>
+        <button class="li" data-go="rg-visit"><div class="face gold">⚡</div><div class="body"><b>Today 2:00–5:00pm · Chaperone · $36</b><span>Mr Nathan, 78 · Pasir Ris Dr 4 · urgent cover</span></div><span class="pill gold">Today</span></button>
+        <button class="li" data-go="rg-visit"><div class="face">Tu</div><div class="body"><b>Tue 9:30–11:30am · Polyclinic escort · $24</b><span>Mr Nathan · Pasir Ris Polyclinic</span></div></button>
+        <button class="li" data-go="rg-visit"><div class="face">We</div><div class="body"><b>Wed 3:00–5:00pm · Companionship · $22</b><span>Mr Silva, 76 · Elias Rd · repeats weekly</span></div><span class="pill green">Weekly</span></button>
+        <div class="card tint" style="margin-top:6px">
+          <div class="row"><div class="grow"><h3>July so far</h3><p>27 hours · $318.40 earned</p></div><button class="chip" data-go="rg-impact" style="min-height:44px">Impact →</button></div>
         </div>
-        <div class="eyebrow-sm">Certificates</div>
-        <div class="li"><div class="body"><b>CPR + AED (VCRF EAD)</b><span class="mono">STL-2026-8841 · St. Luke's Hospital · expires Jul 2028</span></div><span class="pill green">Valid</span></div>
-        <div class="li"><div class="body"><b>Mobility assistance</b><span class="mono">VGD-MOB-3307 · Vanguard in-house · no expiry</span></div><span class="pill green">Valid</span></div>
-        <div class="li"><div class="body"><b>Working with seniors + SOPs</b><span class="mono">VGD-SOP-3308 · Vanguard in-house</span></div><span class="pill green">Valid</span></div>
-        <button class="btn" data-go="rg-jobs">See available visits</button>
       </section>
 
-      <section class="screen" id="rg-jobs">
+      <section class="screen" id="rg-available">
         <div class="appbar">
-          <h1>Visits near you<span class="sub">Matched to your skills · Pasir Ris sub-region</span></h1>
+          <h1>Available asks<span class="sub">Filtered to your services, languages and times</span></h1>
         </div>
-        <div class="card tint">
-          <div class="row"><h3 class="grow">Your regulars</h3></div>
-          <p>Families you've helped before see you first — seniors settle best with a face they know.</p>
+        <div class="chips" style="margin-bottom:10px">
+          <button class="chip sel">Chaperone ✓</button><button class="chip sel">Companionship ✓</button><button class="chip sel">Tamil · English</button><button class="chip" data-go="rg-profile">Edit prefs</button>
         </div>
-        <button class="li" data-go="rg-job">
-          <div class="face gold">⚡</div>
-          <div class="body"><b>Crisis · Chaperone, today 2–5pm</b><span>Mr Nathan, 78 · Pasir Ris Dr 4 · <b style="color:var(--pandan)">you've visited him 6 times</b> · Tamil</span></div>
-          <div class="end"><span class="pill gold">$36 + transport</span></div>
-        </button>
-        <button class="li" data-go="rg-job">
-          <div class="face">🚶</div>
-          <div class="body"><b>Polyclinic escort, Tue 9:30am</b><span>Mdm Chua, 81 · Pasir Ris St 11 · first visit — paired with Vanguard staff</span></div>
-          <div class="end"><span class="pill grey">$24 + transport</span></div>
-        </button>
-        <button class="li" data-go="rg-job">
-          <div class="face">☕</div>
-          <div class="body"><b>Companionship, every Wed 3–5pm</b><span>Mr Silva, 76 · Elias Rd · recurring weekly · mahjong kaki wanted · English</span></div>
-          <div class="end"><span class="pill grey">$22 + transport</span></div>
-        </button>
-        <p style="font-size:.72rem;color:var(--slate);text-align:center;margin-top:8px">You only see visits that match your certifications and language.</p>
+        <div class="seg" data-seggroup="avail">
+          <button class="on" data-pane="avail-now">Now · near you</button>
+          <button data-pane="avail-future">Coming up</button>
+        </div>
+        <div class="segpane on" id="avail-now">
+          <div class="card tint" style="margin-bottom:10px"><p><b>Within 30 minutes, within 1 km</b> — geofenced so you can actually make it.</p></div>
+          <button class="li" data-go="rg-visit"><div class="face gold">⚡</div><div class="body"><b>Now · Wellness check · 1 hr · $14</b><span>Mdm Wong, 83 · Blk 442 (650m away) · helper away today</span></div><span class="pill gold">30 min</span></button>
+        </div>
+        <div class="segpane" id="avail-future">
+          <button class="li" data-go="rg-visit"><div class="face">Th</div><div class="body"><b>Thu 10am–12pm · Chaperone · $24</b><span>Mdm Chua, 81 · dental, Pasir Ris Central · first visit — paired with staff</span></div></button>
+          <button class="li" data-go="rg-visit"><div class="face">Fr</div><div class="body"><b>Fri 2–4pm · Companionship · $22</b><span>Mr Silva, 76 · mahjong kaki wanted · English</span></div></button>
+        </div>
       </section>
 
-      <section class="screen" id="rg-job">
+      <section class="screen" id="rg-visit">
         <div class="appbar">
-          <button class="back" data-go="rg-jobs" aria-label="Back">←</button>
-          <h1>Crisis visit · Mr Nathan<span class="sub">Today 2:00–5:00pm · Pasir Ris Dr 4, Blk 415</span></h1>
-        </div>
-        <div class="card tint">
-          <h3>Why you were matched</h3>
-          <p>You've visited Mr Nathan <b>6 times</b> — he knows you. His helper left suddenly and the family needs bridging help this week. You speak Tamil; so does he.</p>
+          <button class="back" data-go="rg-home" aria-label="Back">←</button>
+          <h1>Visit detail<span class="sub">Today 2:00–5:00pm · Chaperone</span></h1>
         </div>
         <div class="card">
-          <h3>The visit</h3>
-          <p>Accompany Uncle to the wet market, then home. Confirm his 2pm diabetes medication against the checklist. He walks with a stick — take the lift, not the stairs. Daughter Priya is reachable in the app.</p>
+          <h3>Mr Nathan, 78</h3>
+          <p>You've visited him 6 times — he knows you. Market trip, then his 2pm medication against the checklist. Walks with a stick; take the lift. Daughter Priya reachable in-app.</p>
           <div class="divider"></div>
-          <div class="row"><span class="pill green">Chaperone</span><span class="pill green">Meds checklist</span><span class="pill grey">3 hours</span></div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:.74rem;line-height:2">
+            FROM&nbsp;&nbsp;Blk 415 Pasir Ris Dr 4<br>
+            TO&nbsp;&nbsp;&nbsp;&nbsp;Wet market + home<br>
+            TIME&nbsp;&nbsp;14:00 – 17:00 (3 hrs)<br>
+            FEE&nbsp;&nbsp;&nbsp;$36.00 + $3.20 transport
+          </div>
+          <div class="divider"></div>
+          <div class="row"><span class="pill green">Cashless · settled weekly via Vanguard</span></div>
         </div>
-        <div class="stack">
-          <div class="s-row"><span>Your pay · 3 hrs × $12</span><span class="amt">$36.00</span></div>
-          <div class="s-row"><span>Transport reimbursed</span><span class="amt">+ $3.20</span></div>
-          <div class="s-row total"><span>You receive</span><span class="amt">$39.20</span></div>
-        </div>
-        <button class="btn gold" id="acceptBtn">Accept this visit</button>
-        <button class="btn ghost" data-go="rg-jobs">Not this time</button>
+        <button class="btn gold" id="startVisit">Start visit — enter Papa's code</button>
+        <div class="otp" id="visitOtp" style="display:none"><span></span><span></span><span></span><span></span></div>
+        <button class="btn" id="endVisit" style="display:none" data-go="rg-feedback">End visit</button>
+        <button class="btn ghost" id="cancelVisit" data-done="Cancelled — coordinator notified">Cancel visit (free until 12:00pm)</button>
       </section>
 
-      <section class="screen" id="rg-earnings">
+      <section class="screen" id="rg-feedback">
+        <div class="appbar">
+          <h1>How did it go?<span class="sub">Goes to the care team — helps the next visit</span></h1>
+        </div>
+        <div class="chips">
+          <button class="chip sel">Went well</button>
+          <button class="chip">Senior seemed tired</button>
+          <button class="chip">Meds issue</button>
+          <button class="chip">Family not home</button>
+        </div>
+        <input class="f-input" style="margin-top:12px" placeholder="Anything the care team should know…">
+        <button class="li" style="margin-top:12px"><div class="face gold">⚑</div><div class="body"><b>Flag a concern</b><span>About the senior's wellbeing — or how you were treated</span></div></button>
+        <button class="btn" data-go="rg-home">Submit · $36.00 added</button>
+      </section>
+
+      <section class="screen" id="rg-impact">
         <div class="appbar">
           <h1>My impact<span class="sub">July so far</span></h1>
         </div>
@@ -618,48 +862,69 @@ button.li:hover{border-color:var(--pandan)}
             <div style="text-align:right"><div style="font-size:.72rem;opacity:.8">Hours</div><div class="mono" style="font-size:1.7rem;font-weight:500">27</div></div>
           </div>
         </div>
-        <div class="eyebrow-sm">What your hours meant</div>
-        <div class="li"><div class="face">🧓</div><div class="body"><b>4 seniors, 11 visits</b><span>Mr Nathan (6), Mdm Chua (2), Mr Silva (2), Mdm Wong (1)</span></div></div>
+        <details class="disc"><summary>Hours — 11 visits, tap for detail</summary>
+          <p class="mono" style="line-height:2">Mr Nathan ×6 · 14 hrs<br>Mdm Chua ×2 · 5 hrs<br>Mr Silva ×2 · 4 hrs<br>Mdm Wong ×1 · 4 hrs</p>
+        </details>
+        <details class="disc"><summary>Earned MTD — tap for detail</summary>
+          <p class="mono" style="line-height:2">Visits · $296.00<br>Transport · $22.40<br>Total · $318.40</p>
+        </details>
         <div class="li"><div class="face">🔁</div><div class="body"><b>Consistency streak: 6 repeat visits</b><span>Seniors do best with faces they know — you're one of them</span></div></div>
-        <div class="li"><div class="face">⚡</div><div class="body"><b>2 crisis activations covered</b><span>A helper runaway and a post-discharge week</span></div></div>
-        <div class="card tint">
-          <h3>Tier 2 within reach</h3>
-          <p>Complete the dementia basics module to unlock dementia-care visits — higher rate, and Pasir Ris needs 5 more Tier 2 kakis.</p>
-          <button class="btn quiet" style="margin-top:10px" data-go="rg-training">Book the module</button>
+        <div class="li"><div class="face">⚡</div><div class="body"><b>2 urgent activations covered</b><span>A helper runaway and a post-discharge week</span></div></div>
+        <button class="btn" id="withdrawBtn" data-done="✓ $318.40 sent to PayNow ··2841">Withdraw to PayNow</button>
+      </section>
+
+      <section class="screen" id="rg-profile">
+        <div class="appbar">
+          <button class="back" data-go="rg-home" aria-label="Back">←</button>
+          <h1>My profile</h1>
         </div>
+        <div class="li"><div class="face" style="width:52px;height:52px;font-size:1rem">TB</div><div class="body"><b>Tan Bee Lian</b><span>Tier 1 · Good standing · Vanguard-verified</span></div></div>
+        <div class="eyebrow-sm">Contact</div>
+        <input class="f-input" value="+65 9XXX XXXX" style="margin-bottom:8px">
+        <input class="f-input" value="beelian.tan@gmail.com">
+        <div class="eyebrow-sm">Preferences · editable</div>
+        <div class="chips">
+          <button class="chip sel">English</button><button class="chip sel">Tamil</button><button class="chip sel">Weekday am/pm</button><button class="chip sel">Within Pasir Ris</button>
+        </div>
+        <div class="eyebrow-sm">Payout</div>
+        <div class="li"><div class="face">💳</div><div class="body"><b>PayNow ··2841</b><span>Weekly settlement via Vanguard</span></div><button class="chip" style="min-height:44px">Relink</button></div>
+        <button class="btn quiet" data-go="rg-training">Training & certificates</button>
+        <button class="btn ghost">Log out</button>
+        <button class="btn ghost" style="color:var(--clay);border-color:#E8C4B8" data-done="Request sent — coordinator will call you">Suspend or delete my account</button>
       </section>
 
       <!-- ============================================================
-           ADMIN — AGENT CONSOLE  (Wei Lin, ops lead, Vanguard Pasir Ris)
+           OPS CONSOLE (Wei Lin) — Today, matching modes, quality, profile
            ============================================================ -->
 
-      <section class="screen" id="ad-overview">
+      <section class="screen" id="ad-today">
         <div class="appbar">
-          <h1>Ops · Pasir Ris<span class="sub">Fri 11 Jul · agents ran overnight · 3 items need you</span></h1>
+          <h1>Today · Pasir Ris<span class="sub">Agents ran overnight · 4 items need you</span></h1>
+          <button class="avatar-btn" data-go="ad-profile" aria-label="Wei Lin's profile">WL</button>
         </div>
 
         <div class="card" style="background:linear-gradient(150deg,var(--pandan),var(--pandan-deep));color:#fff;border:0">
           <div class="row" style="text-align:center;gap:0">
-            <div class="grow"><div class="mono" style="font-size:1.5rem">41</div><div style="font-size:.68rem;opacity:.85">bookings this week</div></div>
-            <div class="grow"><div class="mono" style="font-size:1.5rem">92%</div><div style="font-size:.68rem;opacity:.85">consistency score</div></div>
-            <div class="grow"><div class="mono" style="font-size:1.5rem">3</div><div style="font-size:.68rem;opacity:.85">for your review</div></div>
+            <div class="grow"><div class="mono" style="font-size:1.5rem">4</div><div style="font-size:.68rem;opacity:.85">need your review</div></div>
+            <div class="grow"><div class="mono" style="font-size:1.5rem">2</div><div style="font-size:.68rem;opacity:.85">unfilled visits today</div></div>
+            <div class="grow"><div class="mono" style="font-size:1.5rem">92%</div><div style="font-size:.68rem;opacity:.85">repeat-pair rate</div></div>
           </div>
         </div>
+        <details class="disc"><summary>What's the repeat-pair rate?</summary><p>Of this week's visits, the share where the senior saw a kaki they already knew. Target ≥90% — familiarity is the product. (Which numbers ops actually needs: to validate with a focus group before pilot.)</p></details>
 
         <div class="eyebrow-sm">Your agents</div>
         <button class="li" data-go="ad-onboarding">
           <div class="face">✓</div>
-          <div class="body"><b>Onboarding agent</b><span>Verified 12 applicants against St. Luke's + Singpass records · <b style="color:#8F3A24">2 flagged for you</b></span></div>
+          <div class="body"><b>Onboarding agent</b><span>Verified 12 applicants against St. Luke's + Singpass records</span></div>
           <div class="end"><span class="pill clay">2</span></div>
         </button>
-        <button class="li" data-go="ad-matching">
+        <button class="li" data-go="ad-match-cases">
           <div class="face">⚙</div>
-          <div class="body"><b>Matching agent</b><span>34 visits auto-matched, regulars preserved · <b style="color:#8F3A24">1 exception</b>: no Tamil-speaking kaki free Tue am</span></div>
+          <div class="body"><b>Matching agent</b><span>34 visits auto-matched, regulars preserved · 1 exception queued</span></div>
           <div class="end"><span class="pill clay">1</span></div>
         </button>
         <button class="li" data-go="ad-quality">
-          <div class="face">❋</div>
-          <div class="body"><b>Quality agent</b><span>Read 18 visit reports · overall positive · 1 senior showing repeat fatigue — suggests a check-in call</span></div>
+          <div class="body" style="margin-left:52px"><b>Quality agent</b><span>Read 18 visit reports · 1 pattern flagged for follow-up</span></div>
           <div class="end"><span class="pill gold">1</span></div>
         </button>
         <div class="card tint">
@@ -670,7 +935,7 @@ button.li:hover{border-color:var(--pandan)}
 
       <section class="screen" id="ad-onboarding">
         <div class="appbar">
-          <button class="back" data-go="ad-overview" aria-label="Back">←</button>
+          <button class="back" data-go="ad-today" aria-label="Back">←</button>
           <h1>Onboarding queue<span class="sub">Agent-verified · you approve or hold</span></h1>
         </div>
 
@@ -682,12 +947,12 @@ button.li:hover{border-color:var(--pandan)}
             ✓ Singpass identity verified<br>
             ✓ CPR+AED STL-2026-8841 · matched St. Luke's registry<br>
             ✓ Mobility + SOP modules passed (Vanguard LMS)<br>
-            ◐ Shadow visit booked 16 Jul — not yet done<br>
+            ◐ Shadow visit booked Thu — not yet done<br>
             ⚠ Dementia module: not taken
           </div>
           <div class="divider"></div>
           <p><b>Agent recommends:</b> approve at <b>Tier 1</b>, chaperone + companionship only. Keep dementia visits locked until the Tier 2 module.</p>
-          <button class="btn" id="approveTan">Approve at Tier 1</button>
+          <button class="btn" id="approveTan" data-done="✓ Approved at Tier 1 — shadow visit stands">Approve at Tier 1</button>
           <button class="btn ghost">Hold for interview</button>
         </div>
 
@@ -696,77 +961,122 @@ button.li:hover{border-color:var(--pandan)}
           <p style="margin-top:6px">Ex-Grab driver via the GrabTask transition pool. CPR cert valid, but the agent couldn't match his caregiving reference — document looks reused from another application.</p>
           <div class="divider"></div>
           <p><b>Agent recommends:</b> request original reference + schedule a video interview before any tier.</p>
-          <button class="btn quiet">Request documents</button>
+          <button class="btn quiet" data-done="✓ Documents requested">Request documents</button>
         </div>
 
         <div class="li"><div class="face">✓</div><div class="body"><b>10 applicants auto-cleared this week</b><span>All records matched · certs valid · auto-scheduled for shadow visits</span></div><span class="pill green">Done</span></div>
       </section>
 
-      <section class="screen" id="ad-matching">
+      <section class="screen" id="ad-match-base">
         <div class="appbar">
-          <button class="back" data-go="ad-overview" aria-label="Back">←</button>
-          <h1>Matching weights<span class="sub">How the agent ranks kakis for each request</span></h1>
+          <button class="back" data-go="ad-today" aria-label="Back">←</button>
+          <h1>Matching · broad base<span class="sub">Pick an operating state — weights shown, not toggled</span></h1>
         </div>
 
-        <div class="card">
-          <div class="row" style="margin-bottom:2px"><b class="grow" style="font-size:.84rem">Consistency <span style="color:var(--slate);font-weight:400">· same kaki, same senior</span></b><span class="mono" style="font-size:.8rem" id="wConsist">45%</span></div>
-          <input type="range" min="0" max="100" value="45" style="width:100%;accent-color:var(--pandan)" aria-label="Consistency weight" data-w="wConsist">
-          <div class="divider"></div>
-          <div class="row" style="margin-bottom:2px"><b class="grow" style="font-size:.84rem">Language match</b><span class="mono" style="font-size:.8rem" id="wLang">20%</span></div>
-          <input type="range" min="0" max="100" value="20" style="width:100%;accent-color:var(--pandan)" aria-label="Language weight" data-w="wLang">
-          <div class="divider"></div>
-          <div class="row" style="margin-bottom:2px"><b class="grow" style="font-size:.84rem">Proximity <span style="color:var(--slate);font-weight:400">· within sub-region</span></b><span class="mono" style="font-size:.8rem" id="wProx">20%</span></div>
-          <input type="range" min="0" max="100" value="20" style="width:100%;accent-color:var(--pandan)" aria-label="Proximity weight" data-w="wProx">
-          <div class="divider"></div>
-          <div class="row" style="margin-bottom:2px"><b class="grow" style="font-size:.84rem">Speed to fill</b><span class="mono" style="font-size:.8rem" id="wSpeed">15%</span></div>
-          <input type="range" min="0" max="100" value="15" style="width:100%;accent-color:var(--pandan)" aria-label="Speed weight" data-w="wSpeed">
-        </div>
+        <button class="modecard sel" data-mode><b>Balanced — default</b><span>Regulars first, language matched, fill within SLA.</span><span class="weights">consistency 45 · language 20 · proximity 20 · speed 15</span></button>
+        <button class="modecard" data-mode><b>High demand / low supply — fill fast</b><span>Proximity first, consistency relaxed. Use in demand spikes so no visit goes unfilled.</span><span class="weights">proximity 40 · speed 25 · consistency 20 · language 15</span></button>
+        <button class="modecard" data-mode><b>Low demand / high supply — deepen bonds</b><span>Consistency and language first. Use in quiet weeks to build durable pairs.</span><span class="weights">consistency 55 · language 25 · proximity 15 · speed 5</span></button>
 
         <div class="card" style="border-color:var(--marigold)">
           <div class="row"><h3 class="grow">Agent recommendation</h3><span class="pill gold">New</span></div>
-          <p style="margin-top:6px">Two Hokkien-speaking seniors were matched with English-only kakis this week — both first visits went poorly. <b>Raise language match to 30%</b> (from speed). Simulated on last month's 163 bookings: fill time +18 min, first-visit success 84% → 93%.</p>
-          <button class="btn" id="applyWeights">Apply recommended weights</button>
-          <button class="btn ghost">Dismiss</button>
+          <p style="margin-top:6px">Demand is up 40% this week (school holidays). <b>Suggest switching to High-demand mode</b> until Friday. Simulated on last month's 163 bookings: unfilled visits 5 → 1, repeat-pair rate dips 92% → 87%.</p>
+          <button class="btn" id="applyMode" data-done="✓ High-demand mode until Friday — agent will report impact">Switch to High-demand mode</button>
+          <button class="btn ghost">Keep Balanced</button>
         </div>
 
+        <button class="btn quiet" data-go="ad-match-cases">Case-by-case exceptions (1) →</button>
+
         <div class="card tint">
-          <h3>Hard rules the agent can't override</h3>
+          <h3>Hard rules no mode can override</h3>
           <p style="font-family:'Spline Sans Mono',monospace;font-size:.7rem;line-height:2">
-          · First visit to a new senior → pair with Vanguard staff<br>
+          · First visit to a new senior → paired with Vanguard staff<br>
           · No public ratings or rankings of care staff (MOH)<br>
           · Certification tier must cover the task — no exceptions<br>
-          · Crisis triggers jump the queue</p>
+          · Urgent triggers jump the queue</p>
         </div>
+      </section>
+
+      <section class="screen" id="ad-match-cases">
+        <div class="appbar">
+          <button class="back" data-go="ad-match-base" aria-label="Back">←</button>
+          <h1>Matching · case by case<span class="sub">Per-senior exceptions — custom weights live only here</span></h1>
+        </div>
+
+        <div class="card" style="border-color:var(--clay)">
+          <div class="row"><h3 class="grow">Mdm Lee Siew Eng, 84</h3><span class="pill clay">Exception</span></div>
+          <p style="margin-top:6px">Needs a Tamil-speaking kaki Tue am — none free. Her regular (Mdm Halimah) is double-booked.</p>
+          <div class="divider"></div>
+          <p><b>Agent recommends:</b> offer Mr Lim (Hokkien + basic Tamil, met her once at the SCC) <i>with</i> a Vanguard staff pairing — or shift the visit to Tue 2pm when Halimah frees up.</p>
+          <div class="divider"></div>
+          <label class="f-label" style="margin-top:4px">Custom weights — this senior only</label>
+          <div class="row" style="margin-bottom:2px"><b class="grow" style="font-size:.8rem">Consistency</b><span class="mono" style="font-size:.78rem" id="wC">60%</span></div>
+          <input type="range" min="0" max="100" value="60" style="width:100%;accent-color:var(--pandan)" data-w="wC" aria-label="Consistency weight">
+          <div class="row" style="margin:6px 0 2px"><b class="grow" style="font-size:.8rem">Language</b><span class="mono" style="font-size:.78rem" id="wL">30%</span></div>
+          <input type="range" min="0" max="100" value="30" style="width:100%;accent-color:var(--pandan)" data-w="wL" aria-label="Language weight">
+          <button class="btn" data-done="✓ Saved for Mdm Lee · agent re-matching now">Save weights & re-match</button>
+          <button class="btn ghost" data-done="✓ Shifted to Tue 2pm with Halimah">Take the agent's option B</button>
+        </div>
+
+        <div class="li"><div class="face">✓</div><div class="body"><b>No other exceptions</b><span>33 of 34 matches this week ran on the broad-base state</span></div></div>
       </section>
 
       <section class="screen" id="ad-quality">
         <div class="appbar">
-          <button class="back" data-go="ad-overview" aria-label="Back">←</button>
-          <h1>Quality<span class="sub">From visit reports + private care notes — never public ratings</span></h1>
+          <button class="back" data-go="ad-today" aria-label="Back">←</button>
+          <h1>Quality<span class="sub">Reports + private notes — never public ratings</span></h1>
+        </div>
+        <div class="seg" data-seggroup="qual">
+          <button class="on" data-pane="qual-elderly">Elderly</button>
+          <button data-pane="qual-service">Kaki service</button>
+          <button data-pane="qual-kaki">Kaki wellbeing</button>
+          <button data-pane="qual-archive">Archive</button>
         </div>
 
-        <div class="eyebrow-sm">This week's themes · 18 reports read</div>
-        <div class="chips">
-          <span class="pill green">Meds adherence strong (11)</span>
-          <span class="pill green">Seniors greeting kakis by name (7)</span>
-          <span class="pill gold">Transport delays, Elias Rd (3)</span>
-          <span class="pill clay">Fatigue flags (1)</span>
+        <div class="segpane on" id="qual-elderly">
+          <div class="chips" style="margin-bottom:10px"><span class="pill green">Meds adherence strong (11)</span><span class="pill gold">Fatigue flags (1)</span></div>
+          <div class="card" style="border-color:var(--clay)">
+            <div class="row"><h3 class="grow">Mr Silva, 76 — repeat fatigue</h3><span class="pill clay">Review</span></div>
+            <p style="margin-top:6px">Three consecutive reports mention tiring quickly and skipping his walk. Individually minor; together a pattern his caregiver may not have connected. Priya's private note ("Papa seemed tired after the market trip") filed against the same check.</p>
+            <div class="divider"></div>
+            <p><b>Agent recommends:</b> care-coordinator check-in call + flag to the Vanguard nurse for the next PHV touchpoint.</p>
+            <button class="btn" id="qualityAct" data-done="✓ Check-in scheduled · nurse flagged for PHV">Schedule the check-in</button>
+            <button class="btn ghost" data-done="✓ Noted — will re-flag if it recurs">Mark as noted</button>
+          </div>
         </div>
 
-        <div class="card" style="border-color:var(--clay);margin-top:14px">
-          <div class="row"><h3 class="grow">Mr Silva, 76 — repeat fatigue</h3><span class="pill clay">Review</span></div>
-          <p style="margin-top:6px">Quality agent noticed three consecutive reports mention Uncle Silva tiring quickly and skipping his walk. Individually minor; together a pattern his caregiver may not have connected.</p>
-          <div class="divider"></div>
-          <p><b>Agent recommends:</b> care coordinator check-in call to the family + flag to the Vanguard nurse for the next PHV touchpoint.</p>
-          <button class="btn" id="qualityAct">Schedule the check-in</button>
-          <button class="btn ghost">Mark as noted</button>
+        <div class="segpane" id="qual-service">
+          <div class="chips" style="margin-bottom:10px"><span class="pill green">Seniors greeting kakis by name (7)</span><span class="pill gold">Transport delays, Elias Rd (3)</span></div>
+          <div class="li"><div class="face">📝</div><div class="body"><b>Caregiver note · re: a new kaki</b><span>"He was kind but seemed unsure with the wheelchair." → refresher module suggested by agent · pending your OK</span></div><button class="chip" data-done="Sent ✓" style="min-height:44px">Approve</button></div>
         </div>
 
-        <div class="li"><div class="face">📝</div><div class="body"><b>Private care note · from Priya (caregiver)</b><span>"Papa seemed tired after the market trip." Routed here, matched to the Silva-style pattern check — no action needed yet.</span></div><span class="pill grey">Filed</span></div>
-        <div class="card tint">
-          <h3>Why no stars?</h3>
-          <p>MOH and AIC won't permit public rating of care staff — and seniors aren't restaurants. Quality lives in structured reports, private notes and patterns, reviewed by a human.</p>
+        <div class="segpane" id="qual-kaki">
+          <div class="card" style="border-color:var(--marigold)">
+            <div class="row"><h3 class="grow">Kaki report — repeated door-step cancellations</h3><span class="pill gold">New</span></div>
+            <p style="margin-top:6px">A kaki reports one family has cancelled on arrival twice — travel time unpaid, felt disrespected. The platform protects kakis too.</p>
+            <div class="divider"></div>
+            <p><b>Agent recommends:</b> coordinator calls the family; second occurrence triggers the cancellation fee per policy.</p>
+            <button class="btn" data-done="✓ Coordinator call scheduled">Schedule the call</button>
+          </div>
         </div>
+
+        <div class="segpane" id="qual-archive">
+          <input class="f-input" placeholder="Search archive — senior, kaki, month…" style="margin-bottom:10px">
+          <div class="li"><div class="face">✓</div><div class="body"><b>Mdm Wong — missed meds pattern · June</b><span>Resolved: pill organiser + wellness checks Mon/Thu · closed 28 Jun</span></div><span class="pill grey">Closed</span></div>
+          <div class="li"><div class="face">✓</div><div class="body"><b>Kaki late-arrival cluster · May</b><span>Resolved: bus 15 timetable change; matching now adds 15 min buffer · closed 19 May</span></div><span class="pill grey">Closed</span></div>
+        </div>
+      </section>
+
+      <section class="screen" id="ad-profile">
+        <div class="appbar">
+          <button class="back" data-go="ad-today" aria-label="Back">←</button>
+          <h1>Wei Lin<span class="sub">Ops lead · Vanguard Pasir Ris ICCP pilot</span></h1>
+        </div>
+        <div class="eyebrow-sm">My cases</div>
+        <div class="li"><div class="face">⚙</div><div class="body"><b>Mdm Lee — Tamil Tue am exception</b><span>Tagged: Mdm Lee (senior) · Mr Lim (kaki) · opened today</span></div><span class="pill gold">Open</span></div>
+        <div class="li"><div class="face">❋</div><div class="body"><b>Mr Silva — fatigue pattern</b><span>Tagged: Mr Silva (senior) · Halimah (kaki) · check-in scheduled</span></div><span class="pill green">Active</span></div>
+        <div class="eyebrow-sm">Support</div>
+        <button class="li"><div class="face">💬</div><div class="body"><b>Send feedback on Kakis</b><span>Goes straight to the build team</span></div></button>
+        <button class="li"><div class="face">❓</div><div class="body"><b>Help — FAQs & resources</b><span>Playbooks, escalation tree, or ask the assistant</span></div></button>
       </section>
 
       </div><!-- /screens -->
@@ -774,25 +1084,25 @@ button.li:hover{border-color:var(--pandan)}
       <!-- bottom navs -->
       <nav class="bottomnav" id="nav-cg" aria-label="Caregiver navigation">
         <button class="navbtn on" data-go="cg-home"><span class="ico">⌂</span>Home</button>
-        <button class="navbtn" data-go="cg-crisis"><span class="ico">⚡</span>Get help</button>
-        <button class="navbtn" data-go="cg-tracking"><span class="ico">◷</span>Visits</button>
+        <button class="navbtn" data-go="cg-service"><span class="ico">＋</span>Book</button>
+        <button class="navbtn" data-go="cg-visits"><span class="ico">◷</span>Visits</button>
       </nav>
-      <nav class="bottomnav" id="nav-rg" aria-label="Respite giver navigation">
-        <button class="navbtn on" data-go="rg-jobs"><span class="ico">☰</span>Visits</button>
-        <button class="navbtn" data-go="rg-training"><span class="ico">🎓</span>Training</button>
-        <button class="navbtn" data-go="rg-earnings"><span class="ico">✦</span>My impact</button>
+      <nav class="bottomnav" id="nav-rg" aria-label="Kaki navigation">
+        <button class="navbtn on" data-go="rg-home"><span class="ico">☰</span>Visits</button>
+        <button class="navbtn" data-go="rg-available"><span class="ico">✚</span>Available</button>
+        <button class="navbtn" data-go="rg-impact"><span class="ico">✦</span>Impact</button>
+        <button class="navbtn" data-go="rg-profile"><span class="ico">◉</span>Profile</button>
       </nav>
-      <nav class="bottomnav" id="nav-ad" aria-label="Admin navigation">
-        <button class="navbtn on" data-go="ad-overview"><span class="ico">◎</span>Agents</button>
+      <nav class="bottomnav" id="nav-ad" aria-label="Ops navigation">
+        <button class="navbtn on" data-go="ad-today"><span class="ico">◎</span>Today</button>
         <button class="navbtn" data-go="ad-onboarding"><span class="ico">✓</span>Onboarding</button>
-        <button class="navbtn" data-go="ad-matching"><span class="ico">⚙</span>Matching</button>
+        <button class="navbtn" data-go="ad-match-base"><span class="ico">⚙</span>Matching</button>
         <button class="navbtn" data-go="ad-quality"><span class="ico">❋</span>Quality</button>
       </nav>
 
     </div><!-- /phone-inner -->
   </div><!-- /phone -->
 
-  <!-- right: demo notes -->
   <aside class="notes" aria-live="polite">
     <div class="eyebrow">Demo notes</div>
     <h2 id="noteTitle">—</h2>
@@ -806,73 +1116,84 @@ button.li:hover{border-color:var(--pandan)}
 </main>
 
 <script>
-/* ============ Kakis prototype engine ============ */
+/* ============ Kakis prototype v2 engine ============ */
 
-const PERSONAS = {
-  cg: {
-    home: 'cg-home',
-    scenario: `
-      <div class="eyebrow">Scenario 1 · The caregiver</div>
-      <h2>Priya activates trusted help in a crisis</h2>
-      <p>Priya, 41, works full-time and cares for her father Mr Nathan, 78 — relatively healthy, walks with a stick, Tamil-speaking. This morning their helper left without notice.</p>
-      <div class="persona-chip"><div class="face">PR</div><div><b>Priya N.</b><span>Sandwich-generation caregiver · Pasir Ris</span></div></div>
-      <div class="persona-chip"><div class="face">NA</div><div><b>Mr Nathan, 78</b><span>The senior — never has to install anything</span></div></div>
-      <p style="margin-top:12px">Walk the flow: <b>Get help now → pick what happened → match → confirm → track → report.</b> Planned bookings ("Book ahead") run the same flow with longer lead times — the Jul 11 HMW covers both.</p>`
-  },
-  rg: {
-    home: 'rg-welcome',
-    scenario: `
-      <div class="eyebrow">Scenario 2 · The respite giver</div>
-      <h2>Mdm Tan trains, certifies, and takes her first visits</h2>
-      <p>Tan Bee Lian, 62, retired early from her admin job. Fit, wants structure and contribution more than income — the exact profile Vanguard recruits as micro-jobbers.</p>
-      <div class="persona-chip"><div class="face">TB</div><div><b>Mdm Tan Bee Lian, 62</b><span>Early retiree · Pasir Ris · joins via her AAC</span></div></div>
-      <p style="margin-top:12px">Walk the flow: <b>onboard → pick skills → Vanguard training → certification wallet → accept a visit → impact.</b></p>`
-  },
-  ad: {
-    home: 'ad-overview',
-    scenario: `
-      <div class="eyebrow">Scenario 3 · The admin</div>
-      <h2>One coordinator, three agents, 200+ bookings</h2>
-      <p>Wei Lin runs ops for the Pasir Ris pilot. Agents handle verification, matching and quality review overnight; she reviews the exceptions over kopi.</p>
-      <div class="persona-chip"><div class="face">WL</div><div><b>Wei Lin</b><span>Ops lead · Vanguard Pasir Ris ICCP pilot</span></div></div>
-      <p style="margin-top:12px">Walk the flow: <b>agent overview → onboarding queue → tune matching → quality patterns.</b></p>`
-  }
+const SCENARIOS = {
+  land: `<div class="eyebrow">Start here</div>
+    <h2>One front door, three journeys</h2>
+    <p>Per team feedback, the demo persona switcher is gone from the consumer surface. The app opens with role selection; ops is a separate internal surface (top-right shortcut, marked internal).</p>
+    <p>Pick a door on the phone, or use the demo shortcuts above.</p>`,
+  cg: `<div class="eyebrow">Journey 1 · The caregiver</div>
+    <h2>Priya books help — service first, then urgency</h2>
+    <p>Priya, 41, cares for her father Mr Nathan, 78 — Tamil-speaking, walks with a stick. This morning their helper left without notice.</p>
+    <div class="persona-chip"><div class="face">PR</div><div><b>Priya N.</b><span>Sandwich-generation caregiver · Pasir Ris</span></div></div>
+    <div class="persona-chip"><div class="face">NA</div><div><b>Mr Nathan, 78</b><span>The senior — has his own simple mode</span></div></div>
+    <p style="margin-top:12px">Walk it: <b>Book a visit → service → urgency tier → what happened → details → match → confirm & pay → track → report.</b></p>`,
+  eb: `<div class="eyebrow">Journey 2 · The elderly, self-booking</div>
+    <h2>Uncle Nathan books for himself</h2>
+    <p>A separate low-density mode per team feedback: oversized targets, plain words, four language toggles, no payment friction (bills to family/ICCP), and a phone number on every screen.</p>
+    <p style="margin-top:12px">Walk it: <b>What do you need → when → done.</b> Three screens, on purpose.</p>`,
+  rg: `<div class="eyebrow">Journey 3 · The respite giver</div>
+    <h2>Mdm Tan signs up, trains, serves</h2>
+    <p>Tan Bee Lian, 62, early retiree. Phone number is her ID; Singpass verifies her; preferences drive what she's offered.</p>
+    <div class="persona-chip"><div class="face">TB</div><div><b>Mdm Tan Bee Lian, 62</b><span>Early retiree · joins via her AAC</span></div></div>
+    <p style="margin-top:12px">Walk it: <b>Sign up → OTP → Singpass consent → services → preferences → training → visits → OTP start → impact → profile.</b></p>`,
+  ad: `<div class="eyebrow">Internal · Ops console</div>
+    <h2>One coordinator, three agents</h2>
+    <p>Wei Lin runs Pasir Ris ops. Agents verify, match and review overnight; she handles the exceptions. Matching has two levels now — broad-base states and per-senior overrides.</p>
+    <div class="persona-chip"><div class="face">WL</div><div><b>Wei Lin</b><span>Ops lead · Vanguard Pasir Ris</span></div></div>
+    <p style="margin-top:12px">Walk it: <b>Today → onboarding queue → matching modes → case-by-case → quality categories → archive.</b></p>`
 };
 
 const NOTES = {
-  'cg-home': {t:'Home = the care circle', b:'The caregiver is the buyer and the user — the senior never installs anything. Regular kakis sit above everything else because <b>consistency is the product</b>. Two peer paths, per the Jul 11 HMW: <b>urgent</b> (matched in hours) and <b>planned</b> (the higher-volume everyday). Urgent keeps the accent colour; planned keeps the platform useful between crises.', ev:['hmw-2026-07-11-broader-need','marsiling-aac-grab-interviews','consistency-as-design-constraint']},
-  'cg-crisis': {t:'The six-trigger picker (urgent path)', b:'The signature screen for the <b>urgent half</b> of the HMW — the six triggers Vanguard named in the room. Urgent requests jump the queue; planned bookings take the quieter road below. Closer to insurance than to Uber: it must be trusted before it is ever used.', ev:['hmw-2026-07-11-broader-need','vanguard-operational-data (six triggers)']},
-  'cg-details': {t:'One flow, two demand curves', b:'Planned and urgent share this screen — same tasks, same language matching, different lead times ("Every Wednesday" serves the recurring gap-fill case). Tasks, not service categories. Medicine admin shows <b>locked</b>: certification tiers gate tasks, visibly.', ev:['hmw-2026-07-11-broader-need','problem/problem.md (task taxonomy)','marsiling-aac-grab-interviews']},
-  'cg-matching': {t:'Consistency-first matching', b:'The matcher checks the senior\'s <b>regulars first</b>, then language, then proximity within the ICCP sub-region — speed is last, not first. Watch the status line: the algorithm narrates its priorities.', ev:['ncss-idi-findings (repel/months)','consistency-as-design-constraint','iccp-model']},
-  'cg-matched': {t:'The kaki pass + the payer stack', b:'A match is presented as a <b>pass you can show Papa</b> — trust transfers through artifacts for this cohort. The price breakdown shows the multi-payer stack openly: $84 becomes $27 because private pay alone is broken.', ev:['vanguard-operational-data (pricing)','respite-marketplace-concept (multi-payer stack)']},
-  'cg-tracking': {t:'Reassurance without phone calls', b:'Live notes in the kaki\'s own voice replace the anxious lunchtime call — the round-1 caregiver checked in on her grandmother all day while working. Meds confirmation is structured, not vibes.', ev:['2026-05-22-caregiver-dementia-grandmother','ncss-idi-findings (caregiver fatigue)']},
-  'cg-report': {t:'Reports yes, ratings no', b:'Post-visit feedback is a <b>private care note</b> routed to the quality agent — never a public star. MOH/AIC will not permit rating care staff, so the design never asks for it.', ev:['devils-advocate (critique 14)','ad-quality screen']},
-  'rg-welcome': {t:'Contribution, not gig hustle', b:'Framed as being <b>somebody\'s kaki</b> — Vanguard\'s micro-jobbers are early-60s retirees motivated by structure and contribution, not wages. Pay is stated honestly, not inflated.', ev:['vanguard-operational-data (micro-jobber profile)','interview-round-1-findings (signal 04)']},
-  'rg-skills': {t:'Skills gate tasks', b:'Choose what you can do; clinical and dementia work stays <b>visibly locked</b> behind Tier 2 modules. Locked-but-visible beats hidden: it shows the path up.', ev:['vanguard-operational-data (training tracks)','marketplace-2x2 (certification moat)']},
-  'rg-training': {t:'Vanguard\'s real training path', b:'These are Vanguard\'s actual modules: CPR/AED externally certified at St. Luke\'s, mobility half-day, SOPs — and the <b>shadow visit</b>, the pre-relationship layer that answers the consistency constraint.', ev:['vanguard-operational-data (training)','consistency-as-design-constraint (pre-relationship layer)']},
-  'rg-wallet': {t:'Certification is the moat', b:'The wallet is what families and Vanguard see — registry-matched certificates with mono IDs, not self-claimed skills. This layer, not the matching code, is the defensible part.', ev:['devils-advocate (critique 8)','luce-sg (competitor already has certs)']},
-  'rg-jobs': {t:'Regulars first, always', b:'Offers are filtered by certification and language; seniors she has visited before rank on top with the reason stated. First visits to new seniors are <b>paired with Vanguard staff</b> — the operational pattern that already works.', ev:['vanguard-operational-data (first-session-with-staff)','consistency-as-design-constraint']},
-  'rg-job': {t:'A visit, fully briefed', b:'The kaki arrives knowing the care plan, the meds checklist, the mobility note. "A caretaker may just be a caretaker but not one that provides care" — the brief is how we beat that.', ev:['2026-05-21-solution-provider-senior-tech','problem/problem.md (task detail)']},
-  'rg-earnings': {t:'Impact over income', b:'Earnings shown honestly at Vanguard\'s $10–12/hr band — but the ledger leads with seniors helped, repeat visits, and crisis covers. The consistency streak is a first-class metric for the giver too.', ev:['vanguard-operational-data (pricing)','interview-round-1-findings (contribution)']},
-  'ad-overview': {t:'Agents do the routine 90%', b:'Vanguard runs today\'s pilot on phone triage and WhatsApp rosters — fine at 20–30 bookings/month, impossible at 200+. Three agents (onboarding, matching, quality) work overnight; the human reviews <b>3 exceptions</b>, not 41 bookings.', ev:['community-chaperone (manual ops)','respite-marketplace-concept (ops scaling)']},
-  'ad-onboarding': {t:'Verify with receipts', b:'The onboarding agent cross-checks Singpass, the St. Luke\'s cert registry and Vanguard\'s LMS, and shows its <b>evidence trail</b>. It recommends; Wei Lin decides. Note the flagged reuse-document case — agents catch what tired humans miss.', ev:['vanguard-operational-data (training/cert tracks)','kakis-design-brief (R10)']},
-  'ad-matching': {t:'Tunable weights, hard rules', b:'Consistency is the heaviest weight by design. The agent proposes changes <b>with simulated evidence</b> (fill time vs first-visit success) — and four rules it can never override, including the MOH no-ratings constraint.', ev:['consistency-as-design-constraint','devils-advocate (critiques 13–14)']},
-  'ad-quality': {t:'Patterns, not leaderboards', b:'The quality agent reads every visit report and private note, surfaces <b>patterns a family might miss</b> (Uncle Silva\'s fatigue), and routes them to a human care coordinator and the Vanguard nurse — quality without public ratings.', ev:['devils-advocate (critique 14)','vanguard-operational-data (PHV touchpoints)']}
+  'land': {t:'Role selection replaces the switcher', b:'Team feedback: consumers never see a persona switcher. The app now opens with <b>"Who needs help today?"</b> — caregiver, elderly self-book, or kaki. Ops is internal, reached by deep link.', ev:['kakis-prototype-spec §A (Lara/Aditi)']},
+  'cg-home': {t:'Home = the care circle', b:'One booking CTA now (service first — urgency comes later). Regulars on top, a <b>Request-a-kaki</b> flow, three upcoming items, and an <b>editable</b> care plan. Help line on every consumer screen.', ev:['spec §B1 (Lara/Aditi)','consistency-as-design-constraint']},
+  'cg-careplan': {t:'The care plan is editable now', b:'Meds with times, mobility, languages, emergency contacts, notes — editable per feedback, so every kaki arrives briefed without the family re-explaining.', ev:['spec §B1 (Lara/Aditi)']},
+  'cg-addkaki': {t:'Growing the circle, familiarity-first', b:'You can only request people the senior has <b>already met</b> — AAC mornings, Vanguard pool. The consistency constraint applied to supply growth.', ev:['spec §B1','ncss-idi-findings (repel/months)']},
+  'cg-service': {t:'Service first, per feedback', b:'The range of services leads — each with a <b>duration estimate</b>. Medicine admin is visible but locked ("Ask about Tier 2"). Urgency is the next question, not the first.', ev:['spec §B2 (Lara/Aditi)']},
+  'cg-when': {t:'Three urgency tiers', b:'The binary is gone. <b>Urgent</b> (30–60 min) · <b>Soon</b> (2 hrs) · <b>Planned</b> (calendar + recurring). Urgent and Soon route through "what happened"; each shows its expected confirmation ETA.', ev:['spec §B2/B5 (Lara/Aditi)']},
+  'cg-crisis': {t:'Triggers, weighted for Pasir Ris', b:'Top three pinned per feedback: helper left, spouse hospitalised, caregiver\'s own emergency. A seventh path — <b>"Not sure, talk to someone"</b> — click-to-call the ICCP coordinator. Step indicator on.', ev:['spec §B3 (Lara/Aditi)','vanguard-operational-data (triggers)']},
+  'cg-details': {t:'One flow, two timing modes', b:'Planned shows a <b>calendar + repeats weekly</b> — no same-day chips. Urgent shows the tier\'s arrival window. Care-plan facts injected; new-pair visits auto-flag the Vanguard staff pairing. 48px chips throughout.', ev:['spec §B4 (Lara/Aditi)']},
+  'cg-matching': {t:'Consistency-first matching', b:'The matcher narrates its priorities: regulars → language → subsidies. Speed is a factor, never the headline.', ev:['consistency-as-design-constraint']},
+  'cg-matched': {t:'Primary + backup + the unavailable path', b:'Feedback asked: what if she can\'t come? Now: a <b>standby backup</b> on every match, and a demo toggle showing the unavailable state with reasons and options. ETA by tier in the header.', ev:['spec §B5 (Lara/Aditi)']},
+  'cg-confirm': {t:'Pay, explained', b:'Payment method (PayNow / card / <b>bill ICCP</b>), a "Why this price?" disclosure walking the multi-payer stack in plain language, and the cancellation policy up front. Subsidy-per-trigger rules: pending Vanguard [ops].', ev:['spec §B6 (Lara/Aditi)','respite-marketplace-concept (multi-payer)']},
+  'cg-tracking': {t:'Contact, escalate, map-later', b:'Message / call the kaki (masked number), <b>escalate to the Vanguard coordinator</b> for late or no-show, and an honest "live map — coming in Beta" placeholder.', ev:['spec §B7 (Lara/Aditi)']},
+  'cg-visits': {t:'Visits = active + history', b:'The tab now holds the live visit <b>and</b> a filterable history — not just today. Reports open from history.', ev:['spec §B7 (Lara/Aditi)']},
+  'cg-report': {t:'Report, chips, one-tap regular', b:'Prompt chips for the care note (tired after walk / refused meds / fall concern), and <b>"Make Halimah a regular + repeat every Tuesday"</b> in one tap. Feedback shared with Vanguard; ratings stay non-public pending the MOH ruling [tension G5].', ev:['spec §B8 (Lara/Aditi)','devils-advocate (critique 14)']},
+  'eb-need': {t:'Elderly mode: fewer words, bigger targets', b:'Four oversized cards, plain language, a language toggle, and <b>"I\'m not sure — call me"</b> as a first-class option. Grounded in the Marsiling findings: dialect, vision, transaction fear.', ev:['spec §C (Lara/Aditi)','marsiling-aac-grab-interviews']},
+  'eb-when': {t:'Three buttons, no calendar', b:'Today / Tomorrow / Pick a day. The senior never faces a grid of chips.', ev:['spec §C']},
+  'eb-done': {t:'Confirmation a senior can trust', b:'A face he knows, a promise she\'ll <b>call before coming</b>, and no payment step — bills to family/ICCP. Trust travels through people, not screens.', ev:['spec §C','interview-round-1-findings']},
+  'rg-start': {t:'A real start page', b:'Copy tightened per Shobhit: two CTAs — <b>Sign in / Sign up</b> — and no bottom tabs until you\'re in.', ev:['spec §D1 (Shobhit/Aditi)']},
+  'rg-phone': {t:'Phone = identity', b:'Mobile number as the unique ID, verified by OTP — the code fills itself in the demo.', ev:['spec §D2 (Shobhit/Aditi)']},
+  'rg-singpass': {t:'Singpass, shown not implied', b:'Feedback: put the flow <b>in</b> the prototype. A mock Myinfo consent lists exactly what\'s pulled — and what isn\'t — with Allow/Decline.', ev:['spec §D2 (Shobhit/Aditi)']},
+  'rg-email': {t:'Email captured separately', b:'Shobhit\'s catch: Singpass doesn\'t provide email. Asked for once, explained why.', ev:['spec §D2 (Shobhit/Aditi)']},
+  'rg-services': {t:'Services mirror the demand side', b:'The same set families book from, locks included — so supply and demand speak one vocabulary.', ev:['spec §D2 (Shobhit/Aditi)']},
+  'rg-prefs': {t:'Preferences drive the feed', b:'Languages, days, area, travel radius — captured at sign-up, editable in Profile, and used to filter the Available tab.', ev:['spec §D2 (Shobhit/Aditi)']},
+  'rg-training': {t:'Training, reorganised', b:'Done / In progress / Certificates segments per feedback. Vanguard\'s real modules; the shadow visit is the pre-relationship layer.', ev:['spec §D6','vanguard-operational-data (training)']},
+  'rg-home': {t:'Home = upcoming visits', b:'"Visits", not "tasks" — the kaki vocabulary. Date, time + duration, and $ on every row; impact strip below; profile top-right.', ev:['spec §D3 (Shobhit/Aditi)']},
+  'rg-available': {t:'Now (geofenced) vs Coming up', b:'The Now segment is 30-minutes-and-1-km — you only see what you can actually reach. Filters mirror her stored preferences, editable in place.', ev:['spec §D3 (Shobhit/Aditi)']},
+  'rg-visit': {t:'Visit detail with OTP start', b:'Who / when / from–to / fee / <b>cashless via Vanguard</b> badge; cancel with a visible cutoff; <b>Start visit exchanges a code with the senior</b> — proof of presence without GPS surveillance. Cashless-only at launch: [ops].', ev:['spec §D4 (Shobhit/Aditi)']},
+  'rg-feedback': {t:'Two-way care', b:'The kaki reports how it went — including <b>how she was treated</b>. Feeds the quality agent\'s kaki-wellbeing category.', ev:['spec §D4/E3 (Shobhit; Zheng Wei)']},
+  'rg-impact': {t:'Impact with drill-downs + PayNow', b:'Hours and earnings now expand to per-visit detail, and there\'s a <b>Withdraw to PayNow</b> action. The consistency streak stays — it\'s the product.', ev:['spec §D5 (Shobhit/Aditi)']},
+  'rg-profile': {t:'Profile, complete', b:'Contact, editable preferences, PayNow link, training, log out, and <b>suspend/delete</b>. Standing shown as "Good standing · Vanguard-verified" — not a public star number [tension G5].', ev:['spec §D7 (Shobhit/Aditi)']},
+  'ad-today': {t:'"Agents" → "Today", tally fixed', b:'Renamed per Zheng Wei; the count now says <b>4</b> and the badges sum to 4. "Consistency score" became <b>repeat-pair rate</b> with a plain-language explainer. Which metrics ops truly needs: focus group before pilot.', ev:['spec §E1 (Zheng Wei/Aditi)']},
+  'ad-onboarding': {t:'Verify with receipts', b:'The agent cross-checks Singpass, the St. Luke\'s registry and Vanguard\'s LMS, shows its evidence trail, and recommends; Wei Lin decides. The reused-document catch stays.', ev:['spec §E (unchanged from v1)','vanguard-operational-data (certs)']},
+  'ad-match-base': {t:'Broad base = named states, not sliders', b:'Zheng Wei\'s design: ops picks an <b>operating state</b> — Balanced / High-demand / Low-demand — with weights displayed read-only. The agent recommends state changes with simulated impact; hard rules are untouchable.', ev:['spec §E2 (Zheng Wei/Aditi)']},
+  'ad-match-cases': {t:'Custom weights live here only', b:'Per-senior exceptions with the agent\'s recommendation and — only at this level — weight overrides. Broad policy stays clean; judgment gets applied where it belongs.', ev:['spec §E2 (Zheng Wei/Aditi)']},
+  'ad-quality': {t:'Three categories + archive', b:'Zheng Wei\'s taxonomy: <b>elderly quality of life · kaki service · kaki wellbeing</b> — the platform protects the giver too. Past cases retrievable in the Archive with outcomes, because quality control needs context.', ev:['spec §E3 (Zheng Wei/Aditi)']},
+  'ad-profile': {t:'Ops profile + tagged cases', b:'Wei Lin\'s cases carry the tagged senior and kaki; app feedback and FAQs/help live here per feedback.', ev:['spec §E4 (Zheng Wei/Aditi)']}
 };
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-
-let persona = 'cg';
 let matchTimer = null;
+let currentTier = 'urgent';
 
-function setPersona(p){
-  persona = p;
-  $$('.personas button').forEach(b => b.classList.toggle('active', b.dataset.persona === p));
-  $$('.bottomnav').forEach(n => n.classList.toggle('active', n.id === 'nav-' + p));
-  $('#scenarioPanel').innerHTML = PERSONAS[p].scenario;
-  go(PERSONAS[p].home);
+function moduleOf(id){
+  if(id === 'land') return 'land';
+  return id.slice(0, 2); // cg / eb / rg / ad
 }
+const NAV_HIDDEN = new Set(['land','eb-need','eb-when','eb-done','rg-start','rg-phone','rg-singpass','rg-email','rg-services','rg-prefs']);
 
 function go(id){
   const target = document.getElementById(id);
@@ -881,14 +1202,25 @@ function go(id){
   $$('.screen').forEach(s => s.classList.remove('active'));
   target.classList.add('active');
   target.scrollTop = 0;
-  // bottom nav highlight
-  const nav = $('#nav-' + persona);
-  if(nav){
-    const map = {cg:{'cg-home':'cg-home','cg-crisis':'cg-crisis','cg-details':'cg-crisis','cg-matching':'cg-crisis','cg-matched':'cg-crisis','cg-tracking':'cg-tracking','cg-report':'cg-tracking'},
-                 rg:{'rg-welcome':'rg-jobs','rg-skills':'rg-training','rg-training':'rg-training','rg-wallet':'rg-training','rg-jobs':'rg-jobs','rg-job':'rg-jobs','rg-earnings':'rg-earnings'},
-                 ad:{'ad-overview':'ad-overview','ad-onboarding':'ad-onboarding','ad-matching':'ad-matching','ad-quality':'ad-quality'}};
-    const active = (map[persona]||{})[id] || id;
-    nav.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.go === active));
+
+  const mod = moduleOf(id);
+  // scenario panel
+  $('#scenarioPanel').innerHTML = SCENARIOS[mod] || SCENARIOS.land;
+  // demo shortcut highlight
+  const jumpMap = {land:'land', cg:'cg-home', eb:'eb-need', rg:'rg-start', ad:'ad-today'};
+  $$('.shortcuts button').forEach(b => b.classList.toggle('active', b.dataset.jump === jumpMap[mod]));
+  // bottom navs
+  $$('.bottomnav').forEach(n => n.classList.remove('active'));
+  if(!NAV_HIDDEN.has(id)){
+    const nav = $('#nav-' + mod);
+    if(nav){
+      nav.classList.add('active');
+      const hl = {cg:{'cg-home':'cg-home','cg-careplan':'cg-home','cg-addkaki':'cg-home','cg-service':'cg-service','cg-when':'cg-service','cg-crisis':'cg-service','cg-details':'cg-service','cg-matching':'cg-service','cg-matched':'cg-service','cg-confirm':'cg-service','cg-tracking':'cg-visits','cg-visits':'cg-visits','cg-report':'cg-visits'},
+                  rg:{'rg-home':'rg-home','rg-visit':'rg-home','rg-feedback':'rg-home','rg-training':'rg-profile','rg-available':'rg-available','rg-impact':'rg-impact','rg-profile':'rg-profile'},
+                  ad:{'ad-today':'ad-today','ad-profile':'ad-today','ad-onboarding':'ad-onboarding','ad-match-base':'ad-match-base','ad-match-cases':'ad-match-base','ad-quality':'ad-quality'}};
+      const active = (hl[mod]||{})[id] || id;
+      nav.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.go === active));
+    }
   }
   // demo notes
   const n = NOTES[id];
@@ -901,7 +1233,7 @@ function go(id){
   if(id === 'cg-matching'){
     const steps = [
       'Checking Papa\'s regular kakis first — familiar faces before new ones.',
-      'Halimah is free 2–5pm · Tamil ✓ · Tier 1 chaperone ✓',
+      'Halimah is free · Tamil ✓ · Tier 1 chaperone ✓ · backup: Mr Koh',
       'Applying subsidies from the Pasir Ris care fund…'
     ];
     let i = 0;
@@ -918,17 +1250,57 @@ function go(id){
 
 /* ---- global click routing ---- */
 document.addEventListener('click', e => {
-  const pBtn = e.target.closest('.personas button');
-  if(pBtn){ setPersona(pBtn.dataset.persona); return; }
+  const jump = e.target.closest('[data-jump]');
+  if(jump){ go(jump.dataset.jump); return; }
+
+  // one-shot morph buttons
+  const doneBtn = e.target.closest('[data-done]');
+  if(doneBtn && !doneBtn.disabled && !doneBtn.dataset.go){
+    doneBtn.textContent = doneBtn.dataset.done;
+    doneBtn.classList.add('done');
+    doneBtn.disabled = true;
+    return;
+  }
 
   const goBtn = e.target.closest('[data-go]');
   if(goBtn){
-    if(goBtn.dataset.mode === 'planned'){
-      const echo = document.getElementById('trigEcho');
-      if(echo) echo.textContent = 'Planned visit · days or weeks ahead';
-      $$('.trigger').forEach(t => t.classList.remove('sel'));
+    // service selection → echo
+    if(goBtn.dataset.svc){
+      const d = {'Chaperone':'usually 2–3 hours','Companionship':'1–3 hours','Wellness check':'about 1 hour','Household help':'1–2 hours'}[goBtn.dataset.svc];
+      $('#svcEcho').textContent = goBtn.dataset.svc + ' · ' + d;
+      $('#trigEcho').textContent = goBtn.dataset.svc;
     }
-    go(goBtn.dataset.go); return;
+    // urgency tier → mode setup
+    if(goBtn.dataset.tier){
+      currentTier = goBtn.dataset.tier;
+      const planned = currentTier === 'planned';
+      $('#urgentWhen').style.display = planned ? 'none' : 'block';
+      $('#plannedWhen').style.display = planned ? 'block' : 'none';
+      if(planned){
+        $('#trigEcho').textContent = ($('#svcEcho').textContent.split(' · ')[0]) + ' · planned';
+      } else {
+        $('#urgentWindow').textContent = currentTier === 'urgent' ? 'Today, within the hour' : 'Today, within 2 hours';
+        const stepEl = document.querySelector('#cg-crisis .stepper');
+        if(stepEl) stepEl.textContent = 'Step 2 of 4 · ' + currentTier;
+      }
+      const eta = {urgent:'Confirmation expected in ~15 minutes (urgent)', soon:'Confirmation expected in ~45 minutes (soon)', planned:'Confirmation within 24 hours (planned)'}[currentTier];
+      $('#matchHead').innerHTML = 'Halimah can come<span class="sub">' + eta + '</span>';
+    }
+    if(goBtn.dataset.done && !goBtn.disabled){
+      goBtn.textContent = goBtn.dataset.done; goBtn.classList.add('done'); goBtn.disabled = true;
+    }
+    go(goBtn.dataset.go);
+    return;
+  }
+
+  // segmented controls
+  const segBtn = e.target.closest('.seg button');
+  if(segBtn){
+    const seg = segBtn.parentElement;
+    seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === segBtn));
+    const screen = seg.closest('.screen');
+    screen.querySelectorAll('.segpane').forEach(p => p.classList.toggle('on', p.id === segBtn.dataset.pane));
+    return;
   }
 
   // crisis trigger selection
@@ -937,7 +1309,30 @@ document.addEventListener('click', e => {
     $$('.trigger').forEach(t => t.classList.remove('sel'));
     trig.classList.add('sel');
     $('#crisisNext').disabled = false;
-    $('#trigEcho').textContent = trig.dataset.trig + ' · crisis activation';
+    $('#trigEcho').textContent = ($('#svcEcho').textContent.split(' · ')[0]) + ' · ' + trig.dataset.trig;
+    return;
+  }
+
+  // mode cards (admin broad base)
+  const mode = e.target.closest('.modecard');
+  if(mode){
+    $$('.modecard').forEach(m => m.classList.remove('sel'));
+    mode.classList.add('sel');
+    return;
+  }
+
+  // language toggle (elderly)
+  const lang = e.target.closest('.langrow button');
+  if(lang){
+    lang.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === lang));
+    return;
+  }
+
+  // calendar day select
+  const day = e.target.closest('.cal-grid button');
+  if(day && !day.classList.contains('dim')){
+    day.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('sel'));
+    day.classList.add('sel');
     return;
   }
 
@@ -948,53 +1343,75 @@ document.addEventListener('click', e => {
     chip.classList.add('sel');
     return;
   }
+  // multi-select chips (no data-single)
+  const mchip = e.target.closest('.chips:not([data-single]) .chip');
+  if(mchip && !mchip.classList.contains('locked') && !mchip.dataset.go){
+    mchip.classList.toggle('sel');
+    return;
+  }
 });
 
-/* ---- scripted one-off interactions ---- */
-$('#acceptBtn')?.addEventListener('click', function(){
-  this.textContent = '✓ Visit accepted — see you at 2pm';
-  this.classList.remove('gold');
-  this.style.background = 'var(--pandan)';
-  this.style.color = '#fff';
-  this.disabled = true;
-  setTimeout(() => go('rg-earnings'), 1400);
+/* ---- scripted interactions ---- */
+
+// caregiver: demo unavailable-path toggle
+$('#unavailToggle')?.addEventListener('click', function(){
+  const un = $('#matchUnavail'), av = $('#matchAvail');
+  const showingUnavail = un.style.display !== 'none';
+  un.style.display = showingUnavail ? 'none' : 'block';
+  av.style.display = showingUnavail ? 'block' : 'none';
+  this.textContent = showingUnavail ? 'Demo: show the unavailable path' : 'Demo: back to the available path';
 });
 
-$('#approveTan')?.addEventListener('click', function(){
-  this.textContent = '✓ Approved at Tier 1 — shadow visit stands';
-  this.disabled = true;
+// elderly: "call me" card
+$('#ebCall')?.addEventListener('click', function(){
+  this.querySelector('b').textContent = '✓ We will call you today';
+  this.querySelector('span:last-child').textContent = 'Before 5pm, from the centre';
+  this.style.borderColor = 'var(--pandan)';
 });
 
-$('#applyWeights')?.addEventListener('click', function(){
-  $('#wLang').textContent = '30%';
-  $('#wSpeed').textContent = '5%';
-  $$('input[type=range]').forEach(r => {
-    if(r.dataset.w === 'wLang') r.value = 30;
-    if(r.dataset.w === 'wSpeed') r.value = 5;
-  });
-  this.textContent = '✓ Applied — agent will report impact next week';
-  this.disabled = true;
+// respite giver: OTP sign-up
+$('#otpBtn')?.addEventListener('click', function(){
+  if(this.dataset.state === 'sent') return;
+  this.dataset.state = 'sent';
+  this.textContent = 'Verifying…';
+  const boxes = $$('#otpBoxes span');
+  const code = ['4','8','2','1'];
+  boxes.forEach((b, i) => setTimeout(() => { b.textContent = code[i]; b.classList.add('fill'); }, 350 * (i + 1)));
+  setTimeout(() => go('rg-singpass'), 350 * 5);
 });
 
+// respite giver: skill toggle in signup
 $('#skillToggle')?.addEventListener('click', function(){
   const on = this.style.borderColor === 'var(--pandan)';
   this.style.borderColor = on ? '' : 'var(--pandan)';
-  this.querySelector('.pill').className = on ? 'pill grey' : 'pill green';
-  this.querySelector('.pill').textContent = on ? 'Tap to add' : 'Selected ✓';
+  const pill = this.querySelector('.pill');
+  pill.className = on ? 'pill grey' : 'pill green';
+  pill.textContent = on ? 'Tap to add' : 'Selected ✓';
 });
 
-$('#qualityAct')?.addEventListener('click', function(){
-  this.textContent = '✓ Check-in scheduled · nurse flagged for PHV';
+// respite giver: visit OTP start/end
+$('#startVisit')?.addEventListener('click', function(){
+  const otp = $('#visitOtp');
+  otp.style.display = 'flex';
+  this.textContent = 'Papa reads you the code…';
   this.disabled = true;
+  const boxes = $$('#visitOtp span');
+  const code = ['7','3','5','9'];
+  boxes.forEach((b, i) => setTimeout(() => { b.textContent = code[i]; b.classList.add('fill'); }, 400 * (i + 1)));
+  setTimeout(() => {
+    this.textContent = '✓ Visit started · 2:01pm';
+    $('#endVisit').style.display = 'flex';
+    $('#cancelVisit').style.display = 'none';
+  }, 400 * 5);
 });
 
-/* live weight labels */
+/* live weight labels (admin case-by-case) */
 $$('input[type=range]').forEach(r => {
-  r.addEventListener('input', () => { $('#' + r.dataset.w).textContent = r.value + '%'; });
+  r.addEventListener('input', () => { const l = $('#' + r.dataset.w); if(l) l.textContent = r.value + '%'; });
 });
 
 /* boot */
-setPersona('cg');
+go('land');
 </script>
 </body>
 </html>
