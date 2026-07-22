@@ -68,9 +68,9 @@ Structural pass on the knowledge base itself. Created `maps/` (this folder). Fol
 
 ## August — planned
 
-### 2026-07-20 (approx.) · SGLN masterclass
+### 2026-07-20 · SGLN masterclass · [[../journal/2026-07-20-masterclass]]
 
-Padlet ideation walk-through with the cohort (~20 ideas, honest that we converged early). Prototype planning begins.
+The cohort carousel. Reframe and research-first framing landed; micro-credentials independently named as the differentiator. The sharpest input: a facilitator's *"your prototype must go to the caregivers, not Vanguard — give it to them, don't sell it"* ([[../reframing/devils-advocate]] critique 15). Aug 20 milestone re-aimed at caregiver testing; Kampung Kakis name collision flagged; Smart Cities Network offer opened. Full synthesis: [[../evidence/sgln-masterclass-feedback-2026-07-20]].
 
 ### 2026-07 → 2026-08 · Follow-on partnership meetings
 

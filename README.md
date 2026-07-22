@@ -384,7 +384,7 @@ The microsite is the substantive showcase of all four — it's literally what th
 - ✅ Solutioning (Jun 25, 2026) — HMW reframed to caregivers; managed-marketplace shape; strategy folder activated.
 - ✅ Vanguard site visit (Jul 8, 2026) — anchor partner confirmed; Pasir Ris ICCP-layered pilot offered by year-end.
 - ✅ HMW narrowing (Jul 8, 2026) — crisis-activation, six named triggers, WHERE + WHEN inside the sentence.
-- ☐ SGLN masterclass (Jul 20, 2026) — checkpoint.
+- ✅ SGLN masterclass (Jul 20, 2026) — reframe validated by the cohort; prototype milestone re-aimed at caregiver testing; devil's advocate at 15 critiques.
 - ☐ Prototype milestone (Aug 20, 2026) — concept prototype pressure-tested against Vanguard's six crisis triggers.
 - ☐ Demo Day (September 2026) — pilot design + pitch.
 

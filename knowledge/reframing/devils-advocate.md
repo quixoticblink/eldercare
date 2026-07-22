@@ -2,7 +2,7 @@
 title: Devil's advocate
 status: draft
 owner: team (rotating; specific critique-owner TBD per critique)
-last_updated: 2026-07-08
+last_updated: 2026-07-20
 ---
 
 The SGLN leadership team sent us a coaching note — separately from the May 19 Zoom, not part of that meeting — asking us to appoint a devil's advocate. This entry holds the strongest case AGAINST whatever framing we're currently leaning on — right now, [[hmw-current]].
@@ -66,6 +66,12 @@ Two new critiques surfaced (or sharpened) at the 2026-07-08 Vanguard visit ([[..
 There's also the beginning of a counter-argument softening earlier critiques: **critique 11 (ownership) is partially answered.** Vanguard's Angeline explicitly volunteered a Pasir Ris pilot by year-end. Not signed, not scoped, but volunteered — and the honesty of the meeting suggests it's real. If it holds, the "who owns this in October" problem gets a partial answer: a Pasir Ris ICCP pilot is a Vanguard operational scope, not our scope, so we don't need to solve full ownership. We only need to solve the pilot design and the multi-payer stack.
 
 **Critique 12 (partner over-optimism) also softens for Vanguard.** They pushed back on us, admitted data gaps, said out loud *"it's not Vanguard's problem, it's a sector problem."* That is the least optimistic partner posture we've heard. Discount their enthusiasm less than we discounted NCSS's.
+
+## Masterclass evidence — added 2026-07-20
+
+The cohort carousel ([[../evidence/sgln-masterclass-feedback-2026-07-20]]) produced one critique sharp enough to join this list, delivered by a facilitator who had reviewed many groups.
+
+15. **We are validating in an echo chamber — the prototype has never touched a caregiver.** His words, roughly: *"Be less salesy. Your prototype must go not to Vanguard, but to the caregivers. Too much money is spent building marketplaces and training people that nobody uses. Figure out the two or three things you will build for, and give it to the caregiver — not selling to them, giving to them. Otherwise it becomes an echo chamber: I got this feature, that feature."* The uncomfortable audit: since the June reframe, every validation conversation has been supply-side and partnership-side — NCSS, Vanguard, the cohort itself. Our caregiver contact dates to round 1 in May, before the concept existed. Partners telling us the concept is good is critique 12 wearing a new hat; a caregiver *using* the thing is the only evidence that counts for the demand side. If we reach Aug 20 with a prototype that has only ever been demoed to people who don't buy, we have built the polished version of the thing this critique warns about. Mitigation now in motion: the Aug 20 milestone is re-aimed at caregiver testing — 2–3 caregiver-facing moments, given not pitched.
 
 ## How this entry should grow
 
