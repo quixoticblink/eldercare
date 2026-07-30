@@ -38,8 +38,8 @@ const AdminView = (() => {
         ${UI.appbar("Approvals", "You decide who's on the platform", "#/admin/home")}
         ${pend.length ? pend.map(u => `
           <div class="card warn" id="u-${u.id}">
-            <div class="row"><h3 class="grow">${UI.esc(u.name || u.email)}</h3><span class="pill gold">Pending</span></div>
-            <p>${UI.esc(u.email)} · wants to join as <b>${UI.esc(u.role || "…not chosen yet")}</b></p>
+            <div class="row"><h3 class="grow">${UI.esc(u.name || UI.contact(u))}</h3><span class="pill gold">Pending</span></div>
+            <p>${UI.esc(UI.contact(u))} · wants to join as <b>${UI.esc(u.role || "…not chosen yet")}</b></p>
             <div class="divider"></div>
             <div class="row">
               <button class="btn quiet" style="margin:0" onclick="AdminView.approve('${u.id}','caregiver')">Approve as caregiver</button>
@@ -47,9 +47,9 @@ const AdminView = (() => {
             </div>
           </div>`).join("") : `<div class="card tint"><p>No one waiting — all clear.</p></div>`}
         <div class="eyebrow">Everyone (${all.length})</div>
-        ${all.map(u => `<div class="li"><div class="face">${UI.initials(u.name || u.email)}</div>
-          <div class="body"><b>${UI.esc(u.name || u.email)}</b>
-          <span>${UI.esc(u.role || "no role")} · ${UI.esc(u.email)}${u.kaki ? " · " + (u.kaki.services || []).join(", ") : ""}</span></div>
+        ${all.map(u => `<div class="li"><div class="face">${UI.initials(u.name || UI.contact(u))}</div>
+          <div class="body"><b>${UI.esc(u.name || UI.contact(u))}</b>
+          <span>${UI.esc(u.role || "no role")} · ${UI.esc(UI.contact(u))}${u.kaki ? " · " + (u.kaki.services || []).join(", ") : ""}</span></div>
           <div class="end"><span class="pill ${u.status === "approved" ? "green" : u.status === "pending" ? "gold" : "clay"}">${u.status}</span>
           ${u.status === "approved" && u.role !== "admin" ? `<br><button class="chip" style="margin-top:6px;min-height:40px;padding:8px 12px;font-size:.78rem" onclick="AdminView.suspend('${u.id}')">Suspend</button>` : ""}
           ${u.status === "suspended" ? `<br><button class="chip" style="margin-top:6px;min-height:40px;padding:8px 12px;font-size:.78rem" onclick="AdminView.approve('${u.id}','${u.role || "caregiver"}')">Reinstate</button>` : ""}</div></div>`).join("")}`);

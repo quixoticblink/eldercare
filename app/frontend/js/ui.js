@@ -58,8 +58,12 @@ const UI = (() => {
 
   const initials = name => (name || "?").split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
+  /* Best display handle for a user: they may have joined by email or by phone,
+     so either field can be empty. Never render a bare "null". */
+  const contact = u => (u && (u.email || u.phone)) || "no contact on file";
+
   const TIER_LABEL = { urgent: "Urgent · within the hour", soon: "Soon · within 2 hours", planned: "Planned" };
 
   return { el, esc, toast, screen, spin, appbar, chipGroup, pick, chipValue,
-           chipMulti, chipValues, statusPill, initials, TIER_LABEL };
+           chipMulti, chipValues, statusPill, initials, contact, TIER_LABEL };
 })();

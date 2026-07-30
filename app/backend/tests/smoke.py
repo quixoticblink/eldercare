@@ -6,12 +6,18 @@ if os.path.exists("/tmp/kakis-test.duckdb"): os.remove("/tmp/kakis-test.duckdb")
 sys.path.insert(0, ".")
 from fastapi.testclient import TestClient
 from backend.main import app
+from backend import config
 c = TestClient(app)
 
-def login(email, role=None, name=None):
-    r = c.post("/api/auth/request-code", json={"email": email}); assert r.status_code == 200, r.text
-    code = r.json()["dev_code"]
-    r = c.post("/api/auth/verify", json={"email": email, "code": code, "role": role, "name": name})
+def request_code(identifier):
+    r = c.post("/api/auth/request-code", json={"identifier": identifier})
+    assert r.status_code == 200, r.text
+    return r.json()
+
+def login(identifier, role=None, name=None, **extra):
+    req = request_code(identifier)
+    r = c.post("/api/auth/verify",
+               json={"identifier": identifier, "code": req["dev_code"], "role": role, "name": name, **extra})
     assert r.status_code == 200, r.text
     d = r.json()
     return {"Authorization": f"Bearer {d['token']}"}, d["user"]
@@ -117,4 +123,57 @@ assert r.status_code == 200 and "Book a visit" in r.json()["reply"] or "book" in
 assert c.post("/api/visits", json={"service":"Chaperone","tier":"soon","date":"today","window":"pm","language":"English"}, headers=kh).status_code == 403
 assert c.post(f"/api/admin/visits/{vid}/assign", json={"kaki_id":"x"}, headers=ch).status_code == 403
 
-print("ALL SMOKE TESTS PASSED ✓  (v1.1 — 30 assertions)")
+# ---- v1.2 · sign in by email OR mobile -------------------------------------
+
+# returning user is recognised, so the UI can skip the name/role questions
+again = request_code("priya@example.com")
+assert again["known"] is True and again["needs_profile"] is False, again
+assert again["channel"] == "email"
+
+# a brand-new identifier still needs the profile step
+fresh = request_code("someone-new@example.com")
+assert fresh["known"] is False and fresh["needs_profile"] is True, fresh
+
+# phone numbers normalise to E.164 however they are typed
+for typed in ("9123 4567", "+65 9123 4567", "6591234567", "91234567"):
+    assert request_code(typed)["identifier"] == "+6591234567", typed
+
+# sign up by mobile only — no email at all
+ph, pu = login("9123 4567", role="kaki", name="Siti")
+assert pu["phone"] == "+6591234567" and pu["status"] == "pending", pu
+assert pu["email"] is None, "phone-only signup must not invent an email"
+assert pu["phone_verified"] is True and pu["email_verified"] is False, pu
+
+# second visit by the same number is a plain sign-in, no profile step
+assert request_code("+6591234567")["needs_profile"] is False
+
+# signing up by email while offering a mobile links both channels
+eh, eu = login("dual@example.com", role="caregiver", name="Mei", contact_phone="8111 2222")
+assert eu["phone"] == "+6581112222" and eu["email_verified"] is True
+assert eu["phone_verified"] is False, "a captured number is not a verified one"
+
+# ...and that same person can then come in through the mobile side
+dh, du = login("+6581112222")
+assert du["id"] == eu["id"], "email and mobile must reach the same account"
+assert du["phone_verified"] is True, "signing in by SMS verifies the number"
+
+# a number already linked to someone else is refused
+req = request_code("clash@example.com")
+r = c.post("/api/auth/verify", json={"identifier": "clash@example.com", "code": req["dev_code"],
+                                     "role": "caregiver", "name": "Clash", "contact_phone": "8111 2222"})
+assert r.status_code == 400 and "already linked" in r.json()["detail"], r.text
+
+# admins can be recognised by mobile too
+os.environ["ADMIN_PHONES"] = "+6599990000"
+config.ADMIN_PHONES = ["+6599990000"]
+_, pa = login("9999 0000", name="Coordinator")
+assert pa["role"] == "admin" and pa["status"] == "approved", pa
+
+# junk identifiers are rejected, not silently accepted
+for junk in ("", "not-an-email", "12", "+"):
+    assert c.post("/api/auth/request-code", json={"identifier": junk}).status_code == 400, junk
+
+# legacy {"email": ...} callers still work
+assert c.post("/api/auth/request-code", json={"email": "priya@example.com"}).status_code == 200
+
+print("ALL SMOKE TESTS PASSED ✓  (v1.2 — 52 assertions)")

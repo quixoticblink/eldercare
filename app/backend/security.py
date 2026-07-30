@@ -1,7 +1,44 @@
-"""M-AUTH · stateless signed tokens (HMAC) + auth dependency. No external JWT lib."""
-import base64, hashlib, hmac, json, time, random
+"""M-AUTH · stateless signed tokens (HMAC), identifier handling, auth dependency.
+
+An "identifier" is whatever the person typed into the single sign-in box: an
+email address or a mobile number. Everything downstream works with the
+normalised pair (channel, value) so the rest of the app never has to guess.
+"""
+import base64, hashlib, hmac, json, re, time, random
 from fastapi import Header, HTTPException
 from . import config, db
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+def normalise_email(raw: str) -> str:
+    email = (raw or "").strip().lower()
+    if not _EMAIL_RE.match(email):
+        raise ValueError("That email address doesn't look right")
+    return email
+
+def normalise_phone(raw: str) -> str:
+    """Accepts '9123 4567', '+65 9123 4567', '6591234567' → '+6591234567'."""
+    s = re.sub(r"[\s\-().]", "", raw or "")
+    digits = re.sub(r"\D", "", s)
+    if not digits:
+        raise ValueError("Enter a mobile number, e.g. 9123 4567")
+    cc = config.DEFAULT_COUNTRY_CODE.lstrip("+")
+    if s.startswith("+"):
+        if not 8 <= len(digits) <= 15:
+            raise ValueError("That mobile number doesn't look right")
+        return "+" + digits
+    if len(digits) == 8:                                  # bare local number
+        return "+" + cc + digits
+    if digits.startswith(cc) and len(digits) == len(cc) + 8:
+        return "+" + digits
+    raise ValueError("Enter a Singapore mobile number, e.g. 9123 4567")
+
+def classify(raw: str) -> tuple[str, str]:
+    """→ ('email'|'phone', normalised value). Raises ValueError on junk."""
+    s = (raw or "").strip()
+    if not s:
+        raise ValueError("Enter your email or mobile number")
+    return ("email", normalise_email(s)) if "@" in s else ("phone", normalise_phone(s))
 
 def _sign(payload_b: bytes) -> str:
     return hmac.new(config.JWT_SECRET.encode(), payload_b, hashlib.sha256).hexdigest()
