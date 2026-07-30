@@ -1,0 +1,5 @@
+# /etc/caddy/Caddyfile — automatic HTTPS reverse proxy
+# Replace with your domain, then: systemctl reload caddy
+kakis.yourdomain.sg {
+    reverse_proxy localhost:8000
+}

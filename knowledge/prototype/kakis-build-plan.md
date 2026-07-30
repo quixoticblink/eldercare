@@ -57,6 +57,10 @@ Install it in Claude Code (`/plugin install superpowers@claude-plugins-official`
 
 Twilio WhatsApp templates need pre-approval — start that paperwork in Phase 0, not when notifications block the demo. Supabase RLS policies are easy to get subtly wrong — they're the PDPA surface, so they get real tests, not vibes. iOS PWA notification limits are real — hence WhatsApp-first, but validate with one kaki's actual iPhone in Phase 1. And the standing risk from the wiki applies to the stack too: if the pilot's owner in October is Vanguard IT or a government cluster, they inherit Postgres + TypeScript on managed services — the most inheritable stack there is. That's not an accident.
 
+## Status update — 2026-07-21: v1 is built
+
+The plan above described the target; a **pilot-adjusted v1 now exists in the repo at `app/`** with its own `app/SPEC.md` (module boundaries M-AUTH…M-HELP, "change X → touch only Y"). Deliberate deviations from the plan, all pilot-pragmatic: FastAPI + **DuckDB** on a single VM instead of Supabase (one process, one DB file, one `cp` as backup — even more inheritable); a **no-build static frontend** in the Kakis design system instead of Next.js (the marked upgrade path stands); **email OTP via Resend** as the first auth rail (mobile OTP is an M-AUTH-only addition); **matching fully manual** in the coordinator console (the deterministic scorer replaces exactly one endpoint later); and the help chatbot ships with a keyword fallback so it works before an Anthropic key is configured. Backend verified by `backend/tests/smoke.py` — 24 assertions across the full lifecycle. Deployment: `app/deploy/README.md` (single-VM or Vercel-split).
+
 ## Connects to
 
 [[kakis-prototype-spec]] is the build target this plan sequences. [[kakis-design-brief]] holds the evidence-to-design trace. [[../strategy/respite-marketplace-concept]] and [[../strategy/consistency-as-design-constraint]] are the strategy this implements. [[../reframing/devils-advocate]] critiques 8 and 14 shaped D4 directly. [[../evidence/vanguard-operational-data]] sets the scale assumptions. The counterparty question in [[../journal/2026-07-07-vanguard-prep]] gates D7.

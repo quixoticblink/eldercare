@@ -1,0 +1,177 @@
+"""M-VISITS · request → assigned → accepted → in_progress → completed, reports, care notes."""
+import random
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from .. import config, db, security
+
+router = APIRouter(prefix="/visits", tags=["visits"])
+
+class VisitIn(BaseModel):
+    service: str
+    tier: str
+    date: str          # "2026-07-22" or "today"
+    window: str        # "14:00–17:00" / "within the hour"
+    language: str
+    notes: str | None = ""
+    trigger: str | None = ""   # urgent/soon path: what happened
+
+class StartIn(BaseModel):
+    otp: str
+
+class ReportIn(BaseModel):
+    chips: list[str] = []
+    text: str = ""
+    meds_confirmed: bool = False
+
+class NoteIn(BaseModel):
+    chips: list[str] = []
+    text: str = ""
+
+def _estimate(service: str) -> dict | None:
+    """Pilot price stack — presentational estimate; billing runs via ICCP during pilot."""
+    m = config.SERVICE_META.get(service)
+    if not m:
+        return None
+    base = m["hours"] * m["rate"]
+    subsidy = round(base * 0.54)      # community care fund (est.)
+    foundation = round(base * 0.14)   # philanthropic top-up (est., means-tested)
+    return {"hours": m["hours"], "rate": m["rate"], "base": base,
+            "subsidy": subsidy, "foundation": foundation,
+            "family_pays": base - subsidy - foundation,
+            "kaki_fee": m["hours"] * m["kaki_rate"], "transport": 3.2}
+
+def _enrich(v: dict) -> dict:
+    h = db.one("SELECT * FROM households WHERE id = ?", [v["household_id"]]) or {}
+    kaki = db.one("SELECT id, name, email, phone FROM users WHERE id = ?", [v["kaki_id"]]) if v.get("kaki_id") else None
+    times_together = 0
+    if kaki:
+        kp = db.one("SELECT tier FROM kaki_profiles WHERE user_id = ?", [kaki["id"]]) or {}
+        kaki["tier"] = kp.get("tier", 1)
+        prof = db.one("SELECT languages FROM kaki_profiles WHERE user_id = ?", [kaki["id"]]) or {}
+        kaki["languages"] = db.uj(prof.get("languages"))
+        times_together = db.q("""SELECT count(*) c FROM visits
+                                 WHERE kaki_id = ? AND household_id = ? AND status = 'completed'""",
+                              [kaki["id"], v["household_id"]])[0]["c"]
+    cg = db.one("SELECT id, name, email FROM users WHERE id = ?", [v["caregiver_id"]]) or {}
+    report = db.one("SELECT * FROM visit_reports WHERE visit_id = ?", [v["id"]])
+    if report:
+        report["chips"] = db.uj(report.get("chips"))
+    plan = db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]])
+    if plan:
+        plan["languages"] = db.uj(plan.get("languages"))
+    return {**v, "window": v.get("time_window"), "trigger": v.get("crisis_trigger") or "",
+            "senior_name": h.get("senior_name"), "senior_age": h.get("senior_age"),
+            "address": h.get("address"), "kaki": kaki, "caregiver": cg,
+            "times_together": times_together, "estimate": _estimate(v.get("service")),
+            "report": report, "care_plan": plan}
+
+@router.post("")
+def create(body: VisitIn, user=Depends(security.current_user)):
+    security.approved_user(user)
+    security.require_role(user, "caregiver")
+    if body.service not in config.SERVICES:
+        raise HTTPException(400, "That service isn't bookable yet")
+    if body.tier not in config.TIERS:
+        raise HTTPException(400, "Pick an urgency")
+    h = db.one("SELECT * FROM households WHERE caregiver_id = ?", [user["id"]])
+    if not h:
+        raise HTTPException(400, "Set up your household and care plan first")
+    vid = db.new_id()
+    otp = f"{random.randint(0, 9999):04d}"
+    db.run("""INSERT INTO visits(id, household_id, caregiver_id, service, tier, date, time_window, language, notes, otp_code, crisis_trigger)
+              VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
+           [vid, h["id"], user["id"], body.service, body.tier, body.date, body.window,
+            body.language, body.notes or "", otp, body.trigger or ""])
+    db.audit(user["email"], "visit_requested", f"{vid} {body.service} {body.tier}")
+    return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
+
+@router.get("")
+def list_visits(user=Depends(security.current_user)):
+    security.approved_user(user)
+    if user["role"] == "caregiver":
+        rows = db.q("SELECT * FROM visits WHERE caregiver_id = ? ORDER BY created_at DESC", [user["id"]])
+    elif user["role"] == "kaki":
+        rows = db.q("SELECT * FROM visits WHERE kaki_id = ? ORDER BY created_at DESC", [user["id"]])
+    else:  # admin
+        rows = db.q("SELECT * FROM visits ORDER BY created_at DESC")
+    return [_enrich(v) for v in rows]
+
+@router.get("/{vid}")
+def get_visit(vid: str, user=Depends(security.current_user)):
+    security.approved_user(user)
+    v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+    if not v:
+        raise HTTPException(404, "Visit not found")
+    if user["role"] != "admin" and user["id"] not in (v["caregiver_id"], v.get("kaki_id")):
+        raise HTTPException(403, "Not your visit")
+    out = _enrich(v)
+    if user["role"] == "kaki":
+        out.pop("otp_code", None)   # kaki gets the code from the senior/caregiver in person
+    return out
+
+def _transition(vid, user, allowed_roles, from_states, to_state, stamp_col=None):
+    v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+    if not v:
+        raise HTTPException(404, "Visit not found")
+    if user["role"] not in allowed_roles and user["role"] != "admin":
+        raise HTTPException(403, "Not allowed")
+    if user["role"] == "kaki" and v.get("kaki_id") != user["id"]:
+        raise HTTPException(403, "Not your visit")
+    if user["role"] == "caregiver" and v["caregiver_id"] != user["id"]:
+        raise HTTPException(403, "Not your visit")
+    if v["status"] not in from_states:
+        raise HTTPException(400, f"Can't do that — visit is {v['status']}")
+    stamp = f", {stamp_col} = current_timestamp" if stamp_col else ""
+    db.run(f"UPDATE visits SET status = ?{stamp} WHERE id = ?", [to_state, vid])
+    db.audit(user["email"], f"visit_{to_state}", vid)
+    return db.one("SELECT * FROM visits WHERE id = ?", [vid])
+
+@router.post("/{vid}/accept")
+def accept(vid: str, user=Depends(security.current_user)):
+    security.approved_user(user)
+    return _enrich(_transition(vid, user, ["kaki"], ["assigned"], "accepted", "accepted_at"))
+
+@router.post("/{vid}/decline")
+def decline(vid: str, user=Depends(security.current_user)):
+    security.approved_user(user)
+    v = _transition(vid, user, ["kaki"], ["assigned"], "requested")
+    db.run("UPDATE visits SET kaki_id = NULL, assigned_at = NULL WHERE id = ?", [vid])
+    return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
+
+@router.post("/{vid}/start")
+def start(vid: str, body: StartIn, user=Depends(security.current_user)):
+    security.approved_user(user)
+    v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+    if not v:
+        raise HTTPException(404, "Visit not found")
+    if body.otp.strip() != v["otp_code"]:
+        raise HTTPException(400, "Wrong start code — ask the family to read it from their visit page")
+    return _enrich(_transition(vid, user, ["kaki"], ["accepted", "assigned"], "in_progress", "started_at"))
+
+@router.post("/{vid}/complete")
+def complete(vid: str, body: ReportIn, user=Depends(security.current_user)):
+    security.approved_user(user)
+    v = _transition(vid, user, ["kaki"], ["in_progress"], "completed", "completed_at")
+    db.run("DELETE FROM visit_reports WHERE visit_id = ?", [vid])
+    db.run("INSERT INTO visit_reports(visit_id, chips, text, meds_confirmed) VALUES (?,?,?,?)",
+           [vid, db.j(body.chips), body.text, body.meds_confirmed])
+    return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
+
+@router.post("/{vid}/cancel")
+def cancel(vid: str, user=Depends(security.current_user)):
+    security.approved_user(user)
+    return _enrich(_transition(vid, user, ["caregiver"],
+                               ["requested", "assigned", "accepted"], "cancelled"))
+
+@router.post("/{vid}/care-note")
+def care_note(vid: str, body: NoteIn, user=Depends(security.current_user)):
+    security.approved_user(user)
+    v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+    if not v:
+        raise HTTPException(404, "Visit not found")
+    if user["id"] not in (v["caregiver_id"], v.get("kaki_id")) and user["role"] != "admin":
+        raise HTTPException(403, "Not your visit")
+    db.run("INSERT INTO care_notes(id, household_id, visit_id, author_id, chips, text) VALUES (?,?,?,?,?,?)",
+           [db.new_id(), v["household_id"], vid, user["id"], db.j(body.chips), body.text])
+    db.audit(user["email"], "care_note", vid)
+    return {"ok": True}

@@ -1,2 +1,9 @@
 .DS_Store
 **/.DS_Store
+
+# app runtime
+app/*.duckdb
+app/.venv/
+app/.env
+app/.env.sh
+__pycache__/

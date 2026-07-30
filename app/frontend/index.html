@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0C3D33">
+<title>Kakis — trusted respite when a need arises</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/kakis.css">
+</head>
+<body>
+<div id="app">
+  <div class="brandbar">
+    <span class="wordmark">Kakis<i>.</i></span>
+    <button id="brandRight" aria-haspopup="true" aria-expanded="false">PASIR RIS PILOT</button>
+  </div>
+  <div id="userMenu" role="menu">
+    <div class="um-who" id="umWho">Not signed in</div>
+    <button id="umSignout" class="out" role="menuitem">Sign out</button>
+  </div>
+  <main id="screen"><div class="spin"></div></main>
+  <nav class="tabs" id="tabs" style="display:none"></nav>
+</div>
+
+<button id="helpBtn" aria-label="Help">?</button>
+<div id="helpPanel" role="dialog" aria-modal="true" aria-label="Help">
+  <div class="sheet">
+    <div class="row">
+      <div class="grow"><h2>Need a hand?</h2>
+        <p style="font-size:.8rem;color:var(--slate)">Ask anything about using Kakis — or call the coordinator: <b style="color:var(--pandan)">6XXX XXXX</b></p>
+      </div>
+      <button class="chip" id="helpClose">Close ✕</button>
+    </div>
+    <div id="chatLog"></div>
+    <div class="chips" id="helpQuick" style="margin-bottom:10px"></div>
+    <div class="chat-row">
+      <input class="f-input" id="chatInput" placeholder="Type a question…" autocomplete="off">
+      <button class="btn" id="chatSend">Send</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/views/auth.js"></script>
+<script src="js/views/caregiver.js"></script>
+<script src="js/views/kaki.js"></script>
+<script src="js/views/admin.js"></script>
+<script src="js/views/help.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
