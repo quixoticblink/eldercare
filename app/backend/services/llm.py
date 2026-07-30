@@ -1,4 +1,4 @@
-"""M-HELP · chatbot brain. Claude via API if a key is set; keyword guide otherwise."""
+"""M-HELP · chatbot brain. Claude or OpenAI via API if a key is set; keyword guide otherwise."""
 import httpx
 from .. import config
 
@@ -27,22 +27,48 @@ Answer briefly (2-4 sentences), warmly, in plain language. App facts:
 - No payments in-app during the pilot (billed via ICCP account). No public ratings of kakis (MOH rule) - concerns go privately to the care team.
 - Coordinator phone: 6XXX XXXX. If you don't know, say so and point to the coordinator."""
 
+def _recent(history: list) -> list:
+    return [{"role": m.get("role", "user"), "content": m.get("content", "")}
+            for m in (history or [])[-6:]]
+
+def _anthropic(message: str, history: list) -> str | None:
+    msgs = _recent(history) + [{"role": "user", "content": message}]
+    r = httpx.post(
+        "https://api.anthropic.com/v1/messages",
+        headers={"x-api-key": config.ANTHROPIC_API_KEY,
+                 "anthropic-version": "2023-06-01"},
+        json={"model": config.LLM_MODEL, "max_tokens": 400,
+              "system": SYSTEM_PROMPT, "messages": msgs},
+        timeout=30,
+    )
+    if r.status_code < 300:
+        return r.json()["content"][0]["text"]
+    return None
+
+def _openai(message: str, history: list) -> str | None:
+    msgs = ([{"role": "system", "content": SYSTEM_PROMPT}]
+            + _recent(history)
+            + [{"role": "user", "content": message}])
+    r = httpx.post(
+        "https://api.openai.com/v1/chat/completions",
+        headers={"Authorization": f"Bearer {config.OPENAI_API_KEY}"},
+        json={"model": config.OPENAI_MODEL, "max_tokens": 400, "messages": msgs},
+        timeout=30,
+    )
+    if r.status_code < 300:
+        return r.json()["choices"][0]["message"]["content"]
+    return None
+
 def reply(message: str, history: list) -> str:
-    if config.ANTHROPIC_API_KEY:
+    # Anthropic first if configured, then OpenAI, then the keyword guide.
+    for key, fn in ((config.ANTHROPIC_API_KEY, _anthropic),
+                    (config.OPENAI_API_KEY, _openai)):
+        if not key:
+            continue
         try:
-            msgs = [{"role": m.get("role", "user"), "content": m.get("content", "")}
-                    for m in (history or [])[-6:]]
-            msgs.append({"role": "user", "content": message})
-            r = httpx.post(
-                "https://api.anthropic.com/v1/messages",
-                headers={"x-api-key": config.ANTHROPIC_API_KEY,
-                         "anthropic-version": "2023-06-01"},
-                json={"model": config.LLM_MODEL, "max_tokens": 400,
-                      "system": SYSTEM_PROMPT, "messages": msgs},
-                timeout=30,
-            )
-            if r.status_code < 300:
-                return r.json()["content"][0]["text"]
+            out = fn(message, history)
+            if out:
+                return out
         except Exception:
             pass
     # keyword fallback

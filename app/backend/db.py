@@ -44,12 +44,39 @@ def _init(c):
       id TEXT PRIMARY KEY, household_id TEXT, visit_id TEXT, author_id TEXT,
       chips TEXT DEFAULT '[]', text TEXT DEFAULT '', created_at TIMESTAMP DEFAULT current_timestamp);
     CREATE TABLE IF NOT EXISTS otp_codes(
-      email TEXT, code TEXT, expires TIMESTAMP);
+      identifier TEXT, channel TEXT, code TEXT, expires TIMESTAMP);
     CREATE TABLE IF NOT EXISTS audit_log(
       ts TIMESTAMP DEFAULT current_timestamp, actor TEXT, action TEXT, detail TEXT);
     """)
     # v1.1 migrations (safe on fresh and existing DBs)
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS crisis_trigger TEXT DEFAULT ''")
+
+    # v1.2 migrations — sign in by email OR mobile.
+    # Which channels a person has actually proved they control. Email-era rows
+    # are backfilled as email-verified since that was the only way in.
+    c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE")
+    c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_verified BOOLEAN DEFAULT FALSE")
+    c.execute("UPDATE users SET email_verified = TRUE WHERE email IS NOT NULL AND email <> '' AND email_verified IS NOT TRUE")
+    # otp_codes was keyed on `email`; it is now keyed on the generic identifier.
+    # The rows are throwaway (codes expire in minutes), so reshaping by drop and
+    # recreate is safe and avoids a fragile column rename.
+    otp_cols = {r[0] for r in c.execute(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'otp_codes'").fetchall()}
+    if "email" in otp_cols:
+        c.execute("DROP TABLE otp_codes")
+        c.execute("CREATE TABLE otp_codes(identifier TEXT, channel TEXT, code TEXT, expires TIMESTAMP)")
+    # An empty-string email would collide under the UNIQUE constraint the moment
+    # a second phone-only account appeared; NULL is the only safe "no email".
+    c.execute("UPDATE users SET email = NULL WHERE email = ''")
+    # Fold the write-ahead log into the database file before serving traffic.
+    # DuckDB can throw an InternalException replaying a WAL entry for
+    # ADD COLUMN ... DEFAULT after an unclean shutdown (e.g. systemctl restart
+    # mid-write), which makes the process crash-loop on boot. Checkpointing
+    # here means there is never such an entry left to replay.
+    try:
+        c.execute("CHECKPOINT")
+    except Exception:
+        pass
 
 def q(sql, params=None):
     """SELECT → list of dicts."""
