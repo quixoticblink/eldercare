@@ -1,7 +1,8 @@
 """M-ADMIN · approvals, manual matching, quality. Automated matching lands here later."""
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from .. import db, security
+from .. import assumptions, db, security
+from ..services import availability
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -68,9 +69,16 @@ def suspend(uid: str, user=Depends(security.current_user)):
     return {"ok": True}
 
 @router.get("/kakis")
-def kakis(user=Depends(security.current_user)):
-    """Approved kakis, for the manual-matching picker."""
+def kakis(visit_id: str | None = None, user=Depends(security.current_user)):
+    """Approved kakis for the matching picker.
+
+    Pass ?visit_id= to get each kaki's availability for that visit's date and
+    window. Availability never filters the list — the coordinator may still need
+    to assign someone who is nominally off, especially for urgent cases — it
+    only sorts and flags."""
     _admin(user)
+    visit = db.one("SELECT * FROM visits WHERE id = ?", [visit_id]) if visit_id else None
+
     rows = db.q("""SELECT u.id, u.name, u.email, u.phone FROM users u
                    WHERE u.role = 'kaki' AND u.status = 'approved' ORDER BY u.name""")
     for r in rows:
@@ -82,6 +90,15 @@ def kakis(user=Depends(security.current_user)):
         for row in db.q("""SELECT household_id, count(*) c FROM visits
                            WHERE kaki_id = ? AND status = 'completed' GROUP BY household_id""", [r["id"]]):
             r["done_with"][row["household_id"]] = row["c"]
+        r["availability"] = availability.summary(r["id"])
+        r["fit"] = (availability.check(r["id"], visit.get("date"), visit.get("time_window"))
+                    if visit else {"state": "unknown", "why": "no visit selected"})
+
+    if visit:
+        order = {"available": 0, "unknown": 1, "unavailable": 2}
+        rows.sort(key=lambda r: (order.get(r["fit"]["state"], 3),
+                                 -r["done_with"].get(visit["household_id"], 0),
+                                 r["active"], (r["name"] or "").lower()))
     return rows
 
 @router.post("/visits/{vid}/assign")
@@ -98,8 +115,20 @@ def assign(vid: str, body: AssignIn, user=Depends(security.current_user)):
         raise HTTPException(400, "Not an approved kaki")
     db.run("UPDATE visits SET kaki_id = ?, status = 'assigned', assigned_at = current_timestamp WHERE id = ?",
            [body.kaki_id, vid])
-    db.audit(user["email"], "visit_assigned", f"{vid} -> {kaki['email']}")
-    return {"ok": True}
+    db.audit(user["email"], "visit_assigned", f"{vid} -> {kaki['email'] or kaki['phone']}")
+    # Name who actually received it — assigning to the wrong kaki is silent
+    # otherwise, and looks exactly like the feature being broken.
+    return {"ok": True,
+            "assigned_to": {"id": kaki["id"], "name": kaki["name"],
+                            "contact": kaki["email"] or kaki["phone"]},
+            "fit": availability.check(kaki["id"], v.get("date"), v.get("time_window"))}
+
+@router.get("/assumptions")
+def get_assumptions(user=Depends(security.current_user)):
+    """The money/time assumptions the engine runs on, so the coordinator can
+    see exactly what drives every figure — and challenge it."""
+    _admin(user)
+    return assumptions.public()
 
 @router.get("/quality")
 def quality(user=Depends(security.current_user)):

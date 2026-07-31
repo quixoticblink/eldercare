@@ -220,3 +220,27 @@ nav.tabs button.on{color:var(--pandan-deep);background:var(--mint)}
   border-radius:50%;animation:spin .8s linear infinite;margin:24px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:.001s!important}}
+
+/* Money disclaimer — every screen with a dollar figure carries this. */
+.money-note{font-size:.68rem;line-height:1.45;color:var(--slate,#5E6B65);opacity:.85;
+  margin:8px 2px 14px;padding-top:8px;border-top:1px dashed var(--mint,#CFE3DA)}
+
+/* Availability grid — weekday rows x half-day toggles. */
+.avail-grid{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;align-items:center;margin:8px 0}
+.avail-grid .day{font-size:.8rem;font-weight:600;padding-right:6px}
+.avail-grid .slot{border:1px solid var(--mint,#CFE3DA);background:#fff;border-radius:10px;
+  padding:9px 6px;font-size:.72rem;text-align:center;cursor:pointer;min-height:40px}
+.avail-grid .slot.sel{background:var(--pandan,#14594A);color:#fff;border-color:var(--pandan,#14594A);font-weight:600}
+.avail-grid .hdr{font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;opacity:.7;text-align:center}
+
+/* Matching picker — one row per kaki with an explicit radio. */
+.pick-row{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--mint,#CFE3DA);
+  border-radius:12px;padding:10px 12px;margin:6px 0;background:#fff;cursor:pointer}
+.pick-row.sel{border-color:var(--pandan,#14594A);box-shadow:0 0 0 2px rgba(20,89,74,.14)}
+.pick-row input{margin-top:3px;width:18px;height:18px;flex:none;accent-color:var(--pandan,#14594A)}
+.pick-row .who{font-weight:600;font-size:.9rem}
+.pick-row .meta{font-size:.7rem;opacity:.8;margin-top:2px;line-height:1.5}
+.fit{font-size:.64rem;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.fit.available{background:#E3F3EA;color:#14594A}
+.fit.unavailable{background:#FBE6E2;color:#9B3A26}
+.fit.unknown{background:#F1EFE9;color:#6B6357}

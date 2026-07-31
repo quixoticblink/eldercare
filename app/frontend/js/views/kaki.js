@@ -19,7 +19,8 @@ const KakiView = (() => {
           <div class="row"><div class="grow"><h3>Your impact</h3>
           <p>${done.length} visit${done.length === 1 ? "" : "s"} · ${hours} hrs · ~$${earned.toFixed(2)} earned</p></div>
           <button class="chip" onclick="location.hash='#/kaki/impact'">Impact →</button></div>
-        </div>`);
+        </div>
+        ${UI.moneyNote()}`);
     } catch (e) { UI.toast(e.message, true); }
   }
 
@@ -45,7 +46,7 @@ const KakiView = (() => {
           <p>${UI.esc(v.address || "Pasir Ris")}</p>
           ${v.trigger ? `<p style="margin-top:4px"><b>Why:</b> ${UI.esc(v.trigger)}</p>` : ""}
           ${v.notes ? `<div class="divider"></div><p><b>From the family:</b> ${UI.esc(v.notes)}</p>` : ""}
-          ${v.estimate ? `<div class="divider"></div><div class="row"><span class="pill gold">You receive ~$${(v.estimate.kaki_fee + v.estimate.transport).toFixed(2)}</span><span class="pill green">Cashless · weekly via Vanguard</span></div>` : ""}
+          ${v.estimate ? `<div class="divider"></div><div class="row"><span class="pill gold">You receive ~$${(v.estimate.kaki_fee + v.estimate.transport).toFixed(2)}</span><span class="pill green">Cashless · weekly via Vanguard</span></div>${UI.moneyNote()}` : ""}
         </div>
         <div class="card tint">
           <h3>Care plan — read before you go</h3>
@@ -130,7 +131,8 @@ const KakiView = (() => {
           <span>Seniors do best with faces they know — you're one of them</span></div></div>` : ""}
         ${Object.entries(byHousehold).map(([n, c]) => `<div class="li"><div class="face">${UI.initials(n)}</div>
           <div class="body"><b>${UI.esc(n)}</b><span>${c} visit${c === 1 ? "" : "s"} together</span></div></div>`).join("")}
-        <div class="card tint"><h3>Payouts</h3><p>During the pilot, payouts run weekly via Vanguard to your PayNow. Questions — call the coordinator.</p></div>`);
+        <div class="card tint"><h3>Payouts</h3><p>During the pilot, payouts run weekly via Vanguard to your PayNow. Questions — call the coordinator.</p></div>
+        ${UI.moneyNote()}`);
     } catch (e) { UI.toast(e.message, true); }
   }
 
@@ -152,6 +154,14 @@ const KakiView = (() => {
         <label class="f-label">Languages I speak</label>
         ${UI.chipMulti("langG", App.config.languages, k.languages)}
         <button class="btn" id="saveP">Save profile</button>
+        <button class="li" onclick="location.hash='#/kaki/availability'">
+          <div class="face">◷</div><div class="body"><b>When I can work</b>
+          <span>${(k.availability && k.availability.any_set)
+            ? Object.entries(k.availability.weekly).filter(([, s]) => s.length)
+                .map(([d, s]) => d + " " + s.map(x => x[0].toUpperCase()).join("")).join(" · ")
+            : "Not set yet — the coordinator can't tell when you're free"}</span></div>
+          <div class="end"><span class="pill ${(k.availability && k.availability.any_set) ? "green" : "gold"}">
+            ${(k.availability && k.availability.any_set) ? "Set" : "Add"}</span></div></button>
         <div class="eyebrow">Training & certificates · Tier ${k.tier || 1}</div>
         <div class="li"><div class="body"><b>CPR + AED</b><span class="mono">External cert · St. Luke's Hospital</span></div><span class="pill green">Valid</span></div>
         <div class="li"><div class="body"><b>Mobility assistance</b><span class="mono">Half-day · Vanguard in-house</span></div><span class="pill green">Valid</span></div>
@@ -169,5 +179,92 @@ const KakiView = (() => {
     } catch (e) { UI.toast(e.message, true); }
   }
 
-  return { home, visit, impact, profile };
+  /* Availability: a normal week plus dated exceptions. Most kakis work
+     elsewhere, so "Tue and Sat mornings, but I'm away on the 12th" is the
+     shape that actually matches their lives. */
+  async function availability() {
+    UI.spin();
+    try {
+      const a = await Api.get("/users/me/availability");
+      const days = App.config.weekdays || ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+      const halves = App.config.half_days || ["morning", "afternoon"];
+      const win = a.half_day_windows || {};
+      const on = (d, h) => ((a.weekly || {})[d] || []).includes(h);
+
+      UI.screen(`
+        ${UI.appbar("When I can work", "The coordinator matches visits to this", "#/kaki/profile")}
+        <div class="card tint"><p>Tick the half-days you're usually free. You don't have to be
+        available every week — mark days off below when something comes up.</p></div>
+
+        <div class="eyebrow">My normal week</div>
+        <div class="avail-grid">
+          <span></span>
+          <span class="hdr">Morning<br><small>${UI.esc(win.morning || "")}</small></span>
+          <span class="hdr">Afternoon<br><small>${UI.esc(win.afternoon || "")}</small></span>
+          ${days.map(d => `
+            <span class="day">${UI.esc(d)}</span>
+            ${halves.map(h => `<div class="slot${on(d, h) ? " sel" : ""}" data-d="${d}" data-h="${h}"
+              onclick="this.classList.toggle('sel')">${on(d, h) ? "✓" : ""}</div>`).join("")}
+          `).join("")}
+        </div>
+        <label class="f-label" for="availNote">Anything the coordinator should know</label>
+        <input class="f-input" id="availNote" value="${UI.esc(a.note || "")}"
+          placeholder="e.g. I can do urgent visits at short notice on weekends">
+        <button class="btn" id="saveAvail">Save my week</button>
+
+        <div class="eyebrow">Days off and extra days</div>
+        ${(a.exceptions || []).length ? (a.exceptions || []).map(e => `
+          <div class="li"><div class="face">${e.available ? "＋" : "✕"}</div>
+            <div class="body"><b>${UI.esc(e.date)} · ${UI.esc(e.half_day)}</b>
+            <span>${e.available ? "Extra availability" : "Not available"}${e.note ? " · " + UI.esc(e.note) : ""}</span></div>
+            <div class="end"><button class="chip" onclick="KakiView.dropException('${e.id}')">Remove</button></div>
+          </div>`).join("")
+        : `<div class="card tint"><p>None yet — your normal week applies every week.</p></div>`}
+
+        <div class="card">
+          <h3>Add a date</h3>
+          <label class="f-label" for="exDate">Date</label>
+          <input class="f-input" id="exDate" type="date">
+          <label class="f-label">Which part of the day</label>
+          ${UI.chipGroup("exHalf", ["all", "morning", "afternoon"], "all")}
+          <label class="f-label">Am I working?</label>
+          ${UI.chipGroup("exAvail", ["Not available", "Extra availability"], "Not available")}
+          <label class="f-label" for="exNote">Reason <small>· optional</small></label>
+          <input class="f-input" id="exNote" placeholder="e.g. Away in JB">
+          <button class="btn quiet" id="addEx">Add this date</button>
+        </div>`);
+
+      UI.el("saveAvail").onclick = async () => {
+        const weekly = {};
+        document.querySelectorAll(".avail-grid .slot.sel").forEach(s => {
+          (weekly[s.dataset.d] = weekly[s.dataset.d] || []).push(s.dataset.h);
+        });
+        try {
+          await Api.put("/users/me/availability", { weekly, note: UI.el("availNote").value.trim() });
+          UI.toast("Availability saved ✓");
+          availability();
+        } catch (e) { UI.toast(e.message, true); }
+      };
+
+      UI.el("addEx").onclick = async () => {
+        const date = UI.el("exDate").value;
+        if (!date) return UI.toast("Pick a date", true);
+        try {
+          await Api.post("/users/me/availability/exceptions", {
+            date, half_day: UI.chipValue("exHalf") || "all",
+            available: UI.chipValue("exAvail") === "Extra availability",
+            note: UI.el("exNote").value.trim() });
+          UI.toast("Saved ✓");
+          availability();
+        } catch (e) { UI.toast(e.message, true); }
+      };
+    } catch (e) { UI.toast(e.message, true); }
+  }
+
+  async function dropException(id) {
+    try { await Api.del(`/users/me/availability/exceptions/${id}`); UI.toast("Removed"); availability(); }
+    catch (e) { UI.toast(e.message, true); }
+  }
+
+  return { home, visit, impact, profile, availability, dropException };
 })();

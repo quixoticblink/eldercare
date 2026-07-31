@@ -2,7 +2,7 @@
 import random
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from .. import config, db, security
+from .. import assumptions, config, db, security
 
 router = APIRouter(prefix="/visits", tags=["visits"])
 
@@ -28,17 +28,24 @@ class NoteIn(BaseModel):
     text: str = ""
 
 def _estimate(service: str) -> dict | None:
-    """Pilot price stack — presentational estimate; billing runs via ICCP during pilot."""
-    m = config.SERVICE_META.get(service)
+    """Pilot price stack. Every number comes from assumptions.json — see that
+    file for the source behind each figure. Presentational only; billing runs
+    through the Vanguard / ICCP account during the pilot."""
+    m = assumptions.service(service)
     if not m:
         return None
-    base = m["hours"] * m["rate"]
-    subsidy = round(base * 0.54)      # community care fund (est.)
-    foundation = round(base * 0.14)   # philanthropic top-up (est., means-tested)
-    return {"hours": m["hours"], "rate": m["rate"], "base": base,
+    hours = m.get("hours", assumptions.default_hours())
+    rate = m.get("family_rate_per_hour", 0)
+    base = hours * rate
+    subsidy = round(base * assumptions.subsidy_pct("community_care_fund_pct"))
+    foundation = round(base * assumptions.subsidy_pct("foundation_topup_pct"))
+    return {"hours": hours, "rate": rate, "base": base,
             "subsidy": subsidy, "foundation": foundation,
             "family_pays": base - subsidy - foundation,
-            "kaki_fee": m["hours"] * m["kaki_rate"], "transport": 3.2}
+            "kaki_fee": hours * m.get("kaki_rate_per_hour", 0),
+            "transport": assumptions.transport_allowance(),
+            "illustrative": True,
+            "disclaimer": assumptions.disclaimer()["short"]}
 
 def _enrich(v: dict) -> dict:
     h = db.one("SELECT * FROM households WHERE id = ?", [v["household_id"]]) or {}

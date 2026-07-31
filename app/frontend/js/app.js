@@ -21,6 +21,8 @@ const App = (() => {
     "#/admin/approvals": () => AdminView.approvals(),
     "#/admin/requests": () => AdminView.requests(),
     "#/admin/quality": () => AdminView.quality(),
+    "#/admin/assumptions": () => AdminView.assumptions(),
+    "#/kaki/availability": () => KakiView.availability(),
   };
 
   function homeFor(role) {

@@ -176,4 +176,86 @@ for junk in ("", "not-an-email", "12", "+"):
 # legacy {"email": ...} callers still work
 assert c.post("/api/auth/request-code", json={"email": "priya@example.com"}).status_code == 200
 
-print("ALL SMOKE TESTS PASSED ✓  (v1.2 — 52 assertions)")
+# ---- v1.3 · assumptions, availability, safer matching ----------------------
+
+# every money figure traces back to assumptions.json, not hardcoded constants
+asm = c.get("/api/admin/assumptions", headers=ah)
+assert asm.status_code == 200, asm.text
+A = asm.json()
+assert "Chaperone" in A["services"] and A["services"]["Chaperone"]["hours"] == 3
+assert "source" in A["services"]["Chaperone"], "every figure must state where it came from"
+assert A["disclaimer"]["short"], "a disclaimer string must exist for the UI footer"
+assert c.get("/api/admin/assumptions", headers=ch).status_code == 403, "assumptions are admin-only"
+
+# the price stack is computed from that file
+est = c.get(f"/api/visits/{vid}", headers=ch).json()["estimate"]
+svc = A["services"]["Chaperone"]
+assert est["base"] == svc["hours"] * svc["family_rate_per_hour"], est
+assert est["kaki_fee"] == svc["hours"] * svc["kaki_rate_per_hour"], est
+assert est["transport"] == A["kaki_payment"]["transport_allowance_per_visit"]["value"]
+assert est["illustrative"] is True and est["disclaimer"], est
+
+# --- kaki availability ---
+av = c.get("/api/users/me/availability", headers=kh)
+assert av.status_code == 200 and av.json()["any_set"] is False, av.text
+
+r = c.put("/api/users/me/availability",
+          json={"weekly": {"Tue": ["morning"], "Sat": ["morning", "afternoon"],
+                           "Nonsense": ["morning"], "Wed": ["midnight"]},
+                "note": "Weekends best"}, headers=kh)
+assert r.status_code == 200, r.text
+wk = r.json()["weekly"]
+assert wk["Tue"] == ["morning"] and sorted(wk["Sat"]) == ["afternoon", "morning"], wk
+assert "Nonsense" not in wk and wk["Wed"] == [], "bad day/half-day names must be dropped, not stored"
+assert r.json()["any_set"] is True
+
+# dated exceptions override the weekly pattern
+r = c.post("/api/users/me/availability/exceptions",
+           json={"date": "2026-08-04", "half_day": "all", "available": False, "note": "Away in JB"},
+           headers=kh)
+assert r.status_code == 200 and len(r.json()["exceptions"]) == 1, r.text
+ex_id = r.json()["exceptions"][0]["id"]
+assert c.post("/api/users/me/availability/exceptions",
+              json={"date": "not-a-date"}, headers=kh).status_code == 400
+
+# caregivers have no availability to set
+assert c.get("/api/users/me/availability", headers=ch).status_code == 403
+
+# --- availability drives the matching screen ---
+from backend.services import availability as availmod
+assert availmod.parse_date("2026-08-04").isoformat() == "2026-08-04"
+assert availmod.half_day_for_window("14:00–17:00") == "afternoon"
+assert availmod.half_day_for_window("morning visit") == "morning"
+# 2026-08-04 is a Tuesday: normally a morning slot, but blocked by the exception
+assert availmod.check(kk["id"], "2026-08-04", "09:00–11:00")["state"] == "unavailable"
+# 2026-08-01 is a Saturday, both halves available
+assert availmod.check(kk["id"], "2026-08-01", "09:00–11:00")["state"] == "available"
+# Monday is not in the weekly pattern
+assert availmod.check(kk["id"], "2026-08-03", "09:00–11:00")["state"] == "unavailable"
+
+# a kaki who has never set availability is 'unknown', never 'unavailable' —
+# otherwise the coordinator would silently stop offering them work
+kh2, kk2 = login("newkaki@example.com", role="kaki", name="Fresh Kaki")
+c.post(f"/api/admin/users/{kk2['id']}/approve", json={"role": "kaki"}, headers=ah)
+assert availmod.check(kk2["id"], "2026-08-01", "09:00–11:00")["state"] == "unknown"
+
+# roster is scored per visit and never hides anyone
+r = c.post("/api/visits", json={"service":"Companionship","tier":"planned","date":"2026-08-01",
+                                "window":"09:00–11:00","language":"English"}, headers=ch)
+nvid = r.json()["id"]
+roster = c.get(f"/api/admin/kakis?visit_id={nvid}", headers=ah).json()
+assert len(roster) >= 2, "availability must sort, not filter"
+assert roster[0]["fit"]["state"] == "available", [k["fit"] for k in roster]
+assert all("fit" in k and "availability" in k for k in roster)
+
+# assignment names who actually received it — the mis-assignment trap
+r = c.post(f"/api/admin/visits/{nvid}/assign", json={"kaki_id": kk2["id"]}, headers=ah)
+assert r.status_code == 200 and r.json()["assigned_to"]["id"] == kk2["id"], r.text
+assert r.json()["assigned_to"]["name"] == "Fresh Kaki", r.json()
+# ...and the right kaki sees it, the other does not
+assert any(v["id"] == nvid for v in c.get("/api/visits", headers=kh2).json())
+assert not any(v["id"] == nvid for v in c.get("/api/visits", headers=kh).json())
+
+assert c.delete(f"/api/users/me/availability/exceptions/{ex_id}", headers=kh).json()["exceptions"] == []
+
+print("ALL SMOKE TESTS PASSED ✓  (v1.3 — 82 assertions)")

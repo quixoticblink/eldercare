@@ -68,6 +68,21 @@ def _init(c):
     # An empty-string email would collide under the UNIQUE constraint the moment
     # a second phone-only account appeared; NULL is the only safe "no email".
     c.execute("UPDATE users SET email = NULL WHERE email = ''")
+
+    # v1.3 · kaki availability, for matching.
+    # Two layers: a recurring normal week, plus dated exceptions. Most kakis are
+    # employed elsewhere, so "Tuesdays and Thursday afternoons, except I'm away
+    # next week" is the shape that actually matches reality.
+    #   weekly_slots — JSON {"Mon": ["morning"], "Sat": ["morning","afternoon"], ...}
+    c.execute("ALTER TABLE kaki_profiles ADD COLUMN IF NOT EXISTS weekly_slots TEXT DEFAULT '{}'")
+    c.execute("ALTER TABLE kaki_profiles ADD COLUMN IF NOT EXISTS availability_note TEXT DEFAULT ''")
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS availability_exceptions(
+      id TEXT PRIMARY KEY, user_id TEXT, date TEXT,
+      half_day TEXT,          -- 'morning' | 'afternoon' | 'all'
+      available BOOLEAN,      -- FALSE = day off, TRUE = extra slot outside the weekly pattern
+      note TEXT DEFAULT '');
+    """)
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for
     # ADD COLUMN ... DEFAULT after an unclean shutdown (e.g. systemctl restart

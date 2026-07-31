@@ -165,6 +165,10 @@ def _update_existing(user: dict, channel: str, body: VerifyIn):
 
 @router.get("/me")
 def me(user=Depends(security.current_user)):
+    from .. import assumptions
     return {"user": _public(user), "config": {
         "services": config.SERVICES, "locked_services": config.LOCKED_SERVICES,
-        "tiers": config.TIERS, "languages": config.LANGUAGES}}
+        "tiers": config.TIERS, "languages": config.LANGUAGES,
+        "weekdays": config.WEEKDAYS, "half_days": config.HALF_DAYS,
+        "half_day_windows": assumptions.half_day_windows(),
+        "money_disclaimer": assumptions.disclaimer()}}

@@ -34,14 +34,18 @@ PORT           = int(env("PORT", "8000"))
 TOKEN_DAYS     = 30
 OTP_MINUTES    = 10
 
-SERVICES = ["Chaperone", "Companionship", "Wellness check", "Household help"]
-# est hours, family rate $/hr, kaki rate $/hr — pilot estimates for the price stack
-SERVICE_META = {
-    "Chaperone":       {"hours": 3, "rate": 28, "kaki_rate": 12},
-    "Companionship":   {"hours": 2, "rate": 24, "kaki_rate": 11},
-    "Wellness check":  {"hours": 1, "rate": 24, "kaki_rate": 12},
-    "Household help":  {"hours": 2, "rate": 22, "kaki_rate": 10},
-}
+# The bookable services and their rates come from assumptions.json — one file,
+# one source of truth, editable without a deploy. The literal list below is only
+# a fallback for when that file is missing.
+from . import assumptions as _assumptions          # noqa: E402  (stdlib-only import)
+
+SERVICES = list(_assumptions.services().keys()) or [
+    "Chaperone", "Companionship", "Wellness check", "Household help"]
+
+# Availability is captured in half-days rather than exact hours — realistic for
+# kakis who are also employed elsewhere.
+HALF_DAYS = ["morning", "afternoon"]
+WEEKDAYS  = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 TRIGGERS = ["Helper left suddenly", "Spouse hospitalised", "My own emergency",
             "Discharge, no plan", "Sudden decline", "Loss of a spouse"]
 LOCKED_SERVICES = ["Medicine administration"]  # Tier 2 — visible, not bookable in v1

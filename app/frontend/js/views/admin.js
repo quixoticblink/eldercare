@@ -24,6 +24,10 @@ const AdminView = (() => {
         <button class="li" onclick="location.hash='#/admin/quality'">
           <div class="face">❋</div><div class="body"><b>Quality</b><span>Visit reports and private care notes — never public ratings</span></div>
           <div class="end">${ov.care_notes ? `<span class="pill grey">${ov.care_notes}</span>` : ""}</div></button>
+        <button class="li" onclick="location.hash='#/admin/assumptions'">
+          <div class="face">≈</div><div class="body"><b>Assumptions</b>
+          <span>Every rate, hour and subsidy % behind the figures — and where each came from</span></div>
+          <div class="end"><span class="pill grey">Illustrative</span></div></button>
         <div class="card tint"><h3>Hard rules</h3>
         <p>No public ratings of care staff (MOH) · certification gates tasks · urgent requests first · concerns go to a human.</p></div>`);
     } catch (e) { UI.toast(e.message, true); }
@@ -79,36 +83,82 @@ const AdminView = (() => {
       const visits = await Api.get("/visits");
       const open = visits.filter(v => v.status === "requested");
       const active = visits.filter(v => ["assigned", "accepted", "in_progress"].includes(v.status));
-      const kakis = await Api.get("/admin/kakis");
-      window._kakis = kakis;
       const tierRank = { urgent: 0, soon: 1, planned: 2 };
       open.sort((a, b) => (tierRank[a.tier] ?? 3) - (tierRank[b.tier] ?? 3));
+
+      /* Availability is scored per visit (date + window), so each open request
+         gets its own ranked list rather than one shared roster. */
+      const rosters = {};
+      for (const v of open) rosters[v.id] = await Api.get(`/admin/kakis?visit_id=${encodeURIComponent(v.id)}`);
+
       UI.screen(`
-        ${UI.appbar("Match requests", "Urgent first · pick the kaki with history where you can", "#/admin/home")}
-        ${open.length ? open.map(v => `
+        ${UI.appbar("Match requests", "Urgent first · choose a kaki, then confirm", "#/admin/home")}
+        ${open.length ? open.map(v => {
+          const roster = rosters[v.id] || [];
+          return `
           <div class="card${v.tier === "urgent" ? " warn" : ""}">
             <div class="row" style="flex-wrap:wrap"><h3 class="grow">${UI.esc(v.service)} · ${UI.esc(v.senior_name)}</h3>
               <span class="pill ${v.tier === "urgent" ? "clay" : v.tier === "soon" ? "gold" : "grey"}">${UI.esc(v.tier)}</span>
               ${v.trigger ? `<span class="pill gold">${UI.esc(v.trigger)}</span>` : ""}</div>
-            <p>${UI.esc(v.date)} ${UI.esc(v.window || "")} · ${UI.esc(v.language)} · by ${UI.esc(v.caregiver?.name || v.caregiver?.email || "")}</p>
+            <p>${UI.esc(v.date)} ${UI.esc(v.window || "")} · ${UI.esc(v.language)} · by ${UI.esc(v.caregiver?.name || UI.contact(v.caregiver))}</p>
             ${v.notes ? `<p style="margin-top:6px"><b>Note:</b> ${UI.esc(v.notes)}</p>` : ""}
             <div class="divider"></div>
-            ${kakis.length ? `<div class="chips">
-              ${kakis.map(k => {
+            ${roster.length ? `
+              <div class="eyebrow" style="margin-top:0">Choose one kaki</div>
+              ${roster.map(k => {
                 const history = (k.done_with || {})[v.household_id];
                 const langOk = (k.languages || []).includes(v.language);
                 const svcOk = (k.services || []).includes(v.service);
-                const hint = [history ? `${history}× with this senior` : null, langOk ? v.language + " ✓" : null,
-                              svcOk ? null : "service not set", k.active ? `${k.active} active` : "free"].filter(Boolean).join(" · ");
-                return `<button class="chip" onclick="AdminView.assign('${v.id}','${k.id}')">${UI.esc(k.name || k.email)}<small style="font-weight:400"> — ${hint}</small></button>`;
-              }).join("")}</div>`
+                const fit = k.fit || { state: "unknown", why: "" };
+                const meta = [
+                  history ? `${history}× with this senior` : null,
+                  langOk ? `speaks ${UI.esc(v.language)}` : `no ${UI.esc(v.language)} on profile`,
+                  svcOk ? null : "service not on profile",
+                  k.active ? `${k.active} active visit${k.active === 1 ? "" : "s"}` : "no active visits",
+                ].filter(Boolean).join(" · ");
+                return `
+                <label class="pick-row" onclick="AdminView.markPicked('${v.id}', this)">
+                  <input type="radio" name="pick-${v.id}" value="${k.id}" data-name="${UI.esc(k.name || UI.contact(k))}">
+                  <span class="grow">
+                    <span class="who">${UI.esc(k.name || UI.contact(k))}</span>
+                    <span class="fit ${fit.state}" style="margin-left:6px">${fit.state}${fit.why ? " · " + UI.esc(fit.why) : ""}</span>
+                    <span class="meta">${meta}</span>
+                  </span>
+                </label>`;
+              }).join("")}
+              <button class="btn" onclick="AdminView.confirmAssign('${v.id}')">Assign selected kaki</button>`
             : `<p>No approved kakis yet — approve one first.</p>`}
-          </div>`).join("") : `<div class="card tint"><p>Nothing to match — all requests are assigned.</p></div>`}
+          </div>`; }).join("") : `<div class="card tint"><p>Nothing to match — all requests are assigned.</p></div>`}
         ${active.length ? `<div class="eyebrow">Active</div>` + active.map(v => `
           <div class="li"><div class="face">${UI.initials(v.kaki?.name)}</div>
           <div class="body"><b>${UI.esc(v.service)} · ${UI.esc(v.senior_name)}</b>
-          <span>${UI.esc(v.kaki?.name || "")} · ${UI.esc(v.date)} ${UI.esc(v.window || "")}</span></div>
+          <span>assigned to <b>${UI.esc(v.kaki?.name || UI.contact(v.kaki))}</b> · ${UI.esc(v.date)} ${UI.esc(v.window || "")}</span></div>
           <div class="end">${UI.statusPill(v.status)}</div></div>`).join("") : ""}`);
+    } catch (e) { UI.toast(e.message, true); }
+  }
+
+  /* Highlight the chosen row so the selection is visible before committing. */
+  function markPicked(vid, row) {
+    document.querySelectorAll(`.pick-row`).forEach(r => {
+      const input = r.querySelector(`input[name="pick-${vid}"]`);
+      if (input) r.classList.remove("sel");
+    });
+    row.classList.add("sel");
+  }
+
+  /* Explicit confirm naming the kaki. One-tap assignment used to send visits to
+     whoever was tapped with no confirmation and no name in the toast, which is
+     indistinguishable from the feature being broken when it goes to the wrong
+     person. */
+  async function confirmAssign(vid) {
+    const picked = document.querySelector(`input[name="pick-${vid}"]:checked`);
+    if (!picked) return UI.toast("Pick a kaki first", true);
+    const who = picked.dataset.name;
+    if (!confirm(`Assign this visit to ${who}?\n\nThey'll see it on their Visits screen straight away.`)) return;
+    try {
+      const r = await Api.post(`/admin/visits/${vid}/assign`, { kaki_id: picked.value });
+      UI.toast(`Assigned to ${r.assigned_to?.name || who} ✓`);
+      requests();
     } catch (e) { UI.toast(e.message, true); }
   }
 
@@ -141,5 +191,45 @@ const AdminView = (() => {
     } catch (e) { UI.toast(e.message, true); }
   }
 
-  return { home, approvals, approve, suspend, requests, assign, quality };
+  /* The money and time figures behind every estimate, so the coordinator can
+     see and challenge them without reading the code. */
+  async function assumptions() {
+    UI.spin();
+    try {
+      const a = await Api.get("/admin/assumptions");
+      const row = (label, value, source, note) => `
+        <div class="li"><div class="body">
+          <b>${UI.esc(label)}</b>
+          <span>${UI.esc(String(value))}${note ? " · " + UI.esc(note) : ""}</span>
+          ${source ? `<span class="mono" style="font-size:.62rem;opacity:.75">${UI.esc(source)}</span>` : ""}
+        </div></div>`;
+      const svc = Object.entries(a.services || {}).map(([name, m]) => row(
+        name,
+        `${m.hours} hrs · family $${m.family_rate_per_hour}/hr · kaki $${m.kaki_rate_per_hour}/hr`,
+        m.source, m.note)).join("");
+      const sub = Object.entries(a.subsidies || {}).map(([k, m]) => row(
+        k.replace(/_/g, " "), `${Math.round((m.value || 0) * 100)}%`, m.source, m.note)).join("");
+      const pay = Object.entries(a.kaki_payment || {}).map(([k, m]) => row(
+        k.replace(/_/g, " "), m.value, m.source, m.note)).join("");
+      const time = Object.entries(a.time || {}).filter(([, m]) => m && typeof m === "object" && "value" in m)
+        .map(([k, m]) => row(k.replace(/_/g, " "), m.value, m.source, m.note)).join("");
+
+      UI.screen(`
+        ${UI.appbar("Assumptions", "What every number in the app is built on", "#/admin/home")}
+        <div class="card warn"><h3>${UI.esc((a.disclaimer || {}).short || "For illustration only")}</h3>
+          <p>${UI.esc((a.disclaimer || {}).long || "")}</p>
+          <p style="margin-top:6px" class="mono" style="font-size:.65rem">version ${UI.esc(a.version || "?")} · ${UI.esc(a.currency || "SGD")}</p></div>
+        <div class="eyebrow">Services — hours and rates</div>${svc}
+        <div class="eyebrow">Subsidies</div>${sub}
+        <div class="eyebrow">Kaki payment</div>${pay}
+        <div class="eyebrow">Time</div>${time}
+        <div class="card tint"><h3>Changing these</h3>
+          <p>Every figure lives in <span class="mono">app/assumptions.json</span> on the server.
+          Edit that file and restart — no code change, no deploy. Anything marked
+          <b>PLACEHOLDER</b> has not been confirmed with Vanguard or MOH.</p></div>`);
+    } catch (e) { UI.toast(e.message, true); }
+  }
+
+  return { home, approvals, approve, suspend, requests, assign, markPicked,
+           confirmAssign, assumptions, quality };
 })();

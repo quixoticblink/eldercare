@@ -234,7 +234,8 @@ const CareView = (() => {
             <div class="s-row minus"><span>Foundation top-up<span class="who">Est. · means-tested</span></span><span class="amt">− $${est.foundation.toFixed(2)}</span></div>
             <div class="s-row total"><span>Family pays (est.)</span><span class="amt">$${est.family_pays.toFixed(2)}</span></div>
           </div>
-          <p style="font-size:.74rem;color:var(--slate);margin:-6px 0 10px">Billed through your ICCP account during the pilot — nothing to pay in the app.</p>` : ""}
+          <p style="font-size:.74rem;color:var(--slate);margin:-6px 0 10px">Billed through your ICCP account during the pilot — nothing to pay in the app.</p>
+          ${UI.moneyNote()}` : ""}
         ${v.status === "completed" && v.report ? `
           <div class="card"><h3>Visit report</h3>
             <p>${UI.esc(v.report.text || "")}</p><div class="divider"></div>

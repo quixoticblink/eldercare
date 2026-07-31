@@ -1,0 +1,101 @@
+{
+  "_README": [
+    "Every number the app uses to compute money or time lives here — nothing is",
+    "hardcoded in the engine. Edit this file and restart kakis; no code deploy.",
+    "",
+    "These are PILOT ESTIMATES for illustration, not billed rates. Billing runs",
+    "through the Vanguard / ICCP account during the pilot. Each value carries a",
+    "'source' so the coordinator can see where it came from and challenge it.",
+    "",
+    "Anything with source 'PLACEHOLDER' has not been confirmed with Vanguard or",
+    "MOH and should be treated as a guess."
+  ],
+  "version": "2026-07-31",
+  "currency": "SGD",
+
+  "services": {
+    "Chaperone": {
+      "hours": 3,
+      "family_rate_per_hour": 28,
+      "kaki_rate_per_hour": 12,
+      "source": "PLACEHOLDER — pilot estimate, not confirmed with Vanguard",
+      "note": "Accompanying to appointments; longest typical visit because of travel and waiting."
+    },
+    "Companionship": {
+      "hours": 2,
+      "family_rate_per_hour": 24,
+      "kaki_rate_per_hour": 11,
+      "source": "PLACEHOLDER — pilot estimate, not confirmed with Vanguard",
+      "note": "Conversation, a walk, a meal together. No personal-care tasks."
+    },
+    "Wellness check": {
+      "hours": 1,
+      "family_rate_per_hour": 24,
+      "kaki_rate_per_hour": 12,
+      "source": "PLACEHOLDER — pilot estimate, not confirmed with Vanguard",
+      "note": "Short drop-in to confirm the senior is safe and well."
+    },
+    "Household help": {
+      "hours": 2,
+      "family_rate_per_hour": 22,
+      "kaki_rate_per_hour": 10,
+      "source": "PLACEHOLDER — pilot estimate, not confirmed with Vanguard",
+      "note": "Light housekeeping, laundry, simple meal prep."
+    }
+  },
+
+  "subsidies": {
+    "community_care_fund_pct": {
+      "value": 0.54,
+      "source": "PLACEHOLDER — illustrative means-tested rate, NOT an MOH-confirmed figure",
+      "note": "Applied to the base cost before the family's share is calculated. Real subsidy is means-tested per household and will vary widely."
+    },
+    "foundation_topup_pct": {
+      "value": 0.14,
+      "source": "PLACEHOLDER — assumed philanthropic top-up",
+      "note": "Represents a charitable top-up covering part of the remainder. Not yet committed by any funder."
+    }
+  },
+
+  "kaki_payment": {
+    "transport_allowance_per_visit": {
+      "value": 3.2,
+      "source": "PLACEHOLDER — approx. two-way public transport within Pasir Ris",
+      "note": "Flat per visit regardless of distance during the pilot."
+    },
+    "payout_cycle": {
+      "value": "weekly",
+      "source": "Vanguard pilot arrangement",
+      "note": "Cashless to PayNow."
+    }
+  },
+
+  "time": {
+    "hours_are_estimates": {
+      "value": true,
+      "source": "Design decision",
+      "note": "Visit hours come from the service defaults above, not from measured start/end timestamps. Impact and earnings totals therefore ESTIMATE effort rather than measure it."
+    },
+    "default_hours_when_service_unknown": {
+      "value": 2,
+      "source": "Design decision",
+      "note": "Fallback used when a visit references a service missing from this file."
+    },
+    "urgent_response_target_minutes": {
+      "value": 60,
+      "source": "Pilot service definition",
+      "note": "What 'Urgent — within the hour' promises the family."
+    },
+    "half_day_windows": {
+      "morning": "08:00–13:00",
+      "afternoon": "13:00–18:00",
+      "source": "Design decision",
+      "note": "Availability is captured in half-days, not exact hours, to keep it realistic for part-time kakis."
+    }
+  },
+
+  "disclaimer": {
+    "short": "For illustration only",
+    "long": "Figures are pilot estimates for illustration only. Actual costs, subsidies and payouts are determined by the Vanguard / ICCP account and the applicable means test."
+  }
+}

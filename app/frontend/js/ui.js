@@ -62,8 +62,17 @@ const UI = (() => {
      so either field can be empty. Never render a bare "null". */
   const contact = u => (u && (u.email || u.phone)) || "no contact on file";
 
+  /* Every screen showing a dollar figure must carry this. The numbers are pilot
+     estimates from assumptions.json, not billed amounts — saying so once, in one
+     component, means it can't be forgotten on a screen. */
+  function moneyNote() {
+    const d = (App.config && App.config.money_disclaimer) || {};
+    return `<p class="money-note">${esc(d.short || "For illustration only")} —
+      ${esc(d.long || "figures are pilot estimates, not billed amounts.")}</p>`;
+  }
+
   const TIER_LABEL = { urgent: "Urgent · within the hour", soon: "Soon · within 2 hours", planned: "Planned" };
 
   return { el, esc, toast, screen, spin, appbar, chipGroup, pick, chipValue,
-           chipMulti, chipValues, statusPill, initials, contact, TIER_LABEL };
+           chipMulti, chipValues, statusPill, initials, contact, moneyNote, TIER_LABEL };
 })();
