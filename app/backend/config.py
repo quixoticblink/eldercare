@@ -11,6 +11,9 @@ ADMIN_EMAILS   = [e.strip().lower() for e in env("ADMIN_EMAILS", "abhishekkaul@g
 ADMIN_PHONES   = [p.strip() for p in env("ADMIN_PHONES").split(",") if p.strip()]
 RESEND_API_KEY = env("RESEND_API_KEY")
 MAIL_FROM      = env("MAIL_FROM", "Kakis <onboarding@resend.dev>")
+# Sending through Resend needs DNS records, not a mailbox — so MAIL_FROM can be
+# an address that cannot receive. Point replies somewhere real, or they bounce.
+MAIL_REPLY_TO  = env("MAIL_REPLY_TO")
 DEV_MODE       = env("DEV_MODE", "1") == "1"
 
 # M-AUTH · SMS channel. Sign-in codes go out over AWS SNS when SMS_ENABLED=1;

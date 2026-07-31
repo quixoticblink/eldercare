@@ -7,10 +7,7 @@ def send_otp_email(to: str, code: str) -> dict:
     Resend key) the code is returned to the API so the app works pre-configuration."""
     if config.RESEND_API_KEY:
         try:
-            r = httpx.post(
-                "https://api.resend.com/emails",
-                headers={"Authorization": f"Bearer {config.RESEND_API_KEY}"},
-                json={
+            payload = {
                     "from": config.MAIL_FROM,
                     "to": [to],
                     "subject": f"{code} is your Kakis sign-in code",
@@ -22,7 +19,13 @@ def send_otp_email(to: str, code: str) -> dict:
                         <p style="color:#5E6B65">It expires in {config.OTP_MINUTES} minutes.
                         If you didn't request this, ignore this email.</p>
                       </div>""",
-                },
+            }
+            if config.MAIL_REPLY_TO:
+                payload["reply_to"] = config.MAIL_REPLY_TO
+            r = httpx.post(
+                "https://api.resend.com/emails",
+                headers={"Authorization": f"Bearer {config.RESEND_API_KEY}"},
+                json=payload,
                 timeout=15,
             )
             ok = r.status_code < 300
