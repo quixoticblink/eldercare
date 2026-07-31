@@ -55,13 +55,48 @@ Running, check the security group before anything else.
 Port 8000 is deliberately closed to the internet; Caddy proxies to it over
 localhost.
 
-## Before real users
+## Live status (30 Jul 2026)
 
-- **`DEV_MODE=1` must become `0`.** Sign-in codes are currently returned in the
-  API response, so anyone can sign in as anyone. Needs a Resend key and a
-  verified sending domain first.
-- **`OPENAI_API_KEY` is empty**, so the chatbot serves the built-in keyword
-  guide rather than live answers.
+| Channel | State |
+|---|---|
+| Email sign-in | **Live** — Resend, `singaporekakis.com` verified, from `hello@singaporekakis.com`, replies to abhishekkaul@gmail.com |
+| Chatbot | **Live** — OpenAI `gpt-4o-mini` |
+| SMS sign-in | Off (`SMS_ENABLED=0`) — awaiting SNS sandbox exit and SG Sender ID |
+| `DEV_MODE` | **0** — codes are delivered, never returned in the API |
+
+Confirmed after the switch: `/api/auth/request-code` returns no `dev_code` for
+either a known or an unknown address, and delivery to a real inbox was
+verified (not spam).
+
+Before touching any of this, run the preflight — it refuses to bless a
+`DEV_MODE` change unless a delivery channel actually works:
+
+```bash
+sudo -u kakis /home/kakis/eldercare/app/.venv/bin/python \
+  /home/kakis/eldercare/app/deploy/preflight.py
+# add --send-email you@example.com for a real end-to-end send
+```
+
+To change any secret without it entering shell history:
+
+```bash
+sudo /home/kakis/eldercare/app/deploy/set-secret.sh RESEND_API_KEY
+```
+
+A copy of the pre-go-live `.env` sits at `/home/kakis/.env.bak-predevmode`.
+
+**Worth knowing:** `emailer.py` only returns a dev code when sending *fails*.
+So once Resend was working, on-screen codes stopped appearing even with
+`DEV_MODE=1`. Setting it to `0` removes the fallback for the case where Resend
+is *down* — at which point sign-in stops entirely rather than degrading into
+an open door. That is the intended trade.
+
+## Still to do
+
+- **SMS**: exit the SNS SMS sandbox (support case) and register a Singapore
+  Sender ID (SSIR, weeks + fee). Then `SMS_ENABLED=1`.
+- **DMARC** is `p=quarantine` with `rua` pointing at GoDaddy's address.
+  Consider repointing `rua` to a mailbox you actually read.
 
 The app is then live at **https://singaporekakis.com**. First sign-in with
 `abhishekkaul@gmail.com` lands in the coordinator console.
