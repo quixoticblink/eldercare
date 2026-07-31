@@ -21,6 +21,20 @@ DEV_MODE       = env("DEV_MODE", "1") == "1"
 # SNS notes for go-live: the account starts in the SMS sandbox (only verified
 # numbers receive messages), and Singapore requires a registered Sender ID.
 SMS_ENABLED    = env("SMS_ENABLED", "0") == "1"
+
+# DEMO BACKDOOR — read this before adding anything here.
+# Identifiers on this list get their sign-in code returned in the API response
+# and shown on screen, even when DEV_MODE=0. It exists so the app can be
+# demonstrated without a working SMS provider.
+#
+# Anyone who knows a listed identifier can sign in as that account from the
+# public site. Treat every entry as a shared password. Never list an identifier
+# belonging to a real user, and empty this list once SMS delivery works.
+# Phone numbers must be full E.164, e.g. "+6598553704".
+DEMO_IDENTIFIERS = [d.strip().lower() for d in env("DEMO_IDENTIFIERS").split(",") if d.strip()]
+
+def is_demo_identifier(value: str) -> bool:
+    return bool(value) and value.strip().lower() in DEMO_IDENTIFIERS
 AWS_REGION     = env("AWS_REGION", "ap-southeast-1")
 SMS_SENDER_ID  = env("SMS_SENDER_ID", "Kakis")
 DEFAULT_COUNTRY_CODE = env("DEFAULT_COUNTRY_CODE", "+65")   # bare 8-digit numbers are Singapore

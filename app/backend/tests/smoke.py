@@ -258,4 +258,33 @@ assert not any(v["id"] == nvid for v in c.get("/api/visits", headers=kh).json())
 
 assert c.delete(f"/api/users/me/availability/exceptions/{ex_id}", headers=kh).json()["exceptions"] == []
 
-print("ALL SMOKE TESTS PASSED ✓  (v1.3 — 82 assertions)")
+# --- demo backdoor: on-screen codes for listed identifiers only --------------
+os.environ["DEV_MODE"] = "0"
+config.DEV_MODE = False
+config.DEMO_IDENTIFIERS = ["+6598553704"]
+config.ADMIN_PHONES = ["+6598553704"]
+
+# the demo number gets its code on screen even with DEV_MODE off
+r = c.post("/api/auth/request-code", json={"identifier": "9855 3704"}).json()
+assert r["demo"] is True and r.get("dev_code"), r
+# ...and it lands as an admin, approved, ready to match
+r2 = c.post("/api/auth/verify", json={"identifier": "+6598553704", "code": r["dev_code"], "name": "Demo Admin"})
+demo = r2.json()["user"]
+assert demo["role"] == "admin" and demo["status"] == "approved", demo
+assert demo["email"] is None, "demo admin is phone-only, separate from the email admin"
+dh = {"Authorization": "Bearer " + r2.json()["token"]}
+assert c.get("/api/admin/pending-users", headers=dh).status_code == 200, "demo admin must be able to approve"
+assert c.get("/api/admin/assumptions", headers=dh).status_code == 200
+
+# nobody else leaks a code — this is an allowlist, not a global switch
+other = c.post("/api/auth/request-code", json={"identifier": "+6591112222"}).json()
+assert "dev_code" not in other and not other.get("demo"), other
+mail = c.post("/api/auth/request-code", json={"identifier": "priya@gmail.com"}).json()
+assert "dev_code" not in mail and not mail.get("demo"), mail
+
+# emptying the list closes the door immediately
+config.DEMO_IDENTIFIERS = []
+shut = c.post("/api/auth/request-code", json={"identifier": "9855 3704"}).json()
+assert "dev_code" not in shut and not shut.get("demo"), shut
+
+print("ALL SMOKE TESTS PASSED ✓  (v1.3 — 93 assertions)")

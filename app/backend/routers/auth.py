@@ -79,6 +79,13 @@ def request_code(body: IdentifierIn):
     }
     if result["dev_code"]:
         out["dev_code"] = result["dev_code"]   # DEV_MODE only
+    if config.is_demo_identifier(value):
+        # Demo backdoor: show the code on screen even in production, so the app
+        # can be walked through without a working SMS provider. Flagged and
+        # audited, because it is a real bypass — see config.DEMO_IDENTIFIERS.
+        out["dev_code"] = code
+        out["demo"] = True
+        db.audit(value, "demo_code_issued", f"via {channel}")
     return out
 
 @router.post("/verify")

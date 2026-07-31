@@ -21,7 +21,8 @@ const AuthView = (() => {
       UI.el("sendBtn").disabled = true;
       try {
         const r = await Api.post("/auth/request-code", { identifier });
-        session = { identifier: r.identifier || identifier, channel: r.channel, needsProfile: r.needs_profile };
+        session = { identifier: r.identifier || identifier, channel: r.channel,
+                    needsProfile: r.needs_profile, demo: !!r.demo };
         code(r.dev_code);
       } catch (e) { UI.toast(e.message, true); UI.el("sendBtn").disabled = false; }
     };
@@ -42,8 +43,11 @@ const AuthView = (() => {
     UI.screen(`
       ${UI.appbar(session.channel === "phone" ? "Check your phone" : "Check your email",
                   `We sent a code to ${session.identifier}`)}
-      ${devCode ? `<div class="card warn"><h3>Dev mode</h3><p>Your code is
-        <b class="mono">${UI.esc(devCode)}</b> (${channelLabel(session.channel)} sending not configured yet).</p></div>` : ""}
+      ${devCode ? `<div class="card warn"><h3>${session.demo ? "Demo account" : "Dev mode"}</h3><p>Your code is
+        <b class="mono">${UI.esc(devCode)}</b> —
+        ${session.demo
+          ? "shown here because this is a demo login, so the walkthrough works without SMS."
+          : `${channelLabel(session.channel)} sending is not configured yet.`}</p></div>` : ""}
       <label class="f-label" for="codeIn">6-digit code</label>
       <input class="f-input mono" id="codeIn" inputmode="numeric" maxlength="6" placeholder="••••••"
         style="text-align:center;font-size:1.5rem;letter-spacing:8px">

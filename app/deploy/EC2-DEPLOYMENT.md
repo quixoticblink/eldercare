@@ -91,6 +91,33 @@ So once Resend was working, on-screen codes stopped appearing even with
 is *down* — at which point sign-in stops entirely rather than degrading into
 an open door. That is the intended trade.
 
+## Demo login — READ THIS
+
+`DEMO_IDENTIFIERS=+6598553704` and `ADMIN_PHONES=+6598553704`.
+
+Typing that number into the sign-in box shows the 6-digit code **on screen**,
+even though `DEV_MODE=0`, and signs you in as **Demo Coordinator** — a
+phone-only admin account, separate from `abhishekkaul@gmail.com`. It exists so
+the app can be demonstrated without working SMS.
+
+**This is a backdoor on a public URL.** Anyone who types that number becomes a
+full admin: they can approve users, match visits and read every care plan.
+Treat the number as a shared password.
+
+It is an allowlist, not a global switch — verified live: every other number and
+every email address returns no code. Each use writes a `demo_code_issued` row
+to `audit_log`.
+
+Close it when demos are done:
+
+```bash
+sudo sed -i 's/^DEMO_IDENTIFIERS=.*/DEMO_IDENTIFIERS=/' /home/kakis/eldercare/app/.env
+sudo systemctl restart kakis
+```
+
+That leaves the account intact but unreachable until SMS is live. To remove the
+account entirely, suspend "Demo Coordinator" from the Approvals screen.
+
 ## Still to do
 
 - **SMS**: exit the SNS SMS sandbox (support case) and register a Singapore
