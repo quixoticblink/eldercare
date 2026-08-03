@@ -98,7 +98,7 @@ Willingness-to-pay is clearly below the un-subsidised price for many clients. Va
 
 ## AAC national footprint
 
-- **~240 Active Ageing Centres** across Singapore.
+- **~24 Active Ageing Centres** across Singapore.
 - One AAC serves **1,500–4,000 seniors** in its catchment (~3,000 as working figure).
 - **Only 15–25% of seniors** in a catchment area are actually reached by their local AAC — capacity constraints plus the get-them-to-come-out problem.
 - The **15–25% who show up are not the ones most at risk**; the concern is about the unreached majority.
