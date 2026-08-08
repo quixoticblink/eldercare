@@ -61,7 +61,7 @@ localhost.
 |---|---|
 | Email sign-in | **Live** — Resend, `singaporekakis.com` verified, from `hello@singaporekakis.com`, replies to abhishekkaul@gmail.com |
 | Chatbot | **Live** — OpenAI `gpt-4o-mini` |
-| SMS sign-in | Off (`SMS_ENABLED=0`) — awaiting SNS sandbox exit and SG Sender ID |
+| SMS sign-in | **Live** — AWS SNS via the `KakisAppRole` instance role, Sender ID `Kakis`, delivery confirmed to a real handset |
 | `DEV_MODE` | **0** — codes are delivered, never returned in the API |
 
 Confirmed after the switch: `/api/auth/request-code` returns no `dev_code` for
@@ -91,32 +91,28 @@ So once Resend was working, on-screen codes stopped appearing even with
 is *down* — at which point sign-in stops entirely rather than degrading into
 an open door. That is the intended trade.
 
-## Demo login — READ THIS
+## Demo admin account
 
-`DEMO_IDENTIFIERS=+6598553704` and `ADMIN_PHONES=+6598553704`.
+`ADMIN_PHONES=+6598553704` → **Demo Coordinator**, a phone-only admin account
+separate from `abhishekkaul@gmail.com`. Signing in with that number now
+receives a real SMS code like any other user; confirmed working end to end
+through the UI.
 
-Typing that number into the sign-in box shows the 6-digit code **on screen**,
-even though `DEV_MODE=0`, and signs you in as **Demo Coordinator** — a
-phone-only admin account, separate from `abhishekkaul@gmail.com`. It exists so
-the app can be demonstrated without working SMS.
+**`DEMO_IDENTIFIERS` is empty, and should stay that way.** Any identifier on
+that list has its sign-in code returned in the API response and shown on
+screen, bypassing delivery entirely — on a public URL that makes the identifier
+a shared password, and this one is a full admin. It existed only to cover the
+gap before SMS worked. Each use writes `demo_code_issued` to `audit_log`.
 
-**This is a backdoor on a public URL.** Anyone who types that number becomes a
-full admin: they can approve users, match visits and read every care plan.
-Treat the number as a shared password.
-
-It is an allowlist, not a global switch — verified live: every other number and
-every email address returns no code. Each use writes a `demo_code_issued` row
-to `audit_log`.
-
-Close it when demos are done:
+If a demo ever needs it back (no handset in the room, say), re-add it and
+remove it immediately afterwards:
 
 ```bash
+sudo /home/kakis/eldercare/app/deploy/set-secret.sh DEMO_IDENTIFIERS   # +6598553704
+# afterwards
 sudo sed -i 's/^DEMO_IDENTIFIERS=.*/DEMO_IDENTIFIERS=/' /home/kakis/eldercare/app/.env
 sudo systemctl restart kakis
 ```
-
-That leaves the account intact but unreachable until SMS is live. To remove the
-account entirely, suspend "Demo Coordinator" from the Approvals screen.
 
 ## SMS via AWS SNS
 
@@ -153,10 +149,16 @@ permanent fix; it takes weeks and carries a fee.
 
 ## Still to do
 
-- **SMS**: exit the SNS SMS sandbox (support case) and register a Singapore
-  Sender ID (SSIR, weeks + fee). Then `SMS_ENABLED=1`.
+- **Reattach the corrected IAM policy.** The role can publish but not read
+  sandbox status, so `preflight.py` reports it as unknown. Cosmetic — nothing
+  depends on it — but worth fixing so the check isn't blind.
 - **DMARC** is `p=quarantine` with `rua` pointing at GoDaddy's address.
-  Consider repointing `rua` to a mailbox you actually read.
+  Repoint `rua` to a mailbox you actually read, or authentication failures go
+  unnoticed.
+- **Sender ID registration (SSIR).** Delivery works today, but an unregistered
+  alphanumeric Sender ID is not guaranteed long-term in Singapore.
+- **Restore-from-backup has never been tested.** Snapshots are written nightly;
+  a backup you have not restored is a hope, not a backup.
 
 The app is then live at **https://singaporekakis.com**. First sign-in with
 `abhishekkaul@gmail.com` lands in the coordinator console.
