@@ -96,29 +96,43 @@ def check_sns(send_to=None):
     except ImportError:
         line(BAD, "boto3 not installed")
         return False
+    # Credentials first. sts:GetCallerIdentity needs no permission at all, so it
+    # cleanly separates "no credentials" from "credentials without permission".
     try:
-        sns = boto3.client("sns", region_name=config.AWS_REGION)
-        sandbox = sns.get_sms_sandbox_account_status().get("IsInSandbox", True)
+        who = boto3.client("sts", region_name=config.AWS_REGION).get_caller_identity()["Arn"]
     except NoCredentialsError:
         line(BAD, "no AWS credentials — attach an IAM role with sns:Publish to the instance")
         return False
-    except ClientError as e:
-        line(BAD, f"AWS rejected the call: {e.response['Error'].get('Code')}")
-        return False
     except Exception as e:
-        line(BAD, f"could not reach SNS: {e}")
+        line(BAD, f"could not reach AWS: {e}")
         return False
+    line(OK, f"credentials work ({who.split('/')[-2] if '/' in who else who}), region {config.AWS_REGION}")
 
-    line(OK, f"credentials work, region {config.AWS_REGION}")
-    if sandbox:
+    sns = boto3.client("sns", region_name=config.AWS_REGION)
+    # Sandbox status is reporting only. Losing it must not be read as "SMS is
+    # broken" — sns:Publish can be granted while the read actions are not, and
+    # that combination sends messages perfectly well.
+    sandbox = None
+    try:
+        sandbox = sns.get_sms_sandbox_account_status().get("IsInSandbox", True)
+    except ClientError as e:
+        if e.response["Error"].get("Code") in ("AuthorizationError", "AccessDenied"):
+            line(WARN, "cannot read sandbox status — the role lacks sns:GetSMSSandboxAccountStatus. "
+                       "Sending is unaffected; only this report is blind.")
+        else:
+            line(BAD, f"AWS rejected the call: {e.response['Error'].get('Code')}")
+            return False
+    except Exception as e:
+        line(WARN, f"sandbox status unavailable: {e}")
+
+    if sandbox is True:
         line(BAD, "account is in the SMS SANDBOX — only verified numbers receive messages")
         try:
-            nums = sns.list_sms_sandbox_phone_numbers().get("PhoneNumbers", [])
-            for n in nums:
+            for n in sns.list_sms_sandbox_phone_numbers().get("PhoneNumbers", []):
                 line(WARN, f"  sandbox-verified: {n.get('PhoneNumber')} ({n.get('Status')})")
         except Exception:
             pass
-    else:
+    elif sandbox is False:
         line(OK, "out of the sandbox — any number can receive codes")
     line(OK if config.SMS_SENDER_ID else WARN, f"SMS_SENDER_ID = {config.SMS_SENDER_ID or '(none)'}")
     line(WARN, "Singapore requires a REGISTERED Sender ID; unregistered senders are dropped by carriers")
@@ -126,9 +140,12 @@ def check_sns(send_to=None):
     if send_to:
         from backend.services import sms as smsmod
         out = smsmod.send_otp_sms(send_to, "123456")
-        line(OK if out["sent"] else BAD, f"test SMS to {send_to}: sent={out['sent']}")
+        line(OK if out["sent"] else BAD, f"test SMS to {send_to}: SNS accepted={out['sent']}")
+        line(WARN, "SNS accepting a message is not proof of delivery — confirm the handset received it")
         return bool(out["sent"])
-    return not sandbox
+    # Unknown sandbox status is not a failure: publish permission is what
+    # matters, and the only honest way to confirm delivery is --send-sms.
+    return sandbox is not True
 
 # --------------------------------------------------------------- chatbot
 def check_llm():
