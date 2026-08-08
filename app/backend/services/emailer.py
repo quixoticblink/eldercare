@@ -35,3 +35,32 @@ def send_otp_email(to: str, code: str) -> dict:
     # No key configured: dev fallback
     print(f"[kakis DEV] OTP for {to}: {code}")
     return {"sent": False, "dev_code": code if config.DEV_MODE else None}
+
+def send_email(to: str, subject: str, body_html: str) -> bool:
+    """Generic transactional email (notifications, not codes). Returns success.
+    Never raises — a failed notification must not break the action that
+    triggered it."""
+    if not config.RESEND_API_KEY:
+        print(f"[kakis DEV] email to {to}: {subject}")
+        return False
+    payload = {
+        "from": config.MAIL_FROM,
+        "to": [to],
+        "subject": subject,
+        "html": f"""<div style="font-family:sans-serif;max-width:460px;margin:auto">
+            <h2 style="color:#0C3D33">Kakis<span style="color:#F0A63C">.</span></h2>
+            {body_html}
+            <p style="color:#5E6B65;font-size:.8rem;margin-top:18px">
+              Questions? Call the Pasir Ris ICCP coordinator on 6XXX XXXX.</p>
+          </div>""",
+    }
+    if config.MAIL_REPLY_TO:
+        payload["reply_to"] = config.MAIL_REPLY_TO
+    try:
+        r = httpx.post("https://api.resend.com/emails",
+                       headers={"Authorization": f"Bearer {config.RESEND_API_KEY}"},
+                       json=payload, timeout=15)
+        return r.status_code < 300
+    except Exception as e:
+        print(f"[kakis] email to {to} failed: {e}")
+        return False

@@ -2,7 +2,8 @@
 import random
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from .. import assumptions, config, db, security
+from .. import assumptions, config, db, security, settings
+from ..services import matching
 
 router = APIRouter(prefix="/visits", tags=["visits"])
 
@@ -89,7 +90,17 @@ def create(body: VisitIn, user=Depends(security.current_user)):
               VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
            [vid, h["id"], user["id"], body.service, body.tier, body.date, body.window,
             body.language, body.notes or "", otp, body.trigger or ""])
-    db.audit(user["email"], "visit_requested", f"{vid} {body.service} {body.tier}")
+    db.audit(user["email"] or user["phone"], "visit_requested", f"{vid} {body.service} {body.tier}")
+
+    # Auto-matching, when the coordinator has switched it on. It only ever picks
+    # a kaki whose availability positively covers the visit; anything it cannot
+    # fill stays 'requested' for a human rather than being forced onto someone.
+    if settings.get("auto_match"):
+        try:
+            matching.try_auto_assign(vid, "auto-match")
+        except Exception as e:
+            print(f"[kakis] auto-match failed for {vid}: {e}")   # booking still stands
+
     return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
 
 @router.get("")

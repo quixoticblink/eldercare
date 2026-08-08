@@ -109,10 +109,16 @@ def verify(body: VerifyIn):
     db.audit(value, "login", f"via {channel}")
     return {"token": security.make_token(user["id"]), "user": _public(user)}
 
+def _auto_approved(role: str) -> bool:
+    from .. import settings
+    return bool(settings.get(f"auto_approve_{role}")) if role in ("kaki", "caregiver") else False
+
 def _create_user(channel: str, value: str, body: VerifyIn):
     is_admin = _is_admin(channel, value)
     role = "admin" if is_admin else (body.role if body.role in ("caregiver", "kaki") else "")
-    status = "approved" if is_admin else "pending"
+    # Admins are always approved. Everyone else waits for the coordinator unless
+    # auto-approval has been deliberately switched on for their role.
+    status = "approved" if (is_admin or _auto_approved(role)) else "pending"
 
     email = value if channel == "email" else None
     phone = value if channel == "phone" else ""
@@ -172,10 +178,11 @@ def _update_existing(user: dict, channel: str, body: VerifyIn):
 
 @router.get("/me")
 def me(user=Depends(security.current_user)):
-    from .. import assumptions
+    from .. import assumptions, settings
     return {"user": _public(user), "config": {
         "services": config.SERVICES, "locked_services": config.LOCKED_SERVICES,
         "tiers": config.TIERS, "languages": config.LANGUAGES,
         "weekdays": config.WEEKDAYS, "half_days": config.HALF_DAYS,
         "half_day_windows": assumptions.half_day_windows(),
-        "money_disclaimer": assumptions.disclaimer()}}
+        "money_disclaimer": assumptions.disclaimer(),
+        "paynow": settings.paynow()}}

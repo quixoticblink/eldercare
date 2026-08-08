@@ -24,6 +24,9 @@ const AdminView = (() => {
         <button class="li" onclick="location.hash='#/admin/quality'">
           <div class="face">❋</div><div class="body"><b>Quality</b><span>Visit reports and private care notes — never public ratings</span></div>
           <div class="end">${ov.care_notes ? `<span class="pill grey">${ov.care_notes}</span>` : ""}</div></button>
+        <button class="li" onclick="location.hash='#/admin/settings'">
+          <div class="face">⚙</div><div class="body"><b>Settings</b>
+          <span>Auto-approval, auto-matching, service pricing and PayNow details</span></div></button>
         <button class="li" onclick="location.hash='#/admin/assumptions'">
           <div class="face">≈</div><div class="body"><b>Assumptions</b>
           <span>Every rate, hour and subsidy % behind the figures — and where each came from</span></div>
@@ -230,6 +233,112 @@ const AdminView = (() => {
     } catch (e) { UI.toast(e.message, true); }
   }
 
+  /* Settings: automation switches, the price stack, and PayNow details. */
+  async function settings() {
+    UI.spin();
+    try {
+      const [s, a] = await Promise.all([Api.get("/admin/settings"), Api.get("/admin/assumptions")]);
+      const toggle = (key, on, title, sub) => `
+        <label class="li" style="cursor:pointer">
+          <div class="face">${on ? "●" : "○"}</div>
+          <div class="body"><b>${UI.esc(title)}</b><span>${sub}</span></div>
+          <div class="end"><input type="checkbox" id="${key}" ${on ? "checked" : ""}
+            style="width:22px;height:22px;accent-color:var(--pandan)"></div>
+        </label>`;
+
+      const rateRows = Object.entries(a.services || {}).map(([name, m]) => `
+        <div class="card" style="padding:12px">
+          <b>${UI.esc(name)}</b>
+          <div class="avail-grid" style="grid-template-columns:1fr 1fr 1fr">
+            <span class="hdr">Hours</span><span class="hdr">Family $/hr</span><span class="hdr">Kaki $/hr</span>
+            <input class="f-input" style="margin:0" type="number" min="0" step="0.5"
+              data-svc="${UI.esc(name)}" data-f="hours" value="${m.hours}">
+            <input class="f-input" style="margin:0" type="number" min="0" step="0.5"
+              data-svc="${UI.esc(name)}" data-f="family_rate_per_hour" value="${m.family_rate_per_hour}">
+            <input class="f-input" style="margin:0" type="number" min="0" step="0.5"
+              data-svc="${UI.esc(name)}" data-f="kaki_rate_per_hour" value="${m.kaki_rate_per_hour}">
+          </div>
+          <span class="mono" style="font-size:.62rem;opacity:.7">${UI.esc(m.source || "")}</span>
+        </div>`).join("");
+
+      UI.screen(`
+        ${UI.appbar("Settings", "Automation, pricing and payment", "#/admin/home")}
+
+        <div class="eyebrow">Automation</div>
+        <div class="card warn" style="padding:12px">
+          <p style="font-size:.76rem">Each of these removes a human from a decision about who enters
+          a vulnerable person's home. They are off unless you turn them on.</p>
+        </div>
+        ${toggle("auto_approve_caregiver", s.auto_approve_caregiver, "Auto-approve caregivers",
+                 "New caregivers skip the approval queue and can book immediately")}
+        ${toggle("auto_approve_kaki", s.auto_approve_kaki, "Auto-approve kakis",
+                 "New kakis become bookable without a coordinator reviewing them first")}
+        ${toggle("auto_match", s.auto_match, "Auto-match visits on booking",
+                 "Assigns the best available kaki the moment a visit is booked. Never picks someone whose availability doesn't cover it — those stay for you")}
+        <button class="btn" id="saveToggles">Save automation settings</button>
+        <button class="btn quiet" id="sweepNow">Auto-match all open requests now</button>
+        <p class="hint" style="font-size:.7rem;opacity:.8">The sweep runs on demand whether or not
+        the toggle above is on — urgent requests first.</p>
+
+        <div class="eyebrow">Pricing</div>
+        ${rateRows}
+        <button class="btn" id="saveRates">Save pricing</button>
+        ${UI.moneyNote()}
+
+        <div class="eyebrow">PayNow</div>
+        <label class="f-label">Account type</label>
+        ${UI.chipGroup("pnType", ["uen", "mobile"], s.paynow_type || "uen")}
+        <label class="f-label" for="pnValue">${"UEN or mobile number"}</label>
+        <input class="f-input" id="pnValue" value="${UI.esc(s.paynow_value || "")}"
+          placeholder="e.g. 202512345K or +6598553704">
+        <label class="f-label" for="pnName">Account name shown to families</label>
+        <input class="f-input" id="pnName" value="${UI.esc(s.paynow_name || "")}"
+          placeholder="e.g. Vanguard Healthcare Pte Ltd">
+        <button class="btn" id="savePaynow">Save PayNow details</button>
+        <p class="hint" style="font-size:.7rem;opacity:.8">Shown to caregivers on their visit cost
+        screen. During the pilot billing still runs through the ICCP account — check with the
+        coordinator before asking a family to transfer anything.</p>`);
+
+      UI.el("saveToggles").onclick = async () => {
+        try {
+          await Api.put("/admin/settings", {
+            auto_approve_caregiver: UI.el("auto_approve_caregiver").checked,
+            auto_approve_kaki: UI.el("auto_approve_kaki").checked,
+            auto_match: UI.el("auto_match").checked });
+          UI.toast("Automation settings saved ✓"); settings();
+        } catch (e) { UI.toast(e.message, true); }
+      };
+
+      UI.el("sweepNow").onclick = async () => {
+        try {
+          const r = await Api.post("/admin/auto-match");
+          UI.toast(`Matched ${r.counts.matched}, left ${r.counts.unmatched} for you`);
+        } catch (e) { UI.toast(e.message, true); }
+      };
+
+      UI.el("saveRates").onclick = async () => {
+        const services = {};
+        document.querySelectorAll("[data-svc]").forEach(i => {
+          (services[i.dataset.svc] = services[i.dataset.svc] || {})[i.dataset.f] = parseFloat(i.value);
+        });
+        try {
+          await Api.put("/admin/assumptions/services", { services });
+          UI.toast("Pricing saved ✓"); settings();
+        } catch (e) { UI.toast(e.message, true); }
+      };
+
+      UI.el("savePaynow").onclick = async () => {
+        try {
+          await Api.put("/admin/settings", {
+            paynow_type: UI.chipValue("pnType") || "uen",
+            paynow_value: UI.el("pnValue").value.trim(),
+            paynow_name: UI.el("pnName").value.trim() });
+          UI.toast("PayNow details saved ✓");
+        } catch (e) { UI.toast(e.message, true); }
+      };
+    } catch (e) { UI.toast(e.message, true); }
+  }
+
   return { home, approvals, approve, suspend, requests, assign, markPicked,
-           confirmAssign, assumptions, quality };
+           confirmAssign, assumptions, settings, quality };
 })();

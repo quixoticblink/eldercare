@@ -22,6 +22,7 @@ const App = (() => {
     "#/admin/requests": () => AdminView.requests(),
     "#/admin/quality": () => AdminView.quality(),
     "#/admin/assumptions": () => AdminView.assumptions(),
+    "#/admin/settings": () => AdminView.settings(),
     "#/kaki/availability": () => KakiView.availability(),
   };
 

@@ -1,8 +1,20 @@
-import os, sys
+import os, sys, shutil, tempfile
 os.environ["DB_PATH"] = "/tmp/kakis-test.duckdb"
 os.environ["DEV_MODE"] = "1"
 os.environ["ADMIN_EMAILS"] = "admin@kakis.sg"
 if os.path.exists("/tmp/kakis-test.duckdb"): os.remove("/tmp/kakis-test.duckdb")
+
+# The rate-editing tests write assumptions.json. Point the app at a throwaway
+# copy so running this on the server can never overwrite live pricing.
+if not os.environ.get("ASSUMPTIONS_PATH"):
+    _here = os.path.dirname(os.path.abspath(globals().get("__file__", "backend/tests/smoke.py")))
+    _src = os.path.join(_here, "..", "..", "assumptions.json")
+    if not os.path.exists(_src):
+        _src = "assumptions.json"                 # run from app/
+    _tmp = os.path.join(tempfile.mkdtemp(prefix="kakis-smoke-"), "assumptions.json")
+    shutil.copyfile(_src, _tmp)
+    os.environ["ASSUMPTIONS_PATH"] = _tmp
+
 sys.path.insert(0, ".")
 from fastapi.testclient import TestClient
 from backend.main import app
@@ -312,4 +324,97 @@ config.SMS_ENABLED = False
 assert smsmod.send_otp_sms("+6591234567", "123456")["dev_code"] == "123456"
 config.SMS_PROVIDER = "sns"
 
-print("ALL SMOKE TESTS PASSED ✓  (v1.3 — 101 assertions)")
+# ---- v1.4 · notifications, automation toggles, pricing, PayNow -------------
+from backend import settings as st
+from backend.services import notify, matching
+
+# every automation is off by default — nobody inherits it
+base = c.get("/api/admin/settings", headers=ah).json()
+assert base["auto_approve_kaki"] is False and base["auto_approve_caregiver"] is False
+assert base["auto_match"] is False, base
+assert c.get("/api/admin/settings", headers=ch).status_code == 403, "settings are admin-only"
+
+# --- notification routing follows how the person signed in ---
+assert notify.channel_for({"phone": "+6591234567", "phone_verified": True}) == "sms"
+assert notify.channel_for({"email": "a@b.com", "email_verified": True}) == "email"
+# verified channel wins over an unverified one
+assert notify.channel_for({"phone": "+65911", "phone_verified": False,
+                           "email": "a@b.com", "email_verified": True}) == "email"
+# a captured-but-unverified number is still better than nothing
+assert notify.channel_for({"phone": "+65911", "phone_verified": False}) == "sms"
+assert notify.channel_for({}) is None
+# a user with no contact route must not raise
+assert notify.notify({}, "s", "t")["sent"] is False
+
+# assignment notifies both sides and never breaks the assign
+r = c.post("/api/visits", json={"service":"Companionship","tier":"planned","date":"2026-08-01",
+                                "window":"09:00–11:00","language":"English"}, headers=ch).json()
+res = c.post(f"/api/admin/visits/{r['id']}/assign", json={"kaki_id": kk2["id"]}, headers=ah).json()
+assert "notified" in res and set(res["notified"]) == {"kaki", "caregiver"}, res
+assert res["notified"]["kaki"]["channel"] in ("sms", "email"), res
+
+# --- auto-approval ---
+st.set_many({"auto_approve_caregiver": True}, "test")
+_, newcg = login("autocg@example.com", role="caregiver", name="Auto CG")
+assert newcg["status"] == "approved", "auto-approve caregiver should skip the queue"
+_, newkk = login("autokk@example.com", role="kaki", name="Auto KK")
+assert newkk["status"] == "pending", "kaki toggle is separate and still off"
+st.set_many({"auto_approve_caregiver": False}, "test")
+
+# --- auto-matching only ever picks a genuinely available kaki ---
+# kk (Tan Bee Lian) is available Sat; give the fresh kaki no availability at all
+sat = {"service":"Companionship","tier":"planned","date":"2026-08-01",
+       "window":"09:00–11:00","language":"English"}
+st.set_many({"auto_match": True}, "test")
+auto = c.post("/api/visits", json=sat, headers=ch).json()
+assert auto["status"] == "assigned", "auto-match should have filled a Saturday slot"
+assert auto["kaki"]["id"] == kk["id"], auto["kaki"]
+
+# a Monday nobody covers must stay for a human rather than be forced on someone
+mon = dict(sat, date="2026-08-03")
+left = c.post("/api/visits", json=mon, headers=ch).json()
+assert left["status"] == "requested" and not left.get("kaki"), left
+st.set_many({"auto_match": False}, "test")
+
+# booking with the toggle off leaves the request alone
+off = c.post("/api/visits", json=sat, headers=ch).json()
+assert off["status"] == "requested", off
+
+# the manual sweep works regardless of the toggle, urgent first
+sweep = c.post("/api/admin/auto-match", headers=ah).json()
+assert sweep["counts"]["matched"] >= 1, sweep
+assert all(m["kaki"] for m in sweep["matched"]), sweep
+
+# --- pricing editable from the admin panel, written to assumptions.json ---
+r = c.put("/api/admin/assumptions/services",
+          json={"services": {"Companionship": {"family_rate_per_hour": 30, "kaki_rate_per_hour": 14}}},
+          headers=ah)
+assert r.status_code == 200, r.text
+svc = r.json()["services"]["Companionship"]
+assert svc["family_rate_per_hour"] == 30 and svc["kaki_rate_per_hour"] == 14
+assert "coordinator" in svc["source"].lower(), svc["source"]
+# ...and it immediately drives new estimates
+newv = c.post("/api/visits", json=dict(sat, date="2026-08-08"), headers=ch).json()
+assert newv["estimate"]["base"] == svc["hours"] * 30, newv["estimate"]
+# junk and unknown services are rejected, not silently written
+assert c.put("/api/admin/assumptions/services",
+             json={"services": {"Nope": {"hours": 1}}}, headers=ah).status_code == 400
+assert c.put("/api/admin/assumptions/services",
+             json={"services": {"Companionship": {"hours": -3}}}, headers=ah).status_code == 400
+assert c.put("/api/admin/assumptions/services",
+             json={"services": {"Companionship": {"hours": 2}}}, headers=ch).status_code == 403
+
+# --- PayNow ---
+r = c.put("/api/admin/settings", json={"paynow_type": "uen", "paynow_value": "202512345K",
+                                       "paynow_name": "Vanguard Healthcare"}, headers=ah).json()
+assert r["paynow_value"] == "202512345K" and r["paynow_name"] == "Vanguard Healthcare"
+assert c.put("/api/admin/settings", json={"paynow_type": "carrier-pigeon"},
+             headers=ah).status_code == 400
+# caregivers get it in their app config, without needing admin rights
+cfg = c.get("/api/auth/me", headers=ch).json()["config"]
+assert cfg["paynow"]["configured"] is True and cfg["paynow"]["value"] == "202512345K", cfg["paynow"]
+# unknown setting keys are ignored rather than stored
+st.set_many({"totally_made_up": "x"}, "test")
+assert "totally_made_up" not in st.all()
+
+print("ALL SMOKE TESTS PASSED ✓  (v1.4 — 133 assertions)")

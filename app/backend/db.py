@@ -76,6 +76,12 @@ def _init(c):
     #   weekly_slots — JSON {"Mon": ["morning"], "Sat": ["morning","afternoon"], ...}
     c.execute("ALTER TABLE kaki_profiles ADD COLUMN IF NOT EXISTS weekly_slots TEXT DEFAULT '{}'")
     c.execute("ALTER TABLE kaki_profiles ADD COLUMN IF NOT EXISTS availability_note TEXT DEFAULT ''")
+    # v1.4 · coordinator-editable settings (auto-approval, auto-matching, PayNow).
+    # Key/value so a new switch needs no migration. Values are JSON-encoded.
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS settings(
+      key TEXT PRIMARY KEY, value TEXT, updated_at TIMESTAMP DEFAULT current_timestamp);
+    """)
     c.execute("""
     CREATE TABLE IF NOT EXISTS availability_exceptions(
       id TEXT PRIMARY KEY, user_id TEXT, date TEXT,

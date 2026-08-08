@@ -69,3 +69,17 @@ def disclaimer() -> dict:
 def public() -> dict:
     """The whole file, for the admin assumptions screen."""
     return load()
+
+def save(data: dict) -> dict:
+    """Write the file back and refresh the cache. Used by the admin rate editor
+    so assumptions.json stays the single source of truth rather than the DB
+    holding a second, silently diverging copy of the same numbers.
+
+    Written via a temp file and atomic replace: a crash mid-write would
+    otherwise leave the app with no readable pricing at all."""
+    tmp = PATH.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+    os.replace(tmp, PATH)
+    global _cache
+    _cache = data
+    return _cache

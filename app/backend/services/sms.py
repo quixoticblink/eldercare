@@ -75,3 +75,19 @@ def send_otp_sms(to: str, code: str) -> dict:
             return {"sent": False, "dev_code": code if config.DEV_MODE else None}
     print(f"[kakis DEV] SMS OTP for {to}: {code}")
     return {"sent": False, "dev_code": code if config.DEV_MODE else None}
+
+def send_sms(to: str, text: str) -> bool:
+    """Generic SMS (notifications, not codes). Returns success, never raises."""
+    if not config.SMS_ENABLED:
+        print(f"[kakis DEV] SMS to {to}: {text}")
+        return False
+    send = _PROVIDERS.get(config.SMS_PROVIDER)
+    if send is None:
+        print(f"[kakis] unknown SMS_PROVIDER {config.SMS_PROVIDER!r} — not sending")
+        return False
+    try:
+        send(to, text)
+        return True
+    except Exception as e:
+        print(f"[kakis] {config.SMS_PROVIDER} notification to {to} failed: {e}")
+        return False

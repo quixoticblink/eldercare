@@ -1,8 +1,8 @@
 """M-ADMIN · approvals, manual matching, quality. Automated matching lands here later."""
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from .. import assumptions, db, security
-from ..services import availability
+from .. import assumptions, db, security, settings
+from ..services import availability, matching
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -11,6 +11,18 @@ class AssignIn(BaseModel):
 
 class ApproveIn(BaseModel):
     role: str | None = None   # optionally set/override role on approval
+
+class SettingsIn(BaseModel):
+    auto_approve_kaki: bool | None = None
+    auto_approve_caregiver: bool | None = None
+    auto_match: bool | None = None
+    paynow_type: str | None = None
+    paynow_value: str | None = None
+    paynow_name: str | None = None
+
+class ServiceRatesIn(BaseModel):
+    # {"Chaperone": {"hours": 3, "family_rate_per_hour": 28, "kaki_rate_per_hour": 12}}
+    services: dict[str, dict[str, float | int | None]]
 
 def _admin(user):
     security.approved_user(user)
@@ -110,18 +122,61 @@ def assign(vid: str, body: AssignIn, user=Depends(security.current_user)):
         raise HTTPException(404, "Visit not found")
     if v["status"] not in ("requested", "assigned"):
         raise HTTPException(400, f"Visit is {v['status']}")
-    kaki = db.one("SELECT * FROM users WHERE id = ? AND role = 'kaki' AND status = 'approved'", [body.kaki_id])
-    if not kaki:
-        raise HTTPException(400, "Not an approved kaki")
-    db.run("UPDATE visits SET kaki_id = ?, status = 'assigned', assigned_at = current_timestamp WHERE id = ?",
-           [body.kaki_id, vid])
-    db.audit(user["email"], "visit_assigned", f"{vid} -> {kaki['email'] or kaki['phone']}")
-    # Name who actually received it — assigning to the wrong kaki is silent
-    # otherwise, and looks exactly like the feature being broken.
-    return {"ok": True,
-            "assigned_to": {"id": kaki["id"], "name": kaki["name"],
-                            "contact": kaki["email"] or kaki["phone"]},
-            "fit": availability.check(kaki["id"], v.get("date"), v.get("time_window"))}
+    # Shared with the automatic matcher so both paths validate and notify
+    # identically. Returns who actually received it — assigning to the wrong
+    # kaki is silent otherwise, and looks exactly like the feature being broken.
+    try:
+        return matching.assign(vid, body.kaki_id, user["email"] or user["phone"])
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@router.post("/auto-match")
+def auto_match_all(user=Depends(security.current_user)):
+    """Fill every outstanding request that has an available kaki, urgent first.
+    Works regardless of the auto_match toggle — the toggle governs automatic
+    assignment at booking time; this is the coordinator asking explicitly."""
+    _admin(user)
+    return matching.sweep(user["email"] or user["phone"])
+
+@router.get("/settings")
+def get_settings(user=Depends(security.current_user)):
+    _admin(user)
+    return settings.all()
+
+@router.put("/settings")
+def put_settings(body: SettingsIn, user=Depends(security.current_user)):
+    _admin(user)
+    payload = {k: v for k, v in body.model_dump().items() if v is not None}
+    if "paynow_type" in payload and payload["paynow_type"] not in ("uen", "mobile"):
+        raise HTTPException(400, "paynow_type must be 'uen' or 'mobile'")
+    return settings.set_many(payload, user["email"] or user["phone"])
+
+@router.put("/assumptions/services")
+def put_service_rates(body: ServiceRatesIn, user=Depends(security.current_user)):
+    """Edit the price stack from the admin panel. Writes assumptions.json so it
+    stays the single source of truth — hours and rates never live in two places."""
+    _admin(user)
+    data = assumptions.public()
+    services = data.setdefault("services", {})
+    for name, vals in (body.services or {}).items():
+        if name not in services:
+            raise HTTPException(400, f"Unknown service: {name}")
+        for field in ("hours", "family_rate_per_hour", "kaki_rate_per_hour"):
+            if field in vals and vals[field] is not None:
+                try:
+                    number = float(vals[field])
+                except (TypeError, ValueError):
+                    raise HTTPException(400, f"{name}.{field} must be a number")
+                if number < 0:
+                    raise HTTPException(400, f"{name}.{field} cannot be negative")
+                services[name][field] = int(number) if field == "hours" else number
+        services[name]["source"] = f"Set by coordinator via admin panel ({db.now():%Y-%m-%d})"
+    try:
+        assumptions.save(data)
+    except Exception as e:
+        raise HTTPException(500, f"Could not write assumptions.json: {e}")
+    db.audit(user["email"] or user["phone"], "rates_changed", ", ".join(body.services or {}))
+    return assumptions.public()
 
 @router.get("/assumptions")
 def get_assumptions(user=Depends(security.current_user)):

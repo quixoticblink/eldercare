@@ -235,6 +235,16 @@ const CareView = (() => {
             <div class="s-row total"><span>Family pays (est.)</span><span class="amt">$${est.family_pays.toFixed(2)}</span></div>
           </div>
           <p style="font-size:.74rem;color:var(--slate);margin:-6px 0 10px">Billed through your ICCP account during the pilot — nothing to pay in the app.</p>
+          ${(App.config.paynow && App.config.paynow.configured) ? `
+            <div class="card tint" style="padding:12px">
+              <h3>PayNow</h3>
+              <p>If the coordinator asks you to transfer directly, pay to
+              <b>${UI.esc(App.config.paynow.value)}</b>
+              (${UI.esc(App.config.paynow.type === "uen" ? "UEN" : "mobile")})${
+                App.config.paynow.name ? " · " + UI.esc(App.config.paynow.name) : ""}.</p>
+              <p style="font-size:.72rem;opacity:.85">Always confirm with the coordinator first —
+              during the pilot most visits are billed through ICCP, not paid in the app.</p>
+            </div>` : ""}
           ${UI.moneyNote()}` : ""}
         ${v.status === "completed" && v.report ? `
           <div class="card"><h3>Visit report</h3>
