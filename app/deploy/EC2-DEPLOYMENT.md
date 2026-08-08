@@ -118,6 +118,39 @@ sudo systemctl restart kakis
 That leaves the account intact but unreachable until SMS is live. To remove the
 account entirely, suspend "Demo Coordinator" from the Approvals screen.
 
+## SMS via AWS SNS
+
+Instance role **`KakisAppRole`** on `i-0942e81ef83d2beec`, policy in
+`deploy/aws-sns-policy.json`. `SMS_ENABLED=1`, region `ap-southeast-1`.
+
+The policy JSON contains **only** `Version` and `Statement` — IAM rejects any
+other top-level key (a `_comment` field will fail validation), so keep the
+explanation here rather than in the file:
+
+- `sns:Publish` uses `NotResource` on topic ARNs, so the instance can text
+  phone numbers but cannot publish to any SNS topic in the account.
+- The sandbox actions exist only so `preflight.py` can report whether the
+  account is still sandboxed. If those calls return `AuthorizationError`,
+  statements 2 and 3 did not attach — publishing still works, only the
+  reporting is blind.
+
+### Sender ID is the thing most likely to break delivery
+
+`SMS_SENDER_ID` defaults to `Kakis`. **Singapore carriers drop unregistered
+alphanumeric Sender IDs**, and SNS still reports `sent: true` because AWS
+accepted the message — the failure is downstream and silent.
+
+If codes are not arriving, unset the Sender ID so AWS falls back to a shared
+number, and compare:
+
+```bash
+sudo /home/kakis/eldercare/app/deploy/set-secret.sh SMS_SENDER_ID   # enter a single space to clear
+sudo systemctl restart kakis
+```
+
+Registering `Kakis` with the Singapore SMS Sender ID Registry (SSIR) is the
+permanent fix; it takes weeks and carries a fee.
+
 ## Still to do
 
 - **SMS**: exit the SNS SMS sandbox (support case) and register a Singapore
