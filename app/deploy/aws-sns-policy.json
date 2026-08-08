@@ -1,0 +1,41 @@
+{
+  "_comment": [
+    "Least-privilege policy for the Kakis EC2 instance to send SMS sign-in codes.",
+    "Attach to an IAM role, then attach that role to instance i-0942e81ef83d2beec.",
+    "",
+    "Publish is scoped with a condition so this role can only send SMS to phone",
+    "numbers — it cannot publish to your SNS topics. The sandbox actions let the",
+    "preflight check report sandbox status and manage verified test numbers; drop",
+    "them once you are out of the sandbox for good."
+  ],
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SendSmsToPhoneNumbers",
+      "Effect": "Allow",
+      "Action": "sns:Publish",
+      "NotResource": "arn:aws:sns:*:*:*"
+    },
+    {
+      "Sid": "ReadSmsConfigAndSandboxStatus",
+      "Effect": "Allow",
+      "Action": [
+        "sns:GetSMSAttributes",
+        "sns:GetSMSSandboxAccountStatus",
+        "sns:ListSMSSandboxPhoneNumbers",
+        "sns:ListOriginationNumbers"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ManageSandboxTestNumbers",
+      "Effect": "Allow",
+      "Action": [
+        "sns:CreateSMSSandboxPhoneNumber",
+        "sns:VerifySMSSandboxPhoneNumber",
+        "sns:DeleteSMSSandboxPhoneNumber"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
