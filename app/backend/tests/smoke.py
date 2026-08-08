@@ -287,4 +287,29 @@ config.DEMO_IDENTIFIERS = []
 shut = c.post("/api/auth/request-code", json={"identifier": "9855 3704"}).json()
 assert "dev_code" not in shut and not shut.get("demo"), shut
 
-print("ALL SMOKE TESTS PASSED ✓  (v1.3 — 93 assertions)")
+# --- SMS provider switch: sns <-> twilio without a code change ---------------
+from backend.services import sms as smsmod
+config.DEV_MODE = True          # so a failed send still returns a usable code
+config.SMS_ENABLED = True
+
+# an unknown provider must fail safe, never silently pretend to have sent
+config.SMS_PROVIDER = "carrier-pigeon"
+out = smsmod.send_otp_sms("+6591234567", "123456")
+assert out["sent"] is False and out["dev_code"] == "123456", out
+
+# twilio selected but unconfigured: reports not-sent rather than raising
+config.SMS_PROVIDER = "twilio"
+config.TWILIO_ACCOUNT_SID = ""
+config.TWILIO_AUTH_TOKEN = ""
+out = smsmod.send_otp_sms("+6591234567", "123456")
+assert out["sent"] is False and out["dev_code"] == "123456", out
+
+# both providers are wired to the same contract
+assert set(smsmod._PROVIDERS) == {"sns", "twilio"}
+
+# with SMS off entirely, the dev path still yields a code
+config.SMS_ENABLED = False
+assert smsmod.send_otp_sms("+6591234567", "123456")["dev_code"] == "123456"
+config.SMS_PROVIDER = "sns"
+
+print("ALL SMOKE TESTS PASSED ✓  (v1.3 — 101 assertions)")

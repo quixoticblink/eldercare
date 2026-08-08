@@ -85,11 +85,67 @@ def check_resend(send_to=None):
     return True
 
 # ------------------------------------------------------------------ sms
-def check_sns(send_to=None):
-    head("AWS SNS · SMS sign-in codes")
+def check_twilio(send_to=None):
+    head("Twilio · SMS sign-in codes")
+    sid, token = config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN
+    if not (sid and token):
+        line(BAD, "TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN not set")
+        return False
+    try:
+        r = httpx.get(f"https://api.twilio.com/2010-04-01/Accounts/{sid}.json",
+                      auth=(sid, token), timeout=20)
+    except Exception as e:
+        line(BAD, f"could not reach Twilio: {e}")
+        return False
+    if r.status_code == 401:
+        line(BAD, "credentials rejected (401) — check the Account SID and Auth Token")
+        return False
+    if r.status_code >= 300:
+        line(BAD, f"Twilio returned {r.status_code}: {r.text[:160]}")
+        return False
+
+    acct = r.json()
+    kind = (acct.get("type") or "").lower()          # "Trial" | "Full"
+    line(OK, f"credentials accepted — account '{acct.get('friendly_name')}' ({acct.get('status')})")
+    if kind == "trial":
+        line(BAD, "TRIAL account — delivers only to numbers verified in the Twilio console, "
+                  "exactly like the SNS sandbox. Upgrade to send to real caregivers.")
+    else:
+        line(OK, "paid account — can send to any number")
+
+    if config.TWILIO_MESSAGING_SERVICE_SID:
+        line(OK, f"MessagingServiceSid = {config.TWILIO_MESSAGING_SERVICE_SID}")
+    elif config.TWILIO_FROM:
+        line(OK, f"TWILIO_FROM = {config.TWILIO_FROM}")
+        if not config.TWILIO_FROM.startswith("+"):
+            line(WARN, "alphanumeric sender ID — Singapore carriers drop unregistered ones")
+    else:
+        line(BAD, "neither TWILIO_FROM nor TWILIO_MESSAGING_SERVICE_SID is set")
+        return False
+
+    if send_to:
+        from backend.services import sms as smsmod
+        out = smsmod.send_otp_sms(send_to, "123456")
+        line(OK if out["sent"] else BAD, f"test SMS to {send_to}: accepted={out['sent']}")
+        line(WARN, "acceptance is not delivery — confirm the handset received it")
+        return bool(out["sent"])
+    return kind != "trial"
+
+def check_sms(send_to=None):
     if not config.SMS_ENABLED:
+        head("SMS sign-in codes")
         line(WARN, "SMS_ENABLED=0 — SMS codes fall back to DEV_MODE (email still fine)")
         return None                      # not a blocker, just off
+    if config.SMS_PROVIDER == "twilio":
+        return check_twilio(send_to)
+    if config.SMS_PROVIDER != "sns":
+        head("SMS sign-in codes")
+        line(BAD, f"unknown SMS_PROVIDER {config.SMS_PROVIDER!r} — expected 'sns' or 'twilio'")
+        return False
+    return check_sns(send_to)
+
+def check_sns(send_to=None):
+    head("AWS SNS · SMS sign-in codes")
     try:
         import boto3
         from botocore.exceptions import ClientError, NoCredentialsError
@@ -187,7 +243,7 @@ def main():
          f"DEV_MODE = {'1 — sign-in codes are returned in the API response' if config.DEV_MODE else '0 — live'}")
 
     email_ok = check_resend(a.send_email)
-    sms_ok = check_sns(a.send_sms)
+    sms_ok = check_sms(a.send_sms)
     check_llm()
 
     head("Verdict")

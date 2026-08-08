@@ -146,6 +146,36 @@ Check and add numbers in the console: **AWS End User Messaging SMS →
 Configurations → Sandbox destination phone numbers** (or SNS → Mobile → Text
 messaging). Each number receives a verification code you must enter back.
 
+### Switching provider: Twilio ↔ SNS
+
+`SMS_PROVIDER` selects the carrier; no code changes either way.
+
+```bash
+# temporary move to Twilio while ap-southeast-1 is sandboxed
+sudo /home/kakis/eldercare/app/deploy/set-secret.sh SMS_PROVIDER        # twilio
+sudo /home/kakis/eldercare/app/deploy/set-secret.sh TWILIO_ACCOUNT_SID  # AC...
+sudo /home/kakis/eldercare/app/deploy/set-secret.sh TWILIO_AUTH_TOKEN
+sudo /home/kakis/eldercare/app/deploy/set-secret.sh TWILIO_FROM         # +1... or a Messaging Service SID
+
+# back to AWS the moment production access is granted
+sudo /home/kakis/eldercare/app/deploy/set-secret.sh SMS_PROVIDER        # sns
+```
+
+Always confirm with the preflight afterwards — it detects a Twilio **trial**
+account, which is limited to verified numbers in exactly the same way as the
+SNS sandbox and will otherwise reproduce this whole problem under a new name:
+
+```bash
+sudo -u kakis /home/kakis/eldercare/app/.venv/bin/python \
+  /home/kakis/eldercare/app/deploy/preflight.py --send-sms +6591055701
+```
+
+Twilio setup, in order: sign up → **upgrade to pay-as-you-go** (the trial is
+the trap) → buy a number, or create a Messaging Service → copy the Account SID
+and Auth Token from the console dashboard. A Twilio number sending into
+Singapore arrives as international SMS, which sidesteps SSIR Sender ID
+registration; an alphanumeric sender does not.
+
 ### Sender ID is the thing most likely to break delivery
 
 `SMS_SENDER_ID` defaults to `Kakis`. **Singapore carriers drop unregistered

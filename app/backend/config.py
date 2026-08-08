@@ -16,11 +16,31 @@ MAIL_FROM      = env("MAIL_FROM", "Kakis <onboarding@resend.dev>")
 MAIL_REPLY_TO  = env("MAIL_REPLY_TO")
 DEV_MODE       = env("DEV_MODE", "1") == "1"
 
-# M-AUTH · SMS channel. Sign-in codes go out over AWS SNS when SMS_ENABLED=1;
-# until then codes fall back to the DEV_MODE path exactly like email does.
-# SNS notes for go-live: the account starts in the SMS sandbox (only verified
-# numbers receive messages), and Singapore requires a registered Sender ID.
+# M-AUTH · SMS channel. Sign-in codes go out when SMS_ENABLED=1; otherwise they
+# fall back to the DEV_MODE path exactly like email does.
+#
+# SMS_PROVIDER switches carriers with no code change — set it to "sns" to go
+# back to AWS the moment production access is granted for ap-southeast-1.
+#   sns    — AWS SNS. Sandboxed per REGION: accepts a publish to any number and
+#            returns a MessageId, but delivers only to verified destinations.
+#   twilio — no per-region sandbox, but a TRIAL account is likewise limited to
+#            verified numbers. Only a paid account reaches arbitrary numbers.
 SMS_ENABLED    = env("SMS_ENABLED", "0") == "1"
+SMS_PROVIDER   = env("SMS_PROVIDER", "sns").strip().lower()
+
+# --- AWS SNS ---
+# Singapore carriers drop unregistered alphanumeric Sender IDs; clear
+# SMS_SENDER_ID to fall back to a shared originating number.
+AWS_REGION     = env("AWS_REGION", "ap-southeast-1")
+SMS_SENDER_ID  = env("SMS_SENDER_ID", "Kakis")
+
+# --- Twilio ---
+# TWILIO_FROM is a Twilio number in E.164, or an alphanumeric sender ID.
+# A Messaging Service SID takes precedence over TWILIO_FROM when both are set.
+TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN  = env("TWILIO_AUTH_TOKEN")
+TWILIO_FROM        = env("TWILIO_FROM")
+TWILIO_MESSAGING_SERVICE_SID = env("TWILIO_MESSAGING_SERVICE_SID")
 
 # DEMO BACKDOOR — read this before adding anything here.
 # Identifiers on this list get their sign-in code returned in the API response
@@ -35,8 +55,7 @@ DEMO_IDENTIFIERS = [d.strip().lower() for d in env("DEMO_IDENTIFIERS").split(","
 
 def is_demo_identifier(value: str) -> bool:
     return bool(value) and value.strip().lower() in DEMO_IDENTIFIERS
-AWS_REGION     = env("AWS_REGION", "ap-southeast-1")
-SMS_SENDER_ID  = env("SMS_SENDER_ID", "Kakis")
+
 DEFAULT_COUNTRY_CODE = env("DEFAULT_COUNTRY_CODE", "+65")   # bare 8-digit numbers are Singapore
 ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = env("OPENAI_API_KEY")
