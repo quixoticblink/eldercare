@@ -125,10 +125,26 @@ explanation here rather than in the file:
 
 - `sns:Publish` uses `NotResource` on topic ARNs, so the instance can text
   phone numbers but cannot publish to any SNS topic in the account.
-- The sandbox actions exist only so `preflight.py` can report whether the
-  account is still sandboxed. If those calls return `AuthorizationError`,
-  statements 2 and 3 did not attach — publishing still works, only the
-  reporting is blind.
+- **Sandbox management is `sms-voice:*`, not `sns:*`.** AWS moved it to End User
+  Messaging (PinpointSmsVoiceV2). `sns:CreateSMSSandboxPhoneNumber` and friends
+  authorise nothing — the call is evaluated against
+  `sms-voice:CreateVerifiedDestinationNumber`. Granting only the `sns:` names
+  produces an `AuthorizationError` that reads as if the policy were attached
+  correctly.
+
+### Sandbox: only verified numbers receive anything
+
+While the account is in the SMS sandbox for a given **region**, SNS accepts a
+publish to any number and returns a MessageId, but silently delivers only to
+**verified destination numbers**. The symptom is one handset receiving codes
+while every other number gets nothing, with no error anywhere.
+
+Production access is granted **per account per region** — a support case
+approved in one region leaves `ap-southeast-1` sandboxed.
+
+Check and add numbers in the console: **AWS End User Messaging SMS →
+Configurations → Sandbox destination phone numbers** (or SNS → Mobile → Text
+messaging). Each number receives a verification code you must enter back.
 
 ### Sender ID is the thing most likely to break delivery
 

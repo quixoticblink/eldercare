@@ -8,23 +8,25 @@
       "NotResource": "arn:aws:sns:*:*:*"
     },
     {
-      "Sid": "ReadSmsConfigAndSandboxStatus",
+      "Sid": "ReadSnsSmsConfig",
       "Effect": "Allow",
       "Action": [
         "sns:GetSMSAttributes",
-        "sns:GetSMSSandboxAccountStatus",
-        "sns:ListSMSSandboxPhoneNumbers",
         "sns:ListOriginationNumbers"
       ],
       "Resource": "*"
     },
     {
-      "Sid": "ManageSandboxTestNumbers",
+      "Sid": "SmsSandboxViaEndUserMessaging",
       "Effect": "Allow",
       "Action": [
-        "sns:CreateSMSSandboxPhoneNumber",
-        "sns:VerifySMSSandboxPhoneNumber",
-        "sns:DeleteSMSSandboxPhoneNumber"
+        "sms-voice:DescribeAccountAttributes",
+        "sms-voice:DescribeSpendLimits",
+        "sms-voice:DescribeVerifiedDestinationNumbers",
+        "sms-voice:CreateVerifiedDestinationNumber",
+        "sms-voice:SendDestinationNumberVerificationCode",
+        "sms-voice:VerifyDestinationNumber",
+        "sms-voice:DeleteVerifiedDestinationNumber"
       ],
       "Resource": "*"
     }
