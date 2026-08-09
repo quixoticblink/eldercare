@@ -76,6 +76,14 @@ def _init(c):
     #   weekly_slots — JSON {"Mon": ["morning"], "Sat": ["morning","afternoon"], ...}
     c.execute("ALTER TABLE kaki_profiles ADD COLUMN IF NOT EXISTS weekly_slots TEXT DEFAULT '{}'")
     c.execute("ALTER TABLE kaki_profiles ADD COLUMN IF NOT EXISTS availability_note TEXT DEFAULT ''")
+    # v1.5 · rate limiting for the sign-in endpoints. DB-backed rather than
+    # in-memory so the counters survive a restart — an in-process limiter is
+    # reset by every deploy, which makes it security theatre.
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS auth_attempts(
+      kind TEXT, key TEXT, ts TIMESTAMP DEFAULT current_timestamp);
+    """)
+
     # v1.4 · coordinator-editable settings (auto-approval, auto-matching, PayNow).
     # Key/value so a new switch needs no migration. Values are JSON-encoded.
     c.execute("""

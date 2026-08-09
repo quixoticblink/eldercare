@@ -1,6 +1,10 @@
-fastapi>=0.110
-uvicorn[standard]>=0.29
-duckdb>=0.10
-httpx>=0.27
-pydantic[email]>=2.6
-boto3>=1.34            # M-AUTH · SMS sign-in codes via AWS SNS
+# Pinned for reproducible builds (ISO 5055 maintainability; CWE-1104).
+# Unpinned ranges are how DuckDB 1.5.5 — and its WAL-replay crash — arrived
+# unreviewed on the pilot box. Bump these deliberately, then run
+# backend/tests/smoke.py before deploying.
+fastapi==0.141.1
+uvicorn[standard]==0.52.0
+duckdb==1.5.5
+httpx==0.28.1
+pydantic[email]==2.13.4
+boto3==1.43.59            # M-AUTH · SMS sign-in codes via AWS SNS

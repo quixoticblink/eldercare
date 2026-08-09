@@ -1,5 +1,41 @@
-# /etc/caddy/Caddyfile — automatic HTTPS reverse proxy
-# Replace with your domain, then: systemctl reload caddy
-kakis.yourdomain.sg {
+# /etc/caddy/Caddyfile — automatic HTTPS reverse proxy for Kakis.
+# After editing: sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy
+
+{
+    email abhishekkaul@gmail.com
+}
+
+(security_headers) {
+    header {
+        # Force HTTPS for a year. Browsers refuse plaintext to this host after
+        # the first visit, which closes the downgrade window on public wifi.
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        # The app is never meant to be framed — blocks clickjacking of the
+        # approve/assign buttons (CWE-1021).
+        X-Frame-Options "DENY"
+        # Stop browsers second-guessing declared content types (CWE-430).
+        X-Content-Type-Options "nosniff"
+        # Don't leak visited care URLs to third parties via Referer.
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+        # Whitelist-only sources. The app is self-contained: no CDNs, no
+        # third-party scripts, no framing. 'unsafe-inline' is required because
+        # the views use inline onclick handlers and style attributes — removing
+        # it means refactoring the frontend, which is noted in the audit as
+        # remaining work rather than done silently.
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        # Don't advertise the server software.
+        -Server
+    }
+}
+
+singaporekakis.com {
+    import security_headers
+    encode gzip
     reverse_proxy localhost:8000
+}
+
+www.singaporekakis.com {
+    import security_headers
+    redir https://singaporekakis.com{uri} permanent
 }

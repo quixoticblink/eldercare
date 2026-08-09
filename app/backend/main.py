@@ -6,7 +6,16 @@ from fastapi.staticfiles import StaticFiles
 from . import config, db
 from .routers import auth, users, care, visits, admin, chat
 
-app = FastAPI(title="Kakis", version="1.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
+# The interactive docs publish the entire API surface — every endpoint, every
+# field, every admin route — to anyone who visits. Useful while building, an
+# unnecessary gift to an attacker once real care data is in the box. Off unless
+# API_DOCS=1 is set explicitly.
+_docs = config.env("API_DOCS", "0") == "1"
+
+app = FastAPI(title="Kakis", version="1.0.0",
+              docs_url="/api/docs" if _docs else None,
+              redoc_url=None,
+              openapi_url="/api/openapi.json" if _docs else None)
 
 app.add_middleware(
     CORSMiddleware,

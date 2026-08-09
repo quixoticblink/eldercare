@@ -18,10 +18,19 @@ if not os.environ.get("ASSUMPTIONS_PATH"):
 sys.path.insert(0, ".")
 from fastapi.testclient import TestClient
 from backend.main import app
-from backend import config
+from backend import config, db
+from backend.services import ratelimit as _rl
 c = TestClient(app)
 
+# Every request in this suite comes from the same TestClient address, so the
+# per-IP cap would throttle the suite itself. Reset that one counter between
+# calls; the per-identifier cap and the IP cap are both still asserted
+# explicitly in the v1.5 section below.
+def _unthrottle_ip():
+    _rl.clear("request_code_ip", "testclient")
+
 def request_code(identifier):
+    _unthrottle_ip()
     r = c.post("/api/auth/request-code", json={"identifier": identifier})
     assert r.status_code == 200, r.text
     return r.json()
@@ -417,4 +426,60 @@ assert cfg["paynow"]["configured"] is True and cfg["paynow"]["value"] == "202512
 st.set_many({"totally_made_up": "x"}, "test")
 assert "totally_made_up" not in st.all()
 
-print("ALL SMOKE TESTS PASSED ✓  (v1.4 — 133 assertions)")
+# ---- v1.5 · auth hardening (ISO 5055 security) -----------------------------
+from backend.services import ratelimit
+
+# unlimited code requests would let an attacker run up the SMS bill and hammer
+# a caregiver's phone (CWE-770)
+ratelimit.clear("request_code_identifier", "+6591234567")
+limit, _ = ratelimit.LIMITS["request_code_identifier"]
+for i in range(limit):
+    _unthrottle_ip()
+    assert c.post("/api/auth/request-code", json={"identifier": "9123 4567"}).status_code == 200, i
+_unthrottle_ip()
+blocked = c.post("/api/auth/request-code", json={"identifier": "9123 4567"})
+assert blocked.status_code == 429, blocked.status_code
+assert "coordinator" in blocked.json()["detail"], "lockout must offer a human route out"
+
+# a different identifier is unaffected — the limit is per person, not global
+_unthrottle_ip()
+assert c.post("/api/auth/request-code", json={"identifier": "8222 3333"}).status_code == 200
+
+# the per-IP cap catches an attacker cycling through many identifiers
+ratelimit.clear("request_code_ip", "testclient")
+ip_limit, _ = ratelimit.LIMITS["request_code_ip"]
+for i in range(ip_limit):
+    ratelimit.record("request_code_ip", "testclient")
+spread = c.post("/api/auth/request-code", json={"identifier": "8777 6666"})
+assert spread.status_code == 429, "per-IP cap should stop identifier-cycling"
+_unthrottle_ip()
+
+# unlimited guesses would make a 6-digit code walkable inside its 10-min window
+ratelimit.clear("verify_failure", "+6582223333")
+ratelimit.clear("request_code_identifier", "+6582223333")
+vlimit, _ = ratelimit.LIMITS["verify_failure"]
+for i in range(vlimit):
+    _unthrottle_ip()
+    r = c.post("/api/auth/verify", json={"identifier": "8222 3333", "code": "000000"})
+    assert r.status_code == 400, (i, r.status_code)
+locked = c.post("/api/auth/verify", json={"identifier": "8222 3333", "code": "000000"})
+assert locked.status_code == 429, locked.status_code
+
+# a real sign-in clears the counters, so a fumbled digit doesn't strand someone
+ratelimit.clear("verify_failure", "+6582223333")
+ratelimit.clear("request_code_identifier", "+6582223333")
+_unthrottle_ip()
+good = c.post("/api/auth/request-code", json={"identifier": "8222 3333"}).json()
+ratelimit.record("verify_failure", "+6582223333")     # one earlier fumble
+_vr = c.post("/api/auth/verify", json={"identifier": "8222 3333", "code": good.get("dev_code"),
+                                       "role": "caregiver", "name": "Rate Test"})
+assert _vr.status_code == 200, (good, _vr.status_code, _vr.text)
+assert ratelimit.count("verify_failure", "+6582223333", 15) == 0, "success must reset the counter"
+
+# failed attempts are auditable
+assert db.q("SELECT count(*) c FROM audit_log WHERE action = 'login_failed'")[0]["c"] >= vlimit
+
+# the interactive API docs must not be public once real care data is in the box
+assert app.docs_url is None and app.openapi_url is None, "API docs should be off by default"
+
+print("ALL SMOKE TESTS PASSED ✓  (v1.5 — 148 assertions)")

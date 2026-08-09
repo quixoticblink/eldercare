@@ -6,10 +6,10 @@ users are recognised before the code screen is drawn, so they are only ever
 asked for the 6 digits — never their name or role again.
 """
 import datetime
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from .. import config, db, security
-from ..services import emailer, sms
+from ..services import emailer, ratelimit, sms
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -57,8 +57,23 @@ def _claim_free(channel: str, value: str, exclude_id: str | None = None):
         raise HTTPException(400, f"That {label} is already linked to another account")
 
 @router.post("/request-code")
-def request_code(body: IdentifierIn):
+def request_code(body: IdentifierIn, request: Request = None):
     channel, value = _identifier(body)
+
+    # Each call sends a real SMS or email. Unlimited calls means an attacker can
+    # run up the Twilio bill and hammer someone's phone at the same time.
+    ip = ratelimit.client_ip(request)
+    if ratelimit.exceeded("request_code_identifier", value):
+        raise HTTPException(429, f"Too many codes requested. Try again in "
+                                 f"{ratelimit.retry_after('request_code_identifier', value)} minutes, "
+                                 f"or call the coordinator on 6XXX XXXX.")
+    if ip and ratelimit.exceeded("request_code_ip", ip):
+        raise HTTPException(429, "Too many sign-in attempts from this connection. "
+                                 "Please wait a few minutes and try again.")
+    ratelimit.record("request_code_identifier", value)
+    if ip:
+        ratelimit.record("request_code_ip", ip)
+
     user = _find_user(channel, value)
 
     code = security.new_otp()
@@ -92,12 +107,26 @@ def request_code(body: IdentifierIn):
 def verify(body: VerifyIn):
     channel, value = _identifier(body)
 
+    # A 6-digit code is only strong if guesses are limited. Without this an
+    # attacker can walk the whole keyspace inside the 10-minute window.
+    if ratelimit.exceeded("verify_failure", value):
+        raise HTTPException(429, f"Too many incorrect codes. Locked for "
+                                 f"{ratelimit.retry_after('verify_failure', value)} minutes — "
+                                 f"request a new code after that, or call the coordinator.")
+
     row = db.one("SELECT * FROM otp_codes WHERE identifier = ? AND code = ?", [value, body.code.strip()])
     if not row:
+        ratelimit.record("verify_failure", value)
+        db.audit(value, "login_failed", "wrong code")
         raise HTTPException(400, "Wrong code — check and try again")
     if row["expires"] < db.now():
         raise HTTPException(400, "Code expired — request a new one")
     db.run("DELETE FROM otp_codes WHERE identifier = ?", [value])
+    # A genuine sign-in clears the counters, so an honest user who fumbled a few
+    # digits is not left locked out.
+    ratelimit.clear("verify_failure", value)
+    ratelimit.clear("request_code_identifier", value)
+    ratelimit.prune()
 
     user = _find_user(channel, value)
     if not user:

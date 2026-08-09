@@ -7,9 +7,26 @@ Type=simple
 User=kakis
 WorkingDirectory=/home/kakis/eldercare/app
 EnvironmentFile=/home/kakis/eldercare/app/.env
-ExecStart=/home/kakis/eldercare/app/.venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000
+# Bind to loopback only. Caddy terminates TLS and proxies here; before this the
+# app listened on 0.0.0.0, so anything that opened port 8000 in the security
+# group would have exposed it unencrypted (CWE-319).
+ExecStart=/home/kakis/eldercare/app/.venv/bin/uvicorn backend.main:app --host 127.0.0.1 --port 8000 --proxy-headers --forwarded-allow-ips=127.0.0.1
 Restart=on-failure
 RestartSec=3
+
+# The database holds medications, mobility notes and addresses. Files it
+# creates must not be world-readable (CWE-732).
+UMask=0077
+
+# Least privilege for the service account.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/home/kakis
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
 
 [Install]
 WantedBy=multi-user.target
