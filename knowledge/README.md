@@ -18,7 +18,9 @@ If you want to see how the framing got here rather than just where it landed, [[
 
 ## Where we are
 
-Past the first HMW reframe (Jun 25) and a partner-anchored narrowing (Jul 8). Phase: strategy & pilot design. Next milestone: SGLN masterclass Jul 20; prototype window opens Aug 20; Demo Day September. Vanguard is the anchor partner as of Jul 8 — a Pasir Ris ICCP-layered pilot offered by year-end. Devil's advocate is active on all three of the recent moves.
+Past the first HMW reframe (Jun 25) and a partner-anchored narrowing (Jul 8). Phase: **build shipped, tabletop next**. Vanguard is the anchor partner as of Jul 8 — a Pasir Ris ICCP-layered pilot offered by year-end. Devil's advocate is active on all three of the recent moves.
+
+**As of Aug 9:** the prototype is a running app — [[prototype/kakis-app]], live at **https://singaporekakis.com**, three roles, real sign-in codes to real phones. On Aug 3 [[journal/2026-08-03-ncss-vanguard|NCSS and Vanguard]] steered the August milestone away from a launch and towards a **tabletop exercise with a limited user set**, which is the first instrument that puts the product in front of the demand side rather than another partner. Demo Day September.
 
 ## The folders
 

@@ -482,4 +482,68 @@ assert db.q("SELECT count(*) c FROM audit_log WHERE action = 'login_failed'")[0]
 # the interactive API docs must not be public once real care data is in the box
 assert app.docs_url is None and app.openapi_url is None, "API docs should be off by default"
 
-print("ALL SMOKE TESTS PASSED ✓  (v1.5 — 148 assertions)")
+# ---- v1.5 · endpoints that had no coverage at all ---------------------------
+# These were reachable in production but never exercised by a test, which is
+# how a broken decline or cancel button reaches a caregiver unnoticed.
+
+# a kaki can pass a visit back to the coordinator
+dv = c.post("/api/visits", json={"service":"Wellness check","tier":"planned","date":"2026-08-01",
+                                 "window":"09:00–11:00","language":"English"}, headers=ch).json()
+c.post(f"/api/admin/visits/{dv['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah)
+r = c.post(f"/api/visits/{dv['id']}/decline", headers=kh)
+assert r.status_code == 200 and r.json()["status"] == "requested", r.text
+assert r.json().get("kaki") is None, "declining must release the kaki, not keep them attached"
+
+# a caregiver can cancel their own visit, and only their own
+cv2 = c.post("/api/visits", json={"service":"Companionship","tier":"planned","date":"2026-08-01",
+                                  "window":"09:00–11:00","language":"English"}, headers=ch).json()
+assert c.post(f"/api/visits/{cv2['id']}/cancel", headers=kh).status_code == 403, "kaki must not cancel"
+r = c.post(f"/api/visits/{cv2['id']}/cancel", headers=ch)
+assert r.status_code == 200 and r.json()["status"] == "cancelled", r.text
+
+# the full user list backs the admin roster screen
+users = c.get("/api/admin/users", headers=ah).json()
+assert any(u["role"] == "kaki" and "kaki" in u for u in users), "kaki rows must carry their profile"
+assert c.get("/api/admin/users", headers=ch).status_code == 403
+
+# suspend blocks immediately — a token issued before suspension must stop working
+sus_h, sus_u = login("suspendme@example.com", role="caregiver", name="Suspend Me")
+c.post(f"/api/admin/users/{sus_u['id']}/approve", json={}, headers=ah)
+assert c.get("/api/care/household", headers=sus_h).status_code in (200, 404)
+assert c.post(f"/api/admin/users/{sus_u['id']}/suspend", headers=ah).status_code == 200
+assert c.post("/api/visits", json={"service":"Companionship","tier":"planned","date":"2026-08-01",
+                                   "window":"09:00–11:00","language":"English"},
+              headers=sus_h).status_code == 403, "suspension must take effect on the existing session"
+# an admin cannot lock themselves out
+assert c.post(f"/api/admin/users/{admin['id']}/suspend", headers=ah).status_code == 400
+
+# profile round-trips, and a kaki's availability rides along with it
+prof = c.get("/api/users/me/profile", headers=kh).json()
+assert prof["role"] == "kaki" and "availability" in prof["kaki"], prof
+
+# the help bot answers. Without a key it serves the built-in guide; with one it
+# reaches the provider. Either way it must never return an empty reply.
+for q in ["How do I book a visit?", "What is the start code?", "When am I approved?"]:
+    rep = c.post("/api/chat", json={"message": q}, headers=ch)
+    assert rep.status_code == 200 and len(rep.json()["reply"]) > 20, (q, rep.text)
+# it holds a conversation rather than treating each turn as the first
+rep = c.post("/api/chat", json={"message": "and what if I cancel?",
+                                "history": [{"role": "user", "content": "how do I book?"},
+                                            {"role": "assistant", "content": "Home then Book a visit."}]},
+             headers=ch)
+assert rep.status_code == 200 and rep.json()["reply"], rep.text
+# Signed OUT it must still answer — the help button is on the sign-in screen,
+# and "how do I sign in?" is exactly what a confused caregiver asks there.
+# This returned 401 in production; the error text told them nothing.
+anon = c.post("/api/chat", json={"message": "how do I sign in?"})
+assert anon.status_code == 200, anon.text
+assert anon.json()["source"] == "guide", "signed-out help must not call a paid provider"
+assert "code" in anon.json()["reply"].lower(), anon.json()["reply"]
+# an invalid or expired token degrades to the guide rather than erroring
+bad = c.post("/api/chat", json={"message": "how do I book?"},
+             headers={"Authorization": "Bearer not-a-real-token"})
+assert bad.status_code == 200 and bad.json()["source"] == "guide", bad.text
+# signed in, it reaches the assistant path
+assert c.post("/api/chat", json={"message": "how do I book?"}, headers=ch).json()["source"] == "assistant"
+
+print("ALL SMOKE TESTS PASSED ✓  (v1.5 — 170 assertions)")

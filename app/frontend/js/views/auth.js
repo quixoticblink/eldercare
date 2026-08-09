@@ -13,6 +13,8 @@ const AuthView = (() => {
       <input class="f-input" id="ident" type="text" inputmode="email" autocomplete="username"
         placeholder="you@example.com or 9123 4567">
       <button class="btn" id="sendBtn">Send my code</button>
+      <p class="initiative-link">Get to know more of this initiative at
+        <a href="https://eldercare-rho.vercel.app/#" target="_blank" rel="noopener noreferrer">eldercare-rho.vercel.app</a></p>
       <div class="helpline">Stuck? Call <b>Pasir Ris ICCP · 6XXX XXXX</b></div>`);
 
     const submit = async () => {

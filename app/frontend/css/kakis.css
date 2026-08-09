@@ -244,3 +244,8 @@ nav.tabs button.on{color:var(--pandan-deep);background:var(--mint)}
 .fit.available{background:#E3F3EA;color:#14594A}
 .fit.unavailable{background:#FBE6E2;color:#9B3A26}
 .fit.unknown{background:#F1EFE9;color:#6B6357}
+
+/* Sign-in screen link out to the initiative microsite. */
+.initiative-link{font-size:.76rem;text-align:center;color:var(--slate,#5E6B65);margin:12px 2px 0}
+.initiative-link a{color:var(--pandan,#14594A);font-weight:600;text-decoration:underline;
+  text-underline-offset:2px}

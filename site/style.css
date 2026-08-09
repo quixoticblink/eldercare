@@ -875,3 +875,8 @@ footer.site a:focus-visible {
   .proto-modal { padding: 0.5rem; }
   .proto-modal .dialog { height: 96vh; }
 }
+
+/* Sub-heading inside a section, below the lede. Used in The Build to introduce
+   the three journeys without opening a new top-level section. */
+.sub-h{font-family:var(--display);font-size:1.35rem;font-weight:500;color:var(--text);
+  margin:3rem 0 1rem;letter-spacing:-.01em}

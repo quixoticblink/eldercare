@@ -197,6 +197,17 @@ The prototype button opens `.proto-modal` — the site's one piece of real inter
 
 Artefact files live in `site/assets/` (prototype HTML, deck .pptx, deck .pdf, cover image) because the deployed site's root is `site/` — relative links into `../knowledge/` 404 on Vercel. The knowledge-base copies remain canonical; when the prototype or deck changes, re-copy into `assets/`.
 
+As of 2026-08-09 the grid holds three cards: the live app (linking out to
+`singaporekakis.com`), the interactive prototype, and the deck. The live-app card has
+no `.cover` — it links to the real thing rather than an image of it.
+
+### `.sub-h`
+
+A serif sub-heading (`--display`, 1.35rem) inside a `.narrow` block, used to introduce
+a sub-part of a section without opening a new top-level section. Currently used once,
+in The Build, to head the three-journey walkthrough. Use sparingly — if a section needs
+two of these it probably wants to be two sections.
+
 ## 6. Voice and tone
 
 The site copy follows the same voice as the wiki entries — observation-first, conversational, technically rigorous but never stiff. Specifically:
@@ -222,7 +233,7 @@ Punctuation:
 The page reads in this fixed order. New sections can be added but they should slot in here, not appear at random.
 
 1. **Hero.** Project name (brand in header), the HMW restated as a question, the lede with the "so that" clause, meta line.
-2. **Journey.** The narrative arc. Currently a timeline from May 19 onward to Demo Day, with past entries in accent and future entries muted.
+2. **Journey.** The narrative arc. Currently a timeline from May 19 onward to Demo Day, with past entries in accent and future entries muted. Runs through Aug 3 (NCSS/Vanguard tabletop guidance) and Aug 9 (the app going live).
 3. **The Question.** The HMW statement, the three-cell grid, the "How we got here" explanation, the honest-about-shortcomings callout.
 4. **Team.** Five cards with initials, names, and lenses.
 5. **Problem Space.** Three paragraphs of observation-first framing, ending with a link to the wiki overview.
@@ -295,6 +306,7 @@ Remove the `.dormant` class from the `<a>`. Update the description to reflect wh
 
 Keep this current. Each entry: date, what changed, who or what triggered it. Most recent at the top.
 
+- **2026-08-09 (the app went live)** — The prototype became a deployed product, and The Build section now leads with it rather than with the clickable mock. **`#showcase`** h2 changed *"The prototype runs. The deck is a draft."* → *"The app is live. The deck is a draft."*, lede and intro paragraph rewritten (dropped "six weeks ahead of the August milestone", which had expired). **New `.sub-h` component** (see section 5) heading a four-paragraph walkthrough of the three journeys as they actually work — caregiver (care plan, trigger step, the four-digit start code read aloud), kaki (half-day availability grid plus dated exceptions, and the deliberate asymmetry that they never see the start code), coordinator (availability-badged matching that sorts rather than filters, three automation switches all defaulting off), and a closing paragraph on the honest money handling. **`.artefact-grid`** gained a third card — the live app, linking to `singaporekakis.com` and to the user guide in `app/SPEC.md`; it has no `.cover` because it links to the real thing. **Two new journey entries**: Aug 3 · NCSS & Vanguard ("Told to run a tabletop, not a launch" — the guidance to walk the journeys with a limited user set before anyone's mother is on the other end of a booking, and the admission that every validation so far has been supply-side), and Aug 9 · Build ("The prototype became a running app"). Both past, four arc chips each. Wiki side done in the same pass: new `knowledge/prototype/kakis-app.md`, new `knowledge/journal/2026-08-03-ncss-vanguard.md` (marked `thin` pending minutes), prototype and root READMEs updated. Triggered by the app going live and the Aug 3 partner session.
 - **2026-07-21 (masterclass entry)** — The Jul 20 Masterclass journey entry converted from `future` to past, rewritten from the actual session: cohort carousel, micro-credentials landing, the facilitator's "give it to the caregivers, don't sell" critique, milestone re-aimed, Kampung Kakis name collision. Four arc chips, `.step.final` = "milestone re-aimed at caregivers". Wiki side done in the same pass: new `evidence/sgln-masterclass-feedback-2026-07-20.md`, new `journal/2026-07-20-masterclass.md`, devil's advocate grew to critique 15, timeline map + root README status updated. Triggered by the Jul 20 feedback session (post-its + recording).
 - **2026-07-11 (spec link)** — Prototype artefact card in `#showcase` gained a third ghost button, "Read the spec", pointing at `knowledge/prototype/kakis-prototype-spec.md` on GitHub — the full screen-by-screen written mirror of the prototype with inline `> FEEDBACK:` slots. Triggered by the feedback workflow: annotate the spec, then the prototype gets updated from it.
 - **2026-07-11 (showcase — artefacts served from the site)** — The deployed site couldn't show the prototype or deck (they lived outside `site/`, and GitHub blob links don't serve a runnable HTML file or a viewable .pptx). **New `site/assets/` folder** holding copies of `kakis-prototype.html`, `Kakis-DemoDay-Pitch.pptx`, `Kakis-DemoDay-Pitch.pdf` (for in-browser viewing), and `deck-cover.jpg` (title-slide render). Knowledge-base copies stay canonical; re-copy on change. **New top-level "The Build" section (`#showcase`)** between Strategy and Knowledge — lede + one paragraph (names *Kakis* as provisional), then a new **`.artefact-grid`/`.artefact-card` component** (see section 5): the prototype card launches a **`.proto-modal`** (iframe popup, lazy-loaded, Esc/backdrop/button close, focus management, scroll lock) with a full-screen fallback link; the deck card shows the cover render with "View the deck (PDF)" and "Download .pptx" buttons. **Header nav + footer** gained "Build" links. **Jul 11 Build journey entry** now ends with an anchor to `#showcase`. **Section 10 scope** amended — the modal is the site's one sanctioned piece of interactivity. New CSS appended to `style.css` (artefact cards, `.site-btn`, modal), all within the existing blue palette. Triggered by user: the site couldn't show the pitch deck or prototype; wanted a download for the deck and a popup for the prototype.

@@ -59,6 +59,19 @@ def _openai(message: str, history: list) -> str | None:
         return r.json()["choices"][0]["message"]["content"]
     return None
 
+def guide_reply(message: str) -> str:
+    """Keyword guide only — no provider call. Used for signed-out visitors, who
+    are most often asking how to sign in."""
+    m = (message or "").lower()
+    if any(w in m for w in ("sign in", "signin", "log in", "login", "code", "otp")):
+        return HELP_GUIDE["sign in"]
+    for key, answer in HELP_GUIDE.items():
+        if key in m:
+            return answer
+    return ("I can help with signing in, approval, booking a visit, the start code, "
+            "reports, care plans, cancelling, and earnings. Sign in for fuller answers — "
+            "or call the Pasir Ris ICCP coordinator on 6XXX XXXX.")
+
 def reply(message: str, history: list) -> str:
     # Anthropic first if configured, then OpenAI, then the keyword guide.
     for key, fn in ((config.ANTHROPIC_API_KEY, _anthropic),
