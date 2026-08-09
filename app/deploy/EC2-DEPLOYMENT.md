@@ -61,7 +61,7 @@ localhost.
 |---|---|
 | Email sign-in | **Live** — Resend, `singaporekakis.com` verified, from `hello@singaporekakis.com`, replies to abhishekkaul@gmail.com |
 | Chatbot | **Live** — OpenAI `gpt-4o-mini` |
-| SMS sign-in | **Live** — AWS SNS via the `KakisAppRole` instance role, Sender ID `Kakis`, delivery confirmed to a real handset |
+| SMS sign-in | **Live via Twilio** — paid account `singaporekakis`, Messaging Service `MG94c7a1…`, US number `+18023067424`. Delivery confirmed to Singapore handsets that AWS SNS could not reach |
 | `DEV_MODE` | **0** — codes are delivered, never returned in the API |
 
 Confirmed after the switch: `/api/auth/request-code` returns no `dev_code` for
@@ -114,7 +114,28 @@ sudo sed -i 's/^DEMO_IDENTIFIERS=.*/DEMO_IDENTIFIERS=/' /home/kakis/eldercare/ap
 sudo systemctl restart kakis
 ```
 
-## SMS via AWS SNS
+## SMS — currently Twilio
+
+`SMS_PROVIDER=twilio`, paid account, sending through a Messaging Service. This
+replaced SNS because `ap-southeast-1` is still in the SMS sandbox, where only
+verified destination numbers receive anything — one handset worked and every
+other Singapore number silently got nothing.
+
+**A2P 10DLC Brand and Campaign registration is not required here.** That is a
+US carrier rule for messages sent *to* US numbers; traffic to Singapore never
+touches it. Twilio's console labels the number "Registration required" anyway,
+which is misleading in this context. The steps that did matter were the
+compliance profile and the Messaging Service.
+
+Two trade-offs accepted: messages go out as international SMS from a US number,
+so they cost more per message than a local sender and arrive from a `+1`
+number, which some recipients treat as suspicious. In exchange it completely
+sidesteps Singapore SSIR Sender ID registration, which takes weeks.
+
+Delivery problems: **Twilio Console → Monitor → Logs → Messaging** gives
+per-message status and an error code — far better visibility than SNS offered.
+
+## SMS via AWS SNS (standby)
 
 Instance role **`KakisAppRole`** on `i-0942e81ef83d2beec`, policy in
 `deploy/aws-sns-policy.json`. `SMS_ENABLED=1`, region `ap-southeast-1`.
@@ -195,9 +216,10 @@ permanent fix; it takes weeks and carries a fee.
 
 ## Still to do
 
-- **Reattach the corrected IAM policy.** The role can publish but not read
-  sandbox status, so `preflight.py` reports it as unknown. Cosmetic — nothing
-  depends on it — but worth fixing so the check isn't blind.
+- **SNS production access for `ap-southeast-1`**, if you want to move back off
+  Twilio. Everything is still configured; it is a one-line
+  `SMS_PROVIDER=sns` switch. Reattach the corrected IAM policy at the same time
+  so `preflight.py` can read sandbox status instead of guessing.
 - **DMARC** is `p=quarantine` with `rua` pointing at GoDaddy's address.
   Repoint `rua` to a mailbox you actually read, or authentication failures go
   unnoticed.
