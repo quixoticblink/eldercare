@@ -31,7 +31,7 @@ Three roles share one app:
   finish with a report.
 - **Coordinator** — approve people, match visits, and now optionally automate both.
 
-Full feature reference and user guide: [[../../app/SPEC|app/SPEC.md]] section 9.
+Full feature reference and user guide: [[app/SPEC|app/SPEC.md]] section 9.
 
 ## The design decisions worth remembering
 
@@ -93,7 +93,7 @@ working service.
 ## Where it stands
 
 Live, hardened, and audited against ISO/IEC 5055 — see
-[[../../app/deploy/SECURITY-AUDIT|SECURITY-AUDIT.md]]. Rate limiting on sign-in, health
+[[app/deploy/SECURITY-AUDIT|SECURITY-AUDIT.md]]. Rate limiting on sign-in, health
 data off world-readable permissions, security headers, pinned dependencies. 170
 automated assertions covering the full lifecycle.
 

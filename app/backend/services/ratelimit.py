@@ -16,14 +16,32 @@ DB-backed rather than in-memory on purpose: the counters must survive the
 restarts that deployment involves, or the limit is trivially reset.
 """
 import datetime
-from .. import db
+from .. import config, db
 
 # (limit, window minutes) — tuned for elderly users who genuinely do mistype
-# and re-request, while still closing off automated abuse.
+# and re-request, while still closing off automated abuse. Overridable by env so
+# a session can be widened without a code change.
+#
+# The per-IP cap is the one that bites in the real world. Everyone in a room
+# shares one public address: a team test, or the tabletop exercise with five
+# sets of senior + micro-jobber + coordinator, is fifteen-plus people signing in
+# within minutes from a single IP. A cap of 20 would lock the room out halfway
+# through and look exactly like the app being broken, during the session where
+# it is being judged. So the per-IP number is deliberately loose; the real
+# protection against targeted abuse is the per-identifier cap, which is not
+# affected by how many other people share the network.
+def _int(name: str, default: int) -> int:
+    try:
+        return max(1, int(config.env(name, str(default))))
+    except (TypeError, ValueError):
+        return default
+
+WINDOW_MIN = _int("RATE_LIMIT_WINDOW_MIN", 15)
+
 LIMITS = {
-    "request_code_identifier": (5, 15),    # per email/number
-    "request_code_ip":        (20, 15),    # per source address, shared networks exist
-    "verify_failure":          (5, 15),    # wrong codes before lockout
+    "request_code_identifier": (_int("RATE_LIMIT_CODE_PER_IDENTIFIER", 5), WINDOW_MIN),
+    "request_code_ip":         (_int("RATE_LIMIT_CODE_PER_IP", 200), WINDOW_MIN),
+    "verify_failure":          (_int("RATE_LIMIT_VERIFY_FAILURES", 5), WINDOW_MIN),
 }
 
 def _cutoff(minutes: int):

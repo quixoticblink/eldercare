@@ -445,9 +445,12 @@ assert "coordinator" in blocked.json()["detail"], "lockout must offer a human ro
 _unthrottle_ip()
 assert c.post("/api/auth/request-code", json={"identifier": "8222 3333"}).status_code == 200
 
-# the per-IP cap catches an attacker cycling through many identifiers
-ratelimit.clear("request_code_ip", "testclient")
+# the per-IP cap catches an attacker cycling through many identifiers.
+# It is deliberately loose — a room of people shares one address, and the
+# tabletop exercise is fifteen-plus sign-ins from a single wifi.
 ip_limit, _ = ratelimit.LIMITS["request_code_ip"]
+assert ip_limit >= 100, f"per-IP cap {ip_limit} would lock out a room on one network"
+ratelimit.clear("request_code_ip", "testclient")
 for i in range(ip_limit):
     ratelimit.record("request_code_ip", "testclient")
 spread = c.post("/api/auth/request-code", json={"identifier": "8777 6666"})
