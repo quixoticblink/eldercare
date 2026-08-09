@@ -20,7 +20,7 @@ If you want to see how the framing got here rather than just where it landed, [[
 
 Past the first HMW reframe (Jun 25) and a partner-anchored narrowing (Jul 8). Phase: **build shipped, tabletop next**. Vanguard is the anchor partner as of Jul 8 — a Pasir Ris ICCP-layered pilot offered by year-end. Devil's advocate is active on all three of the recent moves.
 
-**As of Aug 9:** the prototype is a running app — [[prototype/kakis-app]], live at **https://singaporekakis.com**, three roles, real sign-in codes to real phones. On Aug 3 [[journal/2026-08-03-ncss-vanguard|NCSS and Vanguard]] steered the August milestone away from a launch and towards a **tabletop exercise with a limited user set**, which is the first instrument that puts the product in front of the demand side rather than another partner. Demo Day September.
+**As of Aug 9:** the prototype is a running app — [[prototype/kakis-app]], live at **https://singaporekakis.com**, three roles, real sign-in codes to real phones. On Aug 3 [[journal/2026-08-03-ncss-vanguard|Vanguard countered]] our live-pilot ask with a **tabletop exercise** — five sets of senior, micro-jobber and coordinator, two sessions (Vanguard and NCSS/Care Corner), week of 17 Aug. Scope narrows to **chaperoning only**. Two things to carry: supply, not demand, is the binding constraint; and the success metric on offer ("lessen your administrative burden") is an operator measure, which leaves **caregiver relief, resilient caregiving and ops digitisation unreconciled as three different products**. Demo Day September.
 
 ## The folders
 
