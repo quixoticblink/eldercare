@@ -2,40 +2,48 @@
 
 A six-month leadership sprint by five people, asking:
 
-> **How might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a crisis hits — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof?**
+> **How might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a need arises — planned or urgent — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof?**
 
-Started May 19, 2026 · Singapore · Public journey.
+Started May 19, 2026 · Singapore · Public journey. The app is live at **[singaporekakis.com](https://singaporekakis.com)**.
 
-_The question has moved twice since we started. The [May 19 opener](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-05-19-individual-exercise.md) → [Jun 25 caregiver reframe](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-06-25-caregiver-respite.md) → [Jul 8 post-Vanguard narrowing](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-07-08-post-vanguard.md) is the record of that._
+_The question has been through five dated iterations since we started. The [May 19 opener](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-05-19-individual-exercise.md) → [Jun 15 NCSS reframe signal](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-06-15-ncss-reframe-signal.md) → [Jun 25 caregiver reframe](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-06-25-caregiver-respite.md) → [Jul 8 post-Vanguard narrowing](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-07-08-post-vanguard.md) → [Jul 11 broadening](https://github.com/quixoticblink/eldercare/blob/main/knowledge/reframing/hmw-2026-07-11-broader-need.md) is the record of that. [`hmw-current.md`](knowledge/reframing/hmw-current.md) always points at the live one._
 
 ---
 
-## Two directories
+## Three directories
 
 ```
 .
 ├── knowledge/    ← the working wiki (Karpathy-voice markdown)
-└── site/         ← the public microsite (Vercel-deployable)
+├── site/         ← the public microsite (Vercel-deployable)
+└── app/          ← Kakis, the working app (FastAPI + DuckDB + static frontend)
 ```
 
-Each directory has a spec file that governs how to update it without breaking the existing style:
+Each directory has a spec file that governs how to update it without breaking what's already there:
 
 - **`knowledge/VOICE.md`** — voice, reasoning order, structural conventions for wiki entries.
 - **`site/SPEC.md`** — design principles, component patterns, update recipes for the microsite.
+- **`app/SPEC.md`** — the module contract, data model, API surface, and the full feature reference / user guide (section 9).
 
-Both are written so you can paste them into a chat with an AI, then add your specific ask, and the result will match what's already there.
+All three are written so you can paste them into a chat with an AI, then add your specific ask, and the result will match what's already there.
 
 ---
 
 ## Quick deploy
 
-The microsite is static HTML. Three options:
+**The microsite** is static HTML. Three options:
 
 1. **Vercel dashboard, drag-and-drop.** Drag the `site/` folder into Vercel. Done.
 2. **Vercel CLI.** `cd site && npx vercel --prod`.
 3. **GitHub + Vercel.** Push this repo, import to Vercel, set **Root Directory** to `site` in project settings.
 
-If you want wiki links (`../knowledge/...`) to resolve on the deployed site, see `site/README.md` for the two build strategies.
+Wiki links on the site are **absolute GitHub URLs** (`https://github.com/quixoticblink/eldercare/blob/main/knowledge/...`) rather than relative paths, so nothing needs bundling into the deployment. Any new wiki link should follow the same scheme — rationale in `site/README.md` and `site/SPEC.md` section 9.
+
+**The app** runs on one small VM — backend serves the frontend, DuckDB is a single file, Caddy handles TLS. [`app/deploy/EC2-DEPLOYMENT.md`](app/deploy/EC2-DEPLOYMENT.md) documents the box that's actually live; [`app/deploy/README.md`](app/deploy/README.md) is the generic two-shape guide (note: its environment block predates v1.2, so check `app/backend/config.py` for the current variable list). Smoke test before any deploy:
+
+```bash
+cd app && python3 backend/tests/smoke.py    # 170 assertions, full lifecycle
+```
 
 ---
 
@@ -305,7 +313,7 @@ Now update the lens.
 
 ### Prompt 13 — Activate a dormant section
 
-Use this when `prototype/` or `pitch/` wakes up. (`strategy/` woke up on 2026-06-25 after the NCSS reframe — its card is now active on the microsite.) Prototype is expected around the 2026-08-20 milestone; pitch around Demo Day (September 2026).
+Use this when a folder wakes up. As of Aug 2026 there are **no dormant cards left** — strategy, prototype and pitch were all un-dormanted on the microsite in the same 2026-07-11 pass. Keep the recipe for the next folder that gets added.
 
 ```
 I want to activate the <STRATEGY | PROTOTYPE | PITCH> dormant card on the microsite.
@@ -342,30 +350,145 @@ Now propose the SPEC extension and the change.
 
 ---
 
-## How to update — both at once
+## The app — Kakis
 
-A few moves touch both directories. Example: HMW changes get a new wiki iteration AND a microsite update AND a journey entry. The right order is always:
+The prototype became a real thing. `app/` is a deployed application at **[singaporekakis.com](https://singaporekakis.com)** — a database, sign-in codes arriving on real phones, and three roles that transact with each other. The working name *Kakis* (Singlish for the trusted companions you can call on) is provisional; there's a Kampung Kakis collision noted in the wiki.
+
+**Stack:** FastAPI + DuckDB behind a no-framework HTML/JS frontend, on one t3.micro in Singapore, TLS via Caddy. One box, one file for a database. That's not a placeholder for a "real" stack — at pilot scale it's the right amount of machinery, and one person can understand the whole thing in an afternoon. The Next.js/Postgres upgrade path is written down in `knowledge/prototype/kakis-build-plan.md` and deliberately not taken yet.
+
+**Three roles share one app:**
+
+- **Caregiver** — set up the household and care plan once, book a visit (service → urgency → trigger → details), read the 4-digit start code to the kaki, receive the report.
+- **Kaki** — declare availability as a weekly half-day grid plus dated exceptions, accept or pass back an assigned visit, start it with the family's code, finish with a report.
+- **Coordinator** — approve people, match visits (urgent first, availability sorts rather than filters), and optionally automate both.
+
+**Four design decisions worth knowing before you change anything:**
+
+1. **The start code is one-way.** The kaki never sees it in their own app. That asymmetry is what turns "the app says a visit happened" into "someone was at the door and the family let them in."
+2. **No public ratings, anywhere.** Concerns from either side go privately to the care team — MOH guidance, and it removes the mechanism that makes gig workers performatively cheerful.
+3. **Every automation defaults off.** Each one removes a human from a decision about who enters a vulnerable person's home.
+4. **Every number lives in `app/assumptions.json`** with its source. Most are still `PLACEHOLDER` and say so on every screen showing a dollar figure.
+
+**Where to read further:**
+
+| File | What's in it |
+|---|---|
+| [`app/SPEC.md`](app/SPEC.md) | The contract: architecture, the seven modules and their change boundaries, roles/auth, data model, API surface, environment variables, the change log (v1 → v1.5), and **section 9 — the full feature reference and user guide** |
+| [`app/deploy/EC2-DEPLOYMENT.md`](app/deploy/EC2-DEPLOYMENT.md) | The box that's actually running — the live deployment, start to finish |
+| [`app/deploy/README.md`](app/deploy/README.md) | The generic two-shape guide: systemd, Caddy, backups, third-party service checklist. Its env block predates v1.2 — `app/backend/config.py` is the real variable list |
+| [`app/deploy/SECURITY-AUDIT.md`](app/deploy/SECURITY-AUDIT.md) | ISO/IEC 5055 self-assessment (v1.5, 9 Aug 2026), findings closed, residual risk, and what "fit for a supervised pilot" excludes |
+| [`knowledge/prototype/kakis-app.md`](knowledge/prototype/kakis-app.md) | The wiki entry — why it's built this way, and the three failures that cost real time |
+
+**Status:** live, hardened, 170 automated assertions covering the full lifecycle. Fit for a **supervised tabletop**, which is exactly what NCSS and Vanguard asked for on Aug 3. Not fit for unsupervised public launch — backups have never been restore-tested, there's no PDPA review or user-facing deletion path, and the pricing is still placeholder.
+
+---
+
+## How to update — the app
+
+The SPEC is the contract: **every change names the module it touches, and only that module's files change.** If a change can't be expressed that way, amend the SPEC first (add a module or split one), then write the code.
+
+### Prompt 15 — Change something inside an existing module
+
+```
+I want to change something in the Kakis app.
+
+What should change: <DESCRIPTION, IN USER TERMS>
+Why: <REASONING — evidence, partner feedback, or a bug>
+
+Rules:
+1. Read app/SPEC.md (attached / pasted below). Identify which module owns this —
+   M-AUTH, M-USERS, M-CARE, M-VISITS, M-ADMIN, M-HELP or M-CORE — using the
+   "If you want to change…" column in section 2.
+2. Name the module before you write any code, and touch only that module's files.
+   Routers never import each other; shared logic goes in db.py/security.py/services/.
+   Frontend views never call fetch directly — always through api.js.
+3. Respect the hard rules in SPEC section 9.5: no public ratings, certification gates
+   tasks, urgent sorts first, the kaki never sees the start code, money figures are
+   labelled illustrative.
+4. If the change touches the schema, add a migration in db.py and checkpoint after
+   schema init — an un-checkpointed ALTER left a WAL entry that crash-looped the
+   service on its second boot.
+5. Update SPEC section 9 (the user guide) if the change is user-visible, and add a
+   change-log line to SPEC section 10.
+6. Extend backend/tests/smoke.py to cover the new behaviour.
+
+Now name the module and make the change.
+```
+
+### Prompt 16 — Add a new module
+
+Use this when the change genuinely doesn't fit an existing module — payments, certification tracking, an elderly self-book surface.
+
+```
+I want to add a new module to the Kakis app.
+
+What it does: <DESCRIPTION>
+Why it isn't an existing module: <REASONING>
+
+Rules:
+1. Read app/SPEC.md. Check section 8 ("Out of scope in v1") first — it already names
+   where several likely additions would land.
+2. Amend the SPEC BEFORE writing code: add a row to the section 2 module table
+   (owns / backend files / frontend files / "if you want to change…"), any new tables
+   in section 4, new endpoints in section 5, new env vars in section 6.
+3. Then write the code, following the boundaries you just declared.
+4. Add the user-facing description to SPEC section 9 and a change-log line to section 10.
+5. Add smoke-test assertions for the new endpoints.
+
+Now propose the SPEC amendment, then the code.
+```
+
+### Prompt 17 — Record a build round in the wiki and on the site
+
+Use this after shipping a version, so the build leaves a trace outside the code.
+
+```
+We shipped a new version of the Kakis app.
+
+Version: <vX.Y> · Date: <YYYY-MM-DD>
+What changed: <BULLETS, GROUPED BY MODULE>
+What went wrong on the way: <ANY FAILURE WORTH REMEMBERING — be honest>
+
+Rules:
+1. Add the change-log entry to app/SPEC.md section 10, matching the existing entries:
+   one bold headline, then prose naming the modules touched.
+2. Update knowledge/prototype/kakis-app.md — revise "Where it stands", and add to
+   "What confused me / what went wrong" if a failure is worth keeping. Read
+   knowledge/VOICE.md first; this is a wiki entry, so it follows the wiki voice.
+3. Add a journey timeline entry to the microsite (Prompt 10 above) if the round is
+   externally visible.
+4. Bump last_updated in any front matter you touched.
+
+Now make the updates.
+```
+
+---
+
+## How to update — all three at once
+
+A few moves touch more than one directory. An HMW change gets a new wiki iteration AND a microsite update AND a journey entry. A shipped app version gets a SPEC change-log line AND a wiki revision AND (sometimes) a timeline entry. The right order is always:
 
 1. Wiki first (the substance lives there).
-2. Microsite second (it reflects the wiki).
-3. SPEC update log last (records the change).
+2. App second, if code is involved — SPEC amendment before code, always.
+3. Microsite third (it reflects the wiki and the app).
+4. SPEC update logs last (they record what changed).
 
-If you're using an AI to handle a multi-step update, paste both `knowledge/VOICE.md` and `site/SPEC.md` along with this README's relevant prompts, and tell the AI the order explicitly.
+If you're using an AI to handle a multi-step update, paste the relevant specs — `knowledge/VOICE.md`, `site/SPEC.md`, `app/SPEC.md` — along with this README's relevant prompts, and tell the AI the order explicitly.
 
 ---
 
 ## The four-part rubric
 
-This is what the sprint will be graded on at Demo Day. Each part is 25 points. The wiki is shaped by it:
+This is what the sprint will be graded on at Demo Day. Each part is 25 points. The repo is shaped by it:
 
-| Rubric line | Wiki folder that feeds it |
+| Rubric line | What feeds it |
 |---|---|
 | Leadership Journey (evidence of learning over 6 months) | `knowledge/journal/` + `knowledge/reframing/` |
 | Quality of Thinking (evidence-backed analysis and strategy) | `knowledge/problem/` + `knowledge/evidence/` + `knowledge/landscape/` + `knowledge/strategy/` |
-| MVP / Prototype (human centricity) | `knowledge/humans/` + `knowledge/strategy/` + later `knowledge/prototype/` |
-| Presentation & Influence | later `knowledge/pitch/` |
+| MVP / Prototype (human centricity) | `knowledge/humans/` + `knowledge/strategy/` + `knowledge/prototype/` + **`app/` — the running application** |
+| Presentation & Influence | `knowledge/pitch/` + the microsite |
 
-The microsite is the substantive showcase of all four — it's literally what the judges will see when we point them at the URL.
+The microsite is the substantive showcase of all four — it's literally what the judges will see when we point them at the URL. The app is the answer to the MVP line: a prototype proves you understood the journey; a running app proves the journey survives contact with an SMS provider and a coordinator's Tuesday.
 
 ## The team
 
@@ -384,10 +507,16 @@ The microsite is the substantive showcase of all four — it's literally what th
 - ✅ Solutioning (Jun 25, 2026) — HMW reframed to caregivers; managed-marketplace shape; strategy folder activated.
 - ✅ Vanguard site visit (Jul 8, 2026) — anchor partner confirmed; Pasir Ris ICCP-layered pilot offered by year-end.
 - ✅ HMW narrowing (Jul 8, 2026) — crisis-activation, six named triggers, WHERE + WHEN inside the sentence.
+- ✅ HMW broadening (Jul 11, 2026) — crisis-only caught as too tight three days later; DO widened to "when a need arises — planned or urgent". Same product, wider demand curve.
 - ✅ SGLN masterclass (Jul 20, 2026) — reframe validated by the cohort; prototype milestone re-aimed at caregiver testing; devil's advocate at 15 critiques.
-- ☐ Prototype milestone (Aug 20, 2026) — concept prototype pressure-tested against Vanguard's six crisis triggers.
+- ✅ Kakis app built and deployed (Jul 21 – Aug 9, 2026) — six rounds, v1 → v1.5: initial build, prototype-sync, dual-channel sign-in, kaki availability + sourced assumptions, assignment notifications and automation toggles, then ISO 5055 security hardening. Live at [singaporekakis.com](https://singaporekakis.com).
+- ✅ NCSS + Vanguard (Aug 3, 2026) — our live-pilot ask countered with a **tabletop exercise**: two separate sessions, roughly five sets of staff + micro-jobber + senior run as two or three groups. Scope narrows to chaperoning. Supply, not demand, named as the binding constraint.
+- ☐ Tabletop sessions (week of Aug 17, 2026) — Vanguard arranges one, NCSS/Care Corner the other. Certification-tracking module and participant demo accounts due first.
+- ☐ Prototype milestone (Aug 20, 2026) — the app pressure-tested against Vanguard's six crisis triggers and real caregiver testing.
 - ☐ Demo Day (September 2026) — pilot design + pitch.
 
-**Current phase:** strategy & pilot design. **Anchor partner:** Vanguard (MOH Holdings). **Current HMW:** [reframing/hmw-current.md](knowledge/reframing/hmw-current.md).
+**Current phase:** build shipped, tabletop next. **Anchor partner:** Vanguard (MOH Holdings), convened by NCSS. **Current HMW:** [reframing/hmw-current.md](knowledge/reframing/hmw-current.md). **Live app:** [singaporekakis.com](https://singaporekakis.com).
 
-See `knowledge/journal/` for the running record and `knowledge/purpose.md` for the always-current snapshot.
+**The most important unresolved thing:** three framings are live at once and nobody has reconciled them — caregiver relief (ours), resilient caregiving (NCSS), and operational digitisation of an existing manual service (Vanguard's proposed success metric, "lessen your administrative burden", which quietly moves the primary user from the caregiver to the coordinator). See [journal/2026-08-03-ncss-vanguard.md](knowledge/journal/2026-08-03-ncss-vanguard.md).
+
+See `knowledge/journal/` for the running record, `knowledge/maps/timeline.md` for the chronological view, and `knowledge/README.md` for the current snapshot. (`knowledge/purpose.md` is the orientation document — good on why this sprint exists, but its "where we are now" section is a mid-July snapshot and hasn't been re-cut since.)

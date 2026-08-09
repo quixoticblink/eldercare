@@ -138,5 +138,10 @@ most important unresolved thing in the meeting and it isn't on anyone's action l
   Vanguard pushed back the same minute: *"they need help also means that it is more people to
   do something for them."*
 
-*Connects to:* [[2026-07-20-masterclass]] · [[../prototype/kakis-app]] ·
-[[../reframing/hmw-current]] · [[../strategy/README]]
+> **Read alongside [[2026-08-03-himmat-review]].** Later the same day Himmat told us the
+> opposite — put the real app in real hands as early as possible, dozens of UAT interviews,
+> supply is abundant, don't narrow the scope. Neither meeting knew about the other. The
+> comparison table is in that entry.
+
+*Connects to:* [[2026-08-03-himmat-review]] · [[2026-07-20-masterclass]] ·
+[[../prototype/kakis-app]] · [[../reframing/hmw-current]] · [[../strategy/README]]
