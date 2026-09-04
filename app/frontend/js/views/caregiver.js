@@ -1,6 +1,12 @@
 /* M-CARE + caregiver side of M-VISITS. */
 const CareView = (() => {
-  let bookDraft = {};
+  /* The booking draft survives a refresh. Seniors reload pages; losing three
+     steps of input to a reload is what happened on 21 Aug. */
+  const DRAFT_KEY = "kakis_book";
+  let bookDraft = loadDraft();
+  function loadDraft() { try { return JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "{}") || {}; } catch (e) { return {}; } }
+  function saveDraft() { try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify(bookDraft)); } catch (e) {} }
+  function clearDraft() { bookDraft = {}; try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) {} }
 
   async function home() {
     UI.spin();
@@ -88,9 +94,11 @@ const CareView = (() => {
     } catch (e) { UI.toast(e.message, true); }
   }
 
-  /* ---- booking flow: service → when → details ---- */
+  /* ---- booking flow: service → when → (what happened) → details ----
+     Each step is its own hash route so back and refresh land on the step the
+     person was on. */
   function book() {
-    bookDraft = {};
+    clearDraft();
     UI.screen(`
       ${UI.appbar("What do they need?", "Pick a service — timing comes next", "#/care/home")}
       <span class="stepper">Step 1 of 3</span>
@@ -104,9 +112,10 @@ const CareView = (() => {
         <div><b>Medicine administration</b><span>Tier 2 kakis only — ask the coordinator</span></div></div>`);
   }
 
-  function pickService(s) { bookDraft.service = s; when(); }
+  function pickService(s) { bookDraft.service = s; saveDraft(); location.hash = "#/care/book/when"; }
 
   function when() {
+    if (!bookDraft.service) return book();
     UI.screen(`
       ${UI.appbar("When?", bookDraft.service, "#/care/book")}
       <span class="stepper">Step 2 of 3</span>
@@ -122,14 +131,14 @@ const CareView = (() => {
   }
 
   function pickTier(t) {
-    bookDraft.tier = t; bookDraft.trigger = "";
-    if (t === "planned") return details();
-    triggers();
+    bookDraft.tier = t; bookDraft.trigger = ""; saveDraft();
+    location.hash = t === "planned" ? "#/care/book/details" : "#/care/book/trigger";
   }
 
   function triggers() {
+    if (!bookDraft.tier) return when();
     UI.screen(`
-      ${UI.appbar("What happened?", "So the right help comes ready", "#/care/book")}
+      ${UI.appbar("What happened?", "So the right help comes ready", "#/care/book/when")}
       <span class="stepper">Step 3 of 4 · ${bookDraft.tier}</span>
       <div class="eyebrow">Most common in Pasir Ris</div>
       ${[["🧳", "Helper left suddenly", "Bridging care while you find a replacement"],
@@ -146,27 +155,29 @@ const CareView = (() => {
       <button class="btn ghost" onclick="CareView.pickTrigger('')">Skip — just need help</button>`);
   }
 
-  function pickTrigger(t) { bookDraft.trigger = t; details(); }
+  function pickTrigger(t) { bookDraft.trigger = t; saveDraft(); location.hash = "#/care/book/details"; }
 
   function details() {
+    if (!bookDraft.tier) return when();
     const planned = bookDraft.tier === "planned";
     const today = new Date().toISOString().slice(0, 10);
+    const back = planned ? "#/care/book/when" : "#/care/book/trigger";
     UI.screen(`
-      ${UI.appbar("The details", `${bookDraft.service} · ${UI.TIER_LABEL[bookDraft.tier]}${bookDraft.trigger ? " · " + bookDraft.trigger : ""}`, "#/care/book")}
+      ${UI.appbar("The details", `${bookDraft.service} · ${UI.TIER_LABEL[bookDraft.tier]}${bookDraft.trigger ? " · " + bookDraft.trigger : ""}`, back)}
       <span class="stepper">Step ${planned ? "3 of 3" : "4 of 4"}</span>
       ${planned ? `
-        <label class="f-label">Date</label>
+        <label class="f-label">Date <small>· required</small></label>
         <input class="f-input" id="date" type="date" min="${today}" value="${today}">
-        <label class="f-label">Time window</label>
+        <label class="f-label">Time window <small>· required</small></label>
         ${UI.chipGroup("winG", ["Morning 9–12", "Afternoon 2–5", "Evening 5–8"], "Afternoon 2–5")}`
       : `
-        <label class="f-label">Arrival window</label>
+        <label class="f-label">Arrival window <small>· required</small></label>
         ${UI.chipGroup("winG", bookDraft.tier === "urgent"
             ? ["Within the hour", "Today, 2–5pm"] : ["Within 2 hours", "Today, 2–5pm"],
           bookDraft.tier === "urgent" ? "Within the hour" : "Within 2 hours")}`}
-      <label class="f-label">Language with them <small>· seniors settle faster in their own language</small></label>
+      <label class="f-label">Language with them <small>· required — seniors settle faster in their own language</small></label>
       ${UI.chipGroup("langG2", App.config.languages, "English")}
-      <label class="f-label">Anything the kaki should know?</label>
+      <label class="f-label">Anything the kaki should know? <small>· optional</small></label>
       <textarea class="f-input" id="notes" placeholder="e.g. Walks with a stick. Helper left suddenly."></textarea>
       <button class="btn gold" id="submitV">Request this visit</button>`);
     UI.el("submitV").onclick = async () => {
@@ -176,6 +187,7 @@ const CareView = (() => {
           date: planned ? UI.el("date").value : "today",
           window: UI.chipValue("winG") || "", language: UI.chipValue("langG2") || "English",
           notes: UI.el("notes").value });
+        clearDraft();
         UI.toast("Request sent — the coordinator is matching a kaki");
         location.hash = "#/care/visit/" + v.id;
       } catch (e) { UI.toast(e.message, true); }

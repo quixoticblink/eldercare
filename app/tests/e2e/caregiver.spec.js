@@ -17,6 +17,25 @@ test.describe("sign-in and approval (Bucket 1 · 1, 2)", () => {
   });
 });
 
+test.describe("booking form (Bucket 1 · 3)", () => {
+  test("a refresh keeps the caregiver on the same step; required and optional fields are marked", async ({ page, request }) => {
+    const s = await seed(request);
+    await useToken(page, s.cg1.token, "#/care/book");
+    await page.getByRole("button", { name: /Companionship/ }).click();
+    await page.getByRole("button", { name: /Planned/ }).click();
+    await expect(page.getByText("Step 3 of 3")).toBeVisible();
+    await page.reload();
+    await expect(page.getByText("Step 3 of 3")).toBeVisible();
+    await expect(page.locator(".appbar")).toContainText("Companionship");
+    await expect(page.locator("label", { hasText: "Date" })).toContainText("required");
+    await expect(page.locator("label", { hasText: "Time" })).toContainText("required");
+    await expect(page.locator("label", { hasText: "Anything the kaki should know" })).toContainText("optional");
+    // Back goes to the previous step, not to step 1.
+    await page.locator(".appbar .back").click();
+    await expect(page.getByText("Step 2 of 3")).toBeVisible();
+  });
+});
+
 test.describe("caregiver", () => {
   test("home renders for an approved caregiver", async ({ page, request }) => {
     const s = await seed(request);
