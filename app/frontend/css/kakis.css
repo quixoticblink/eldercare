@@ -249,3 +249,5 @@ nav.tabs button.on{color:var(--pandan-deep);background:var(--mint)}
 .initiative-link{font-size:.76rem;text-align:center;color:var(--slate,#5E6B65);margin:12px 2px 0}
 .initiative-link a{color:var(--pandan,#14594A);font-weight:600;text-decoration:underline;
   text-underline-offset:2px}
+/* v1.6 · a hint under a label, replacing placeholder text that seniors read as a real value */
+.f-hint{font-size:.78rem;color:var(--slate);margin:-4px 0 8px}
