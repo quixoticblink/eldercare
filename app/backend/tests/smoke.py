@@ -550,9 +550,32 @@ assert bad.status_code == 200 and bad.json()["source"] == "guide", bad.text
 # signed in, it reaches the assistant path
 assert c.post("/api/chat", json={"message": "how do I book?"}, headers=ch).json()["source"] == "assistant"
 
+# ---- v1.6 · Buckets 1 and 2 after the August feedback round ----------------
+# Each block below is one feature from knowledge/prototype/feature-buckets-2026-09-04.md.
+from backend.routers import visits as _visits
+import datetime as _dt
+
+# [B1·4] a same-day window that has already passed is refused, whatever the tier.
+# Seniors saw "Today, 2–5pm" offered for an urgent visit at 6pm on 21 Aug.
+_real_now = _visits._now
+_visits._now = lambda: _dt.datetime(2026, 9, 10, 18, 30)
+late = c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today",
+                                   "window": "Today, 2–5pm", "language": "English"}, headers=ch)
+assert late.status_code == 400 and "passed" in late.json()["detail"], late.text
+ok_win = c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today",
+                                     "window": "Today, 6–9pm", "language": "English"}, headers=ch)
+assert ok_win.status_code == 200, ok_win.text
+# "within the hour" is always fine — it is relative to now
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today",
+                                   "window": "Within the hour", "language": "English"}, headers=ch).status_code == 200
+# a window on a future date is never "passed"
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-01",
+                                   "window": "Afternoon 2–5", "language": "English"}, headers=ch).status_code == 200
+_visits._now = _real_now
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.
 _n = sum(1 for _line in open(os.path.abspath(__file__), encoding="utf-8")
          if _line.lstrip().startswith("assert "))
-print(f"ALL SMOKE TESTS PASSED ✓  (v1.5 — {_n} assertions)")
+print(f"ALL SMOKE TESTS PASSED ✓  (v1.6 — {_n} assertions)")

@@ -1,5 +1,5 @@
 """M-VISITS · request → assigned → accepted → in_progress → completed, reports, care notes."""
-import random
+import datetime, random, re
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from .. import assumptions, config, db, security, settings
@@ -27,6 +27,35 @@ class ReportIn(BaseModel):
 class NoteIn(BaseModel):
     chips: list[str] = []
     text: str = ""
+
+def _now() -> datetime.datetime:
+    """Wall clock, as a function so tests can pin it."""
+    return datetime.datetime.now()
+
+def window_end_hour(window: str) -> int | None:
+    """End hour (0-23) of a preset window like 'Afternoon 2–5', 'Today, 6–9pm',
+    'Morning 9–12'. None for relative windows ('Within the hour') or free text.
+    Bare numbers 1–8 read as pm; 9–12 as am; 'pm' forces pm."""
+    if not window:
+        return None
+    m = re.search(r"(\d{1,2})\s*[–\-]\s*(\d{1,2})\s*(am|pm)?", window.lower())
+    if not m:
+        return None
+    end, ampm = int(m.group(2)), m.group(3)
+    if ampm == "pm" and end < 12:
+        end += 12
+    elif ampm is None and 1 <= end <= 8:
+        end += 12
+    return end if 0 <= end <= 23 else None
+
+def _window_has_passed(date: str, window: str) -> bool:
+    """True when the visit is for today and its window already ended.
+    Seniors were offered 'Today, 2–5pm' for an urgent visit at 6pm (21 Aug)."""
+    now = _now()
+    if (date or "").strip().lower() not in ("today", now.date().isoformat()):
+        return False
+    end = window_end_hour(window)
+    return end is not None and now.hour >= end
 
 def _estimate(service: str) -> dict | None:
     """Pilot price stack. Every number comes from assumptions.json — see that
@@ -81,6 +110,8 @@ def create(body: VisitIn, user=Depends(security.current_user)):
         raise HTTPException(400, "That service isn't bookable yet")
     if body.tier not in config.TIERS:
         raise HTTPException(400, "Pick an urgency")
+    if _window_has_passed(body.date, body.window):
+        raise HTTPException(400, "That window has passed — pick a later one")
     h = db.one("SELECT * FROM households WHERE caregiver_id = ?", [user["id"]])
     if not h:
         raise HTTPException(400, "Set up your household and care plan first")

@@ -157,6 +157,15 @@ const CareView = (() => {
 
   function pickTrigger(t) { bookDraft.trigger = t; saveDraft(); location.hash = "#/care/book/details"; }
 
+  /* Same-day arrival windows, only the ones still ahead of us. At 6pm the
+     2–5pm window must not be offered — it was, on 21 Aug. */
+  const DAY_WINDOWS = [["Today, 9am–12", 12], ["Today, 2–5pm", 17], ["Today, 6–9pm", 21]];
+  function windowsFor(tier, now = new Date()) {
+    const first = tier === "urgent" ? "Within the hour" : "Within 2 hours";
+    const next = DAY_WINDOWS.find(([, end]) => now.getHours() < end);
+    return [first, next ? next[0] : "Tomorrow, 9am–12"];
+  }
+
   function details() {
     if (!bookDraft.tier) return when();
     const planned = bookDraft.tier === "planned";
@@ -172,9 +181,7 @@ const CareView = (() => {
         ${UI.chipGroup("winG", ["Morning 9–12", "Afternoon 2–5", "Evening 5–8"], "Afternoon 2–5")}`
       : `
         <label class="f-label">Arrival window <small>· required</small></label>
-        ${UI.chipGroup("winG", bookDraft.tier === "urgent"
-            ? ["Within the hour", "Today, 2–5pm"] : ["Within 2 hours", "Today, 2–5pm"],
-          bookDraft.tier === "urgent" ? "Within the hour" : "Within 2 hours")}`}
+        ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0])}`}
       <label class="f-label">Language with them <small>· required — seniors settle faster in their own language</small></label>
       ${UI.chipGroup("langG2", App.config.languages, "English")}
       <label class="f-label">Anything the kaki should know? <small>· optional</small></label>
@@ -184,7 +191,7 @@ const CareView = (() => {
       try {
         const v = await Api.post("/visits", {
           service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
-          date: planned ? UI.el("date").value : "today",
+          date: planned ? UI.el("date").value : ((UI.chipValue("winG") || "").startsWith("Tomorrow") ? "tomorrow" : "today"),
           window: UI.chipValue("winG") || "", language: UI.chipValue("langG2") || "English",
           notes: UI.el("notes").value });
         clearDraft();
@@ -304,5 +311,5 @@ const CareView = (() => {
     } catch (e) { UI.toast(e.message, true); }
   }
 
-  return { home, setup, planEdit, book, pickService, when, pickTier, triggers, pickTrigger, details, visit, visits };
+  return { home, setup, planEdit, book, pickService, when, pickTier, triggers, pickTrigger, details, visit, visits, windowsFor };
 })();

@@ -36,6 +36,20 @@ test.describe("booking form (Bucket 1 · 3)", () => {
   });
 });
 
+test.describe("urgent window after 5pm (Bucket 1 · 4)", () => {
+  test("an urgent booking at 18:30 never offers 2–5pm", async ({ page, request }) => {
+    const s = await seed(request);
+    await page.clock.install({ time: new Date("2026-09-10T18:30:00+08:00") });
+    await useToken(page, s.cg1.token, "#/care/book");
+    await page.getByRole("button", { name: /Companionship/ }).click();
+    await page.getByRole("button", { name: /Urgent/ }).click();
+    await page.getByRole("button", { name: "Skip — just need help" }).click();
+    await expect(page.getByRole("button", { name: "Within the hour" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Today, 2–5pm" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Today, 6–9pm" })).toBeVisible();
+  });
+});
+
 test.describe("caregiver", () => {
   test("home renders for an approved caregiver", async ({ page, request }) => {
     const s = await seed(request);
