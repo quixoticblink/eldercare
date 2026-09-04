@@ -212,7 +212,8 @@ const CareView = (() => {
       const steps = [
         ["Requested", true, ""],
         ["Kaki assigned", !!v.kaki, v.kaki ? `${v.kaki.name} — verified by the coordinator` : "The coordinator is matching…"],
-        ["Confirmed", ["accepted", "in_progress", "completed"].includes(v.status), ""],
+        ["Confirmed", ["accepted", "in_progress", "completed"].includes(v.status),
+          v.on_way_at && v.status === "accepted" ? `${(v.kaki && v.kaki.name) || "Your kaki"} is on the way — since ${UI.hhmm(v.on_way_at)}` : ""],
         ["Visit", v.status === "completed", v.status === "in_progress" ? "Happening now" : ""],
       ];
       const est = v.estimate;

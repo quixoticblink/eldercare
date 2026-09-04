@@ -71,8 +71,16 @@ const UI = (() => {
       ${esc(d.long || "figures are pilot estimates, not billed amounts.")}</p>`;
   }
 
+  /* "HH:MM" in the phone's local time from a server timestamp; "" if unparseable. */
+  function hhmm(ts) {
+    if (!ts) return "";
+    const d = new Date(ts);
+    if (isNaN(d)) return "";
+    return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+  }
+
   const TIER_LABEL = { urgent: "Urgent · within the hour", soon: "Soon · within 2 hours", planned: "Planned" };
 
   return { el, esc, toast, screen, spin, appbar, chipGroup, pick, chipValue,
-           chipMulti, chipValues, statusPill, initials, contact, moneyNote, TIER_LABEL };
+           chipMulti, chipValues, statusPill, initials, contact, moneyNote, hhmm, TIER_LABEL };
 })();

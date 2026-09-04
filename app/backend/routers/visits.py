@@ -198,6 +198,26 @@ def decline(vid: str, user=Depends(security.current_user)):
     notify.visit_declined(v, kaki, cg, senior)
     return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
 
+@router.post("/{vid}/on-the-way")
+def on_the_way(vid: str, user=Depends(security.current_user)):
+    """Kaki only, once accepted. Stamps on_way_at and tells the caregiver.
+    Re-pressing is harmless: the first stamp stays."""
+    security.approved_user(user)
+    security.require_role(user, "kaki")
+    v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+    if not v:
+        raise HTTPException(404, "Visit not found")
+    if v.get("kaki_id") != user["id"]:
+        raise HTTPException(403, "Not your visit")
+    if v["status"] != "accepted":
+        raise HTTPException(400, "Accept the visit first")
+    if not v.get("on_way_at"):
+        db.run("UPDATE visits SET on_way_at = current_timestamp WHERE id = ?", [vid])
+        db.audit(user["email"] or user["phone"], "visit_on_the_way", vid)
+        v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+        notify.visit_on_the_way(v, *_parties(v))
+    return _enrich(v)
+
 @router.post("/{vid}/start")
 def start(vid: str, body: StartIn, user=Depends(security.current_user)):
     security.approved_user(user)

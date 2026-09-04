@@ -61,6 +61,10 @@ const KakiView = (() => {
           <button class="btn gold" id="acceptV">Accept this visit</button>
           <button class="btn ghost" id="declineV">I can't make it</button>` : ""}
         ${v.status === "accepted" ? `
+          ${v.on_way_at
+            ? `<div class="card tint"><p>On the way since <b>${UI.hhmm(v.on_way_at)}</b> — the family has been told.</p></div>`
+            : `<button class="btn gold" id="onWayV">I'm on my way</button>
+               <p class="f-hint" style="margin:-4px 4px 10px">Tap when you leave — the family gets a message so they're ready with the start code.</p>`}
           <div class="card warn"><h3>Start the visit</h3>
           <p>Ask the family for the 4-digit start code, then enter it here.</p>
           <div class="otp-in">${[0,1,2,3].map(i => `<input id="o${i}" inputmode="numeric" maxlength="1">`).join("")}</div>
@@ -79,6 +83,8 @@ const KakiView = (() => {
           <button class="li" id="flagC"><div class="face gold">⚑</div>
             <div class="body"><b>Flag a concern</b><span>About the senior's wellbeing — or how you were treated. Goes privately to the care team.</span></div></button>` : ""}
       `);
+      const ow = UI.el("onWayV");
+      if (ow) ow.onclick = async () => { try { await Api.post(`/visits/${id}/on-the-way`); UI.toast("The family has been told you're on the way"); visit(id); } catch (e) { UI.toast(e.message, true); } };
       const a = UI.el("acceptV");
       if (a) a.onclick = async () => { try { await Api.post(`/visits/${id}/accept`); UI.toast("Confirmed — see you there"); visit(id); } catch (e) { UI.toast(e.message, true); } };
       const d = UI.el("declineV");

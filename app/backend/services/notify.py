@@ -136,3 +136,13 @@ def visit_cancelled(visit: dict, by_role: str, kaki: dict, caregiver: dict,
         email_html=(f"<p><b>{name}</b> had to cancel the <b>{visit.get('service')}</b> visit for {who}, "
                     f"{_when(visit)}.{why}</p><p>The coordinator has been told.</p>"),
     )
+
+def visit_on_the_way(visit: dict, kaki: dict, caregiver: dict, senior_name: str = "") -> dict:
+    who, name = senior_name or "the senior", (kaki or {}).get("name") or "Your kaki"
+    return notify(
+        caregiver,
+        subject=f"{name} is on the way",
+        sms_text=f"Kakis: {name} is on the way to {who} now. Have the 4-digit start code ready.",
+        email_html=(f"<p><b>{name}</b> is on the way to {who} now.</p>"
+                    f"<p>Have the 4-digit start code ready on your visit page.</p>"),
+    )

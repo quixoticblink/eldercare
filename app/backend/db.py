@@ -97,6 +97,10 @@ def _init(c):
       available BOOLEAN,      -- FALSE = day off, TRUE = extra slot outside the weekly pattern
       note TEXT DEFAULT '');
     """)
+    # v1.6 · after the August feedback round.
+    # M-VISITS: the kaki taps "I'm on my way"; the caregiver sees when.
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS on_way_at TIMESTAMP")
+
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for
     # ADD COLUMN ... DEFAULT after an unclean shutdown (e.g. systemctl restart

@@ -622,6 +622,23 @@ assert c.post(f"/api/visits/{v16b['id']}/cancel", headers=ch).status_code == 200
 _g = c.post("/api/chat", json={"message": "do I need to keep the app open?"}).json()
 assert "open" in _g["reply"].lower() and "message" in _g["reply"].lower(), _g
 
+# [B1·7] "I'm on my way" — the cheapest possible ETA. Asked for by all three
+# 21 Aug sources and by NCSS.
+v16c = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-04",
+                                   "window": "Morning 9–12", "language": "English"}, headers=ch).json()
+assert c.post(f"/api/admin/visits/{v16c['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+# not before accepting
+assert c.post(f"/api/visits/{v16c['id']}/on-the-way", headers=kh).status_code == 400
+assert c.post(f"/api/visits/{v16c['id']}/accept", headers=kh).status_code == 200
+_sent.clear()
+otw = c.post(f"/api/visits/{v16c['id']}/on-the-way", headers=kh)
+assert otw.status_code == 200 and otw.json()["on_way_at"], otw.text
+assert any("on the way" in t.lower() or "on their way" in t.lower() for t in _texts_to("priya@example.com")), _sent
+# the caregiver's view carries it; the caregiver cannot press it
+assert c.get(f"/api/visits/{v16c['id']}", headers=ch).json()["on_way_at"]
+assert c.post(f"/api/visits/{v16c['id']}/on-the-way", headers=ch).status_code == 403
+assert c.post(f"/api/visits/{v16c['id']}/cancel", headers=ch).status_code == 200
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.
