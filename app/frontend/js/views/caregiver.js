@@ -201,6 +201,10 @@ const CareView = (() => {
     };
   }
 
+  /* What "matching in progress" means in time. The coordinator's targets,
+     not a promise — but a blank was worse: caregivers refreshed to find out. */
+  const MATCH_ETA = { urgent: "within the hour", soon: "within 2 hours", planned: "within a day" };
+
   async function visit(id) {
     UI.spin();
     try {
@@ -241,6 +245,9 @@ const CareView = (() => {
           ${steps.map(([b, done, s], i) => `<li class="${done ? "done" : (i === steps.findIndex(x => !x[1]) ? "now" : "")}">
             <div><b>${b}</b>${s ? `<span>${UI.esc(s)}</span>` : ""}</div></li>`).join("")}
         </ul>
+        ${v.status === "requested" ? `
+          <div class="card tint"><h3>Usually matched ${MATCH_ETA[v.tier] || "soon"}</h3>
+          <p>We'll message you the moment a kaki is confirmed — you don't need to keep checking.</p></div>` : ""}
         ${["assigned", "accepted"].includes(v.status) && v.otp_code ? `
           <div class="card warn"><h3>Start code — read it to your kaki when they arrive</h3>
           <div class="codebox">${v.otp_code.split("").map(d => `<span>${d}</span>`).join("")}</div>

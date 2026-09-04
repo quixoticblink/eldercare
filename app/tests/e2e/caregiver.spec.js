@@ -1,6 +1,6 @@
 // Caregiver-side screens. Feature tasks append tests here.
 const { test, expect } = require("@playwright/test");
-const { seed, useToken, signIn, uniq } = require("./helpers");
+const { seed, useToken, signIn, uniq, api } = require("./helpers");
 
 test.describe("sign-in and approval (Bucket 1 · 1, 2)", () => {
   test("the sign-in field has no placeholder number, only a hint", async ({ page }) => {
@@ -47,6 +47,17 @@ test.describe("urgent window after 5pm (Bucket 1 · 4)", () => {
     await expect(page.getByRole("button", { name: "Within the hour" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Today, 2–5pm" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Today, 6–9pm" })).toBeVisible();
+  });
+});
+
+test.describe("time to match (Bucket 1 · 5)", () => {
+  test("a requested visit says how long matching usually takes", async ({ page, request }) => {
+    const s = await seed(request);
+    const v = await api(request, "POST", "/visits", { token: s.cg1.token, data: {
+      service: "Companionship", tier: "urgent", date: "today", window: "Within the hour", language: "English" } });
+    await useToken(page, s.cg1.token, `#/care/visit/${v.body.id}`);
+    await expect(page.getByText("Usually matched within the hour")).toBeVisible();
+    await expect(page.getByText("We'll message you the moment a kaki is confirmed")).toBeVisible();
   });
 });
 

@@ -75,3 +75,57 @@ def visit_assigned(visit: dict, kaki: dict, caregiver: dict, senior_name: str = 
                     f"<p>Open Kakis to see their profile and the 4-digit start code.</p>"),
     )
     return {"kaki": kaki_res, "caregiver": cg_res}
+
+# ---- lifecycle after assignment (v1.6) --------------------------------------
+# On 21 Aug caregivers refreshed the page to learn whether anything had
+# happened. Each state change now tells the side that did not cause it.
+
+def _when(visit: dict) -> str:
+    return f"{visit.get('date', '')} {visit.get('time_window') or ''}".strip()
+
+def visit_accepted(visit: dict, kaki: dict, caregiver: dict, senior_name: str = "") -> dict:
+    who, name = senior_name or "the senior", (kaki or {}).get("name") or "Your kaki"
+    return notify(
+        caregiver,
+        subject=f"{name} confirmed: {visit.get('service', 'your visit')}",
+        sms_text=(f"Kakis: {name} has confirmed the {(visit.get('service') or 'visit').lower()} "
+                  f"for {who}, {_when(visit)}. The start code is on your visit page."),
+        email_html=(f"<p><b>{name}</b> has confirmed the <b>{visit.get('service')}</b> visit "
+                    f"for {who}.</p><p><b>When:</b> {_when(visit)}</p>"
+                    f"<p>Open Kakis to see their photo and the 4-digit start code.</p>"),
+    )
+
+def visit_declined(visit: dict, kaki: dict, caregiver: dict, senior_name: str = "") -> dict:
+    who, name = senior_name or "the senior", (kaki or {}).get("name") or "The kaki"
+    return notify(
+        caregiver,
+        subject=f"Finding another kaki: {visit.get('service', 'your visit')}",
+        sms_text=(f"Kakis: {name} passed the {(visit.get('service') or 'visit').lower()} for {who} "
+                  f"back to the coordinator, who is finding someone else now. Nothing to do."),
+        email_html=(f"<p>{name} passed the <b>{visit.get('service')}</b> visit for {who} back "
+                    f"to the coordinator, who is finding someone else now.</p><p>Nothing to do.</p>"),
+    )
+
+def visit_cancelled(visit: dict, by_role: str, kaki: dict, caregiver: dict,
+                    senior_name: str = "", reason: str = "") -> dict:
+    """Tell the side that did not cancel."""
+    who = senior_name or "the senior"
+    why = f" Reason: {reason}" if reason else ""
+    if by_role == "caregiver":
+        return notify(
+            kaki,
+            subject=f"Cancelled: {visit.get('service', 'visit')} for {who}",
+            sms_text=(f"Kakis: the family cancelled the {(visit.get('service') or 'visit').lower()} "
+                      f"for {who}, {_when(visit)}.{why} No need to travel."),
+            email_html=(f"<p>The family cancelled the <b>{visit.get('service')}</b> visit for {who}, "
+                        f"{_when(visit)}.{why}</p><p>No need to travel.</p>"),
+        )
+    name = (kaki or {}).get("name") or "Your kaki"
+    return notify(
+        caregiver,
+        subject=f"{name} had to cancel: {visit.get('service', 'your visit')}",
+        sms_text=(f"Kakis: {name} had to cancel the {(visit.get('service') or 'visit').lower()} for {who}, "
+                  f"{_when(visit)}.{why} The coordinator has been told."),
+        email_html=(f"<p><b>{name}</b> had to cancel the <b>{visit.get('service')}</b> visit for {who}, "
+                    f"{_when(visit)}.{why}</p><p>The coordinator has been told.</p>"),
+    )

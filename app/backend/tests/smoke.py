@@ -573,6 +573,38 @@ assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned"
                                    "window": "Afternoon 2–5", "language": "English"}, headers=ch).status_code == 200
 _visits._now = _real_now
 
+# [B1·5] the caregiver hears when the kaki confirms, passes back, or cancels.
+# On 21 Aug caregivers refreshed the page to find out. Record every outbound
+# message instead of sending it.
+from backend.services import emailer as _em, sms as _sms, notify as _notify
+_sent = []
+_orig_email, _orig_sms = _em.send_email, _sms.send_sms
+_em.send_email = lambda to, subject, html: (_sent.append(("email", to, subject, html)) or True)
+_sms.send_sms = lambda to, text: (_sent.append(("sms", to, "", text)) or True)
+
+def _texts_to(identifier):
+    return [m[2] + " " + m[3] for m in _sent if m[1] == identifier]
+
+v16 = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-02",
+                                  "window": "Afternoon 2–5", "language": "English"}, headers=ch).json()
+_sent.clear()
+assert c.post(f"/api/admin/visits/{v16['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+assert any("matched" in t.lower() for t in _texts_to("priya@example.com")), _sent
+_sent.clear()
+assert c.post(f"/api/visits/{v16['id']}/decline", headers=kh).status_code == 200
+assert any("passed" in t.lower() and "back" in t.lower() for t in _texts_to("priya@example.com")), _sent
+# re-assign, accept: caregiver told the kaki confirmed
+assert c.post(f"/api/admin/visits/{v16['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+_sent.clear()
+assert c.post(f"/api/visits/{v16['id']}/accept", headers=kh).status_code == 200
+assert any("confirmed" in t.lower() for t in _texts_to("priya@example.com")), _sent
+# caregiver cancels: the kaki is told
+_sent.clear()
+assert c.post(f"/api/visits/{v16['id']}/cancel", headers=ch).status_code == 200
+assert any("cancel" in t.lower() for t in _texts_to("beelian@example.com")), _sent
+# nothing was sent to the wrong side
+assert not _texts_to("priya@example.com"), _sent
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

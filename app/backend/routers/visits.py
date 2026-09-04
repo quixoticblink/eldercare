@@ -3,7 +3,7 @@ import datetime, random, re
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from .. import assumptions, config, db, security, settings
-from ..services import matching
+from ..services import matching, notify
 
 router = APIRouter(prefix="/visits", tags=["visits"])
 
@@ -76,6 +76,13 @@ def _estimate(service: str) -> dict | None:
             "transport": assumptions.transport_allowance(),
             "illustrative": True,
             "disclaimer": assumptions.disclaimer()["short"]}
+
+def _parties(v: dict) -> tuple[dict | None, dict | None, str]:
+    """(kaki, caregiver, senior_name) for notifications."""
+    kaki = db.one("SELECT * FROM users WHERE id = ?", [v["kaki_id"]]) if v.get("kaki_id") else None
+    cg = db.one("SELECT * FROM users WHERE id = ?", [v["caregiver_id"]])
+    h = db.one("SELECT senior_name FROM households WHERE id = ?", [v["household_id"]]) or {}
+    return kaki, cg, h.get("senior_name") or ""
 
 def _enrich(v: dict) -> dict:
     h = db.one("SELECT * FROM households WHERE id = ?", [v["household_id"]]) or {}
@@ -178,13 +185,17 @@ def _transition(vid, user, allowed_roles, from_states, to_state, stamp_col=None)
 @router.post("/{vid}/accept")
 def accept(vid: str, user=Depends(security.current_user)):
     security.approved_user(user)
-    return _enrich(_transition(vid, user, ["kaki"], ["assigned"], "accepted", "accepted_at"))
+    v = _transition(vid, user, ["kaki"], ["assigned"], "accepted", "accepted_at")
+    notify.visit_accepted(v, *_parties(v))
+    return _enrich(v)
 
 @router.post("/{vid}/decline")
 def decline(vid: str, user=Depends(security.current_user)):
     security.approved_user(user)
     v = _transition(vid, user, ["kaki"], ["assigned"], "requested")
+    kaki, cg, senior = _parties(v)          # before the kaki is cleared
     db.run("UPDATE visits SET kaki_id = NULL, assigned_at = NULL WHERE id = ?", [vid])
+    notify.visit_declined(v, kaki, cg, senior)
     return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
 
 @router.post("/{vid}/start")
@@ -209,8 +220,10 @@ def complete(vid: str, body: ReportIn, user=Depends(security.current_user)):
 @router.post("/{vid}/cancel")
 def cancel(vid: str, user=Depends(security.current_user)):
     security.approved_user(user)
-    return _enrich(_transition(vid, user, ["caregiver"],
-                               ["requested", "assigned", "accepted"], "cancelled"))
+    v = _transition(vid, user, ["caregiver"], ["requested", "assigned", "accepted"], "cancelled")
+    if v.get("kaki_id"):
+        notify.visit_cancelled(v, "caregiver", *_parties(v))
+    return _enrich(v)
 
 @router.post("/{vid}/care-note")
 def care_note(vid: str, body: NoteIn, user=Depends(security.current_user)):
