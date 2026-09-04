@@ -12,6 +12,7 @@ const App = (() => {
   const ROUTES = {
     "#/care/home": () => CareView.home(),
     "#/care/plan": () => CareView.planEdit(),
+    "#/care/profile": () => CareView.profile(),
     "#/care/book": () => CareView.book(),
     "#/care/book/when": () => CareView.when(),
     "#/care/book/trigger": () => CareView.triggers(),

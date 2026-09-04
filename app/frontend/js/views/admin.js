@@ -9,10 +9,12 @@ const AdminView = (() => {
         ${UI.appbar("Today · Pasir Ris", "Coordinator console")}
         <div class="card" style="background:linear-gradient(150deg,var(--pandan),var(--pandan-deep));color:#fff;border:0">
           <div class="row" style="text-align:center">
-            <div class="grow"><div class="mono" style="font-size:1.6rem">${ov.pending_users}</div><div style="font-size:.68rem;opacity:.85">awaiting approval</div></div>
-            <div class="grow"><div class="mono" style="font-size:1.6rem">${ov.open_requests}</div><div style="font-size:.68rem;opacity:.85">to match</div></div>
-            <div class="grow"><div class="mono" style="font-size:1.6rem">${ov.active_visits}</div><div style="font-size:.68rem;opacity:.85">active visits</div></div>
-            <div class="grow"><div class="mono" style="font-size:1.6rem">${ov.completed}</div><div style="font-size:.68rem;opacity:.85">completed</div></div>
+            ${[[ov.pending_users, "awaiting approval", "#/admin/approvals"],
+               [ov.open_requests, "to match", "#/admin/requests"],
+               [ov.active_visits, "active visits", "#/admin/requests"],
+               [ov.completed, "completed", "#/admin/quality"]].map(([n, label, hash]) =>
+              `<button class="grow stat" onclick="location.hash='${hash}'" aria-label="${n} ${label}">
+                 <div class="mono" style="font-size:1.6rem">${n}</div><div style="font-size:.68rem;opacity:.85">${label}</div></button>`).join("")}
           </div>
         </div>
         <button class="li" onclick="location.hash='#/admin/approvals'">

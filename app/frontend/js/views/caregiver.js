@@ -19,7 +19,6 @@ const CareView = (() => {
       UI.screen(`
         ${UI.appbar("Hello, " + (App.user.name || "there"), "Caring for " + household.senior_name)}
         <button class="btn gold" style="min-height:60px;font-size:1.05rem" onclick="location.hash='#/care/book'">Book a visit for ${UI.esc(household.senior_name)}</button>
-        ${open.length ? `<div class="eyebrow">Current visits</div>` + open.map(vRow).join("") : ""}
         <div class="eyebrow">Care plan</div>
         <button class="li" onclick="location.hash='#/care/plan'">
           <div class="face">📋</div>
@@ -27,7 +26,13 @@ const CareView = (() => {
           <span>${UI.esc(plan?.meds || "Add medications")} · ${UI.esc(plan?.mobility || "mobility")} — every kaki sees this before a visit</span></div>
           <span class="pill green">Edit</span>
         </button>
+        ${open.length ? `<div class="eyebrow">Current visits</div>` + open.map(vRow).join("") : ""}
         ${done.length ? `<div class="eyebrow">Recent</div>` + done.map(vRow).join("") : ""}
+        <button class="li" onclick="location.hash='#/care/profile'">
+          <div class="face">${UI.initials(App.user.name)}</div>
+          <div class="body"><b>Your profile</b><span>${UI.esc(App.user.name || "")} · ${UI.esc(UI.contact(App.user))}</span></div>
+          <span class="pill grey">Edit</span>
+        </button>
         <div class="helpline">Need help? Call <b>Pasir Ris ICCP · 6XXX XXXX</b></div>`);
     } catch (e) { UI.toast(e.message, true); }
   }
@@ -73,11 +78,14 @@ const CareView = (() => {
         <label class="f-label">Medications & times</label>
         <textarea class="f-input" id="meds" placeholder="e.g. Metformin — 2:00pm daily, with food">${UI.esc(plan?.meds)}</textarea>
         <label class="f-label">Mobility</label>
-        ${UI.chipGroup("mobG", ["Independent", "Walks with a stick", "Walking frame", "Wheelchair"], plan?.mobility || null)}
+        ${UI.chipGroup("mobG", ["Independent", "Walks with a stick", "Walking frame", "Wheelchair", "Bedridden"], plan?.mobility || null)}
         <label class="f-label">Languages they speak</label>
         ${UI.chipMulti("langG", App.config.languages, plan?.languages || [])}
-        <label class="f-label">Emergency contacts</label>
-        <textarea class="f-input" id="contacts" placeholder="Name · relationship · phone">${UI.esc(plan?.contacts)}</textarea>
+        <label class="f-label">Emergency contact <small>· gets a message when a visit starts and ends</small></label>
+        <input class="f-input" id="cName" value="${UI.esc(plan?.contact_name)}" placeholder="Name" aria-label="Contact name">
+        <input class="f-input" id="cRel" value="${UI.esc(plan?.contact_relationship)}" placeholder="Relationship, e.g. son" aria-label="Contact relationship">
+        <input class="f-input" id="cPhone" inputmode="tel" value="${UI.esc(plan?.contact_phone)}" placeholder="Mobile number" aria-label="Contact mobile number">
+        ${plan?.contacts ? `<textarea class="f-input" id="contacts" aria-label="Other contacts">${UI.esc(plan.contacts)}</textarea>` : `<input type="hidden" id="contacts" value="">`}
         <label class="f-label">Notes for any kaki</label>
         <textarea class="f-input" id="notes" placeholder="e.g. Gets anxious with new faces — introduce slowly">${UI.esc(plan?.notes)}</textarea>
         <button class="btn" id="savePlan">Save care plan</button>`);
@@ -86,9 +94,33 @@ const CareView = (() => {
           await Api.put("/care/plan", {
             meds: UI.el("meds").value, mobility: UI.chipValue("mobG") || "",
             languages: UI.chipValues("langG"), contacts: UI.el("contacts").value,
-            notes: UI.el("notes").value });
+            contact_name: UI.el("cName").value, contact_relationship: UI.el("cRel").value,
+            contact_phone: UI.el("cPhone").value, notes: UI.el("notes").value });
           UI.toast("Care plan saved ✓");
           location.hash = "#/care/home";
+        } catch (e) { UI.toast(e.message, true); }
+      };
+    } catch (e) { UI.toast(e.message, true); }
+  }
+
+  /* Caregivers could edit the care plan but not their own name or number (NCSS 2.1). */
+  async function profile() {
+    UI.spin();
+    try {
+      const p = await Api.get("/users/me/profile");
+      UI.screen(`
+        ${UI.appbar("Your profile", "How the coordinator and your kaki reach you", "#/care/home")}
+        <label class="f-label" for="pname">Your name</label>
+        <input class="f-input" id="pname" value="${UI.esc(p.name)}" autocomplete="name">
+        <label class="f-label" for="pphone">Mobile number <small>· for visit messages</small></label>
+        <input class="f-input" id="pphone" inputmode="tel" value="${UI.esc(p.phone)}" autocomplete="tel">
+        <p class="f-hint">Signed in as ${UI.esc(UI.contact(p))}. To change that, call the coordinator.</p>
+        <button class="btn" id="saveP">Save profile</button>`);
+      UI.el("saveP").onclick = async () => {
+        try {
+          const r = await Api.put("/users/me", { name: UI.el("pname").value.trim(), phone: UI.el("pphone").value.trim() });
+          App.user.name = r.name;
+          UI.toast("Profile saved ✓");
         } catch (e) { UI.toast(e.message, true); }
       };
     } catch (e) { UI.toast(e.message, true); }
@@ -257,7 +289,8 @@ const CareView = (() => {
         ${["assigned", "accepted"].includes(v.status) && v.otp_code ? `
           <div class="card warn"><h3>Start code — read it to your kaki when they arrive</h3>
           <div class="codebox">${v.otp_code.split("").map(d => `<span>${d}</span>`).join("")}</div>
-          <p>This is how we confirm the right person is really there.</p></div>` : ""}
+          <p>Only you can see this code. Read it to your kaki once you have checked it's them —
+          they type it in to start the visit. That's how we know someone was really let in.</p></div>` : ""}
         ${est && v.status !== "cancelled" ? `
           <div class="eyebrow">Estimated cost · pilot</div>
           <div class="stack">
@@ -324,5 +357,5 @@ const CareView = (() => {
     } catch (e) { UI.toast(e.message, true); }
   }
 
-  return { home, setup, planEdit, book, pickService, when, pickTier, triggers, pickTrigger, details, visit, visits, windowsFor };
+  return { home, setup, planEdit, profile, book, pickService, when, pickTier, triggers, pickTrigger, details, visit, visits, windowsFor };
 })();

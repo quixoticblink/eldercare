@@ -26,6 +26,18 @@ test.describe("on the way (Bucket 1 · 7)", () => {
   });
 });
 
+test.describe("start-code copy for the kaki (Bucket 1 · 9)", () => {
+  test("the start card says the kaki never sees the code", async ({ page, request }) => {
+    const s = await seed(request);
+    const v = await api(request, "POST", "/visits", { token: s.cg2.token, data: {
+      service: "Chaperone", tier: "planned", date: "2026-12-06", window: "Morning 9–12", language: "English" } });
+    await api(request, "POST", `/admin/visits/${v.body.id}/assign`, { token: s.admin.token, data: { kaki_id: s.k2.user.id } });
+    await api(request, "POST", `/visits/${v.body.id}/accept`, { token: s.k2.token });
+    await useToken(page, s.k2.token, `#/kaki/visit/${v.body.id}`);
+    await expect(page.getByText("You will never see it in your own app")).toBeVisible();
+  });
+});
+
 test.describe("kaki", () => {
   test("home and profile render for an approved kaki", async ({ page, request }) => {
     const s = await seed(request);

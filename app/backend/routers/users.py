@@ -28,9 +28,18 @@ class ExceptionIn(BaseModel):
 @router.put("/me")
 def update_me(body: ProfileIn, user=Depends(security.current_user)):
     if body.name is not None:
-        db.run("UPDATE users SET name = ? WHERE id = ?", [body.name, user["id"]])
+        db.run("UPDATE users SET name = ? WHERE id = ?", [body.name.strip(), user["id"]])
     if body.phone is not None:
-        db.run("UPDATE users SET phone = ? WHERE id = ?", [body.phone, user["id"]])
+        phone = body.phone.strip()
+        if phone:
+            try:
+                phone = security.normalise_phone(phone)
+            except ValueError as e:
+                raise HTTPException(400, str(e))
+            owner = db.one("SELECT id FROM users WHERE phone = ? AND id <> ?", [phone, user["id"]])
+            if owner:
+                raise HTTPException(400, "That mobile number is already linked to another account")
+        db.run("UPDATE users SET phone = ? WHERE id = ?", [phone, user["id"]])
     if user["role"] == "kaki":
         if not db.one("SELECT 1 FROM kaki_profiles WHERE user_id = ?", [user["id"]]):
             db.run("INSERT INTO kaki_profiles(user_id) VALUES (?)", [user["id"]])
@@ -40,7 +49,7 @@ def update_me(body: ProfileIn, user=Depends(security.current_user)):
             db.run("UPDATE kaki_profiles SET languages = ? WHERE user_id = ?", [db.j(body.languages), user["id"]])
         if body.area is not None:
             db.run("UPDATE kaki_profiles SET area = ? WHERE user_id = ?", [body.area, user["id"]])
-    return get_me_profile(user)
+    return get_me_profile(db.one("SELECT * FROM users WHERE id = ?", [user["id"]]))
 
 @router.get("/me/profile")
 def get_me_profile(user=Depends(security.current_user)):

@@ -82,6 +82,34 @@ test.describe("languages (Bucket 1 · 8)", () => {
   });
 });
 
+test.describe("care plan, profile, start-code copy (Bucket 1 · 9)", () => {
+  test("care plan sits above visits, has Bedridden and split contacts; profile is editable; start code explains itself", async ({ page, request }) => {
+    const s = await seed(request);
+    const v = await api(request, "POST", "/visits", { token: s.cg1.token, data: {
+      service: "Companionship", tier: "planned", date: "2026-12-06", window: "Morning 9–12", language: "English" } });
+    await api(request, "POST", `/admin/visits/${v.body.id}/assign`, { token: s.admin.token, data: { kaki_id: s.k1.user.id } });
+
+    await useToken(page, s.cg1.token, "#/care/home");
+    const screen = await page.locator("#screen").textContent();   // innerText would be uppercased by the eyebrow style
+    expect(screen.indexOf("Care plan")).toBeLessThan(screen.indexOf("Current visits"));
+    await page.getByRole("button", { name: /care plan/ }).click();
+    await expect(page.getByRole("button", { name: "Bedridden" })).toBeVisible();
+    await page.locator("#cName").fill("Ravi");
+    await page.locator("#cRel").fill("Son");
+    await page.locator("#cPhone").fill("9111 2222");
+    await page.getByRole("button", { name: "Save care plan" }).click();
+    await expect(page.getByText("Caring for Mr Nathan")).toBeVisible();
+
+    await page.getByRole("button", { name: /Your profile/ }).click();
+    await page.locator("#pname").fill("Priya Nathan");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page.getByText("Profile saved")).toBeVisible();
+
+    await page.goto(`/#/care/visit/${v.body.id}`);
+    await expect(page.getByText("Only you can see this code")).toBeVisible();
+  });
+});
+
 test.describe("caregiver", () => {
   test("home renders for an approved caregiver", async ({ page, request }) => {
     const s = await seed(request);

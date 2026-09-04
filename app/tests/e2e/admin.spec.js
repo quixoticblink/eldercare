@@ -2,6 +2,15 @@
 const { test, expect } = require("@playwright/test");
 const { seed, useToken, api } = require("./helpers");
 
+test.describe("dashboard tiles are links (Bucket 1 · 9)", () => {
+  test("tapping 'to match' opens the matching screen", async ({ page, request }) => {
+    const s = await seed(request);
+    await useToken(page, s.admin.token, "#/admin/home");
+    await page.getByRole("button", { name: /to match/ }).click();
+    await expect(page).toHaveURL(/#\/admin\/requests/);
+  });
+});
+
 test.describe("coordinator", () => {
   test("today console and matching roster render", async ({ page, request }) => {
     const s = await seed(request);
@@ -12,6 +21,6 @@ test.describe("coordinator", () => {
     await expect(page.getByText("Coordinator console")).toBeVisible();
     await page.goto("/#/admin/requests");
     await expect(page.getByText("Choose one kaki")).toBeVisible();
-    await expect(page.getByText("Tan Bee Lian")).toBeVisible();
+    await expect(page.getByText("Tan Bee Lian").first()).toBeVisible();
   });
 });

@@ -103,6 +103,11 @@ def _init(c):
     # M-VISITS: a visit may need more than one language; `language` stays as
     # the first of them for older screens and the matcher's display.
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS languages TEXT DEFAULT '[]'")
+    # M-CARE: emergency contact as three fields, not one free-text line (NCSS 2.6).
+    # The old `contacts` text stays for anything already typed there.
+    c.execute("ALTER TABLE care_plans ADD COLUMN IF NOT EXISTS contact_name TEXT DEFAULT ''")
+    c.execute("ALTER TABLE care_plans ADD COLUMN IF NOT EXISTS contact_relationship TEXT DEFAULT ''")
+    c.execute("ALTER TABLE care_plans ADD COLUMN IF NOT EXISTS contact_phone TEXT DEFAULT ''")
 
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for

@@ -12,9 +12,12 @@ class HouseholdIn(BaseModel):
 
 class PlanIn(BaseModel):
     meds: str | None = ""
-    mobility: str | None = ""
+    mobility: str | None = ""          # Independent | Walks with a stick | Walking frame | Wheelchair | Bedridden
     languages: list[str] | None = None
-    contacts: str | None = ""
+    contacts: str | None = ""          # legacy free text
+    contact_name: str | None = ""
+    contact_relationship: str | None = ""
+    contact_phone: str | None = ""     # normalised to E.164; used for start/finish messages
     notes: str | None = ""
 
 def _caregiver(user):
@@ -56,9 +59,17 @@ def upsert_plan(body: PlanIn, user=Depends(security.current_user)):
     h = get_household(user["id"])
     if not h:
         raise HTTPException(400, "Set up your household first")
-    db.run("""UPDATE care_plans SET meds=?, mobility=?, languages=?, contacts=?, notes=?
+    phone = (body.contact_phone or "").strip()
+    if phone:
+        try:
+            phone = security.normalise_phone(phone)
+        except ValueError as e:
+            raise HTTPException(400, f"Emergency contact number: {e}")
+    db.run("""UPDATE care_plans SET meds=?, mobility=?, languages=?, contacts=?, notes=?,
+              contact_name=?, contact_relationship=?, contact_phone=?
               WHERE household_id=?""",
            [body.meds or "", body.mobility or "", db.j(body.languages), body.contacts or "",
-            body.notes or "", h["id"]])
+            body.notes or "", (body.contact_name or "").strip(), (body.contact_relationship or "").strip(),
+            phone, h["id"]])
     db.audit(user["email"], "care_plan_update", h["id"])
     return household(user)

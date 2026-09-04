@@ -66,7 +66,8 @@ const KakiView = (() => {
             : `<button class="btn gold" id="onWayV">I'm on my way</button>
                <p class="f-hint" style="margin:-4px 4px 10px">Tap when you leave — the family gets a message so they're ready with the start code.</p>`}
           <div class="card warn"><h3>Start the visit</h3>
-          <p>Ask the family for the 4-digit start code, then enter it here.</p>
+          <p>Ask the family to read you their 4-digit start code and enter it here. You will never
+          see it in your own app — that is how we prove you were let in.</p>
           <div class="otp-in">${[0,1,2,3].map(i => `<input id="o${i}" inputmode="numeric" maxlength="1">`).join("")}</div>
           <button class="btn" id="startV">Start visit</button></div>` : ""}
         ${v.status === "in_progress" ? `

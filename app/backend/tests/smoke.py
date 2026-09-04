@@ -661,6 +661,24 @@ assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned"
                                    "window": "Morning 9–12", "language": "Hokkien"}, headers=ch).json()["languages"] == ["Hokkien"]
 assert c.post(f"/api/visits/{v16d['id']}/cancel", headers=ch).status_code == 200
 
+# [B1·9] care plan: bedridden as a mobility option; emergency contact split
+# into name / relationship / phone (NCSS 2.6). Caregivers can edit their own
+# name and phone (NCSS 2.1).
+_plan = c.put("/api/care/plan", json={"meds": "Metformin 2pm", "mobility": "Bedridden", "languages": ["Tamil"],
+                                      "contact_name": "Ravi", "contact_relationship": "Son", "contact_phone": "9111 2222",
+                                      "notes": ""}, headers=ch)
+assert _plan.status_code == 200, _plan.text
+_pl = _plan.json()["plan"]
+assert _pl["mobility"] == "Bedridden" and _pl["contact_name"] == "Ravi" and _pl["contact_relationship"] == "Son"
+assert _pl["contact_phone"] == "+6591112222", _pl        # normalised to E.164 like every other number
+assert c.put("/api/care/plan", json={"contact_phone": "not a number"}, headers=ch).status_code == 400
+_prof = c.put("/api/users/me", json={"name": "Priya Nathan", "phone": "9333 4444"}, headers=ch)
+assert _prof.status_code == 200 and _prof.json()["name"] == "Priya Nathan", _prof.text
+assert c.get("/api/auth/me", headers=ch).json()["user"]["name"] == "Priya Nathan"
+assert _prof.json()["phone"] == "+6593334444", _prof.json()
+# a number that belongs to someone else is refused (the kaki's number was set in v1.2 tests)
+assert c.put("/api/users/me", json={"phone": "9123 4567"}, headers=ch).status_code == 400
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

@@ -251,3 +251,6 @@ nav.tabs button.on{color:var(--pandan-deep);background:var(--mint)}
   text-underline-offset:2px}
 /* v1.6 · a hint under a label, replacing placeholder text that seniors read as a real value */
 .f-hint{font-size:.78rem;color:var(--slate);margin:-4px 0 8px}
+/* v1.6 · dashboard counts are buttons to the list behind them (NCSS 1.3) */
+.stat{background:none;border:0;color:inherit;font:inherit;padding:6px 2px;border-radius:12px;cursor:pointer;min-height:48px}
+.stat:active{background:rgba(255,255,255,.12)}
