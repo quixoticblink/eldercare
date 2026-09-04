@@ -103,19 +103,19 @@ const AdminView = (() => {
             <div class="row" style="flex-wrap:wrap"><h3 class="grow">${UI.esc(v.service)} · ${UI.esc(v.senior_name)}</h3>
               <span class="pill ${v.tier === "urgent" ? "clay" : v.tier === "soon" ? "gold" : "grey"}">${UI.esc(v.tier)}</span>
               ${v.trigger ? `<span class="pill gold">${UI.esc(v.trigger)}</span>` : ""}</div>
-            <p>${UI.esc(v.date)} ${UI.esc(v.window || "")} · ${UI.esc(v.language)} · by ${UI.esc(v.caregiver?.name || UI.contact(v.caregiver))}</p>
+            <p>${UI.esc(v.date)} ${UI.esc(v.window || "")} · ${UI.esc((v.languages || [v.language]).join(", "))} · by ${UI.esc(v.caregiver?.name || UI.contact(v.caregiver))}</p>
             ${v.notes ? `<p style="margin-top:6px"><b>Note:</b> ${UI.esc(v.notes)}</p>` : ""}
             <div class="divider"></div>
             ${roster.length ? `
               <div class="eyebrow" style="margin-top:0">Choose one kaki</div>
               ${roster.map(k => {
                 const history = (k.done_with || {})[v.household_id];
-                const langOk = (k.languages || []).includes(v.language);
+                const langOk = k.language_ok !== undefined ? k.language_ok : (k.languages || []).includes(v.language);
                 const svcOk = (k.services || []).includes(v.service);
                 const fit = k.fit || { state: "unknown", why: "" };
                 const meta = [
                   history ? `${history}× with this senior` : null,
-                  langOk ? `speaks ${UI.esc(v.language)}` : `no ${UI.esc(v.language)} on profile`,
+                  langOk ? `speaks ${UI.esc((v.languages || [v.language]).join("/"))}` : `no ${UI.esc((v.languages || [v.language]).join("/"))} on profile`,
                   svcOk ? null : "service not on profile",
                   k.active ? `${k.active} active visit${k.active === 1 ? "" : "s"}` : "no active visits",
                 ].filter(Boolean).join(" · ");

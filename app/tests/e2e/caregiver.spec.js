@@ -61,6 +61,27 @@ test.describe("time to match (Bucket 1 · 5)", () => {
   });
 });
 
+test.describe("languages (Bucket 1 · 8)", () => {
+  test("the booking starts from the care plan's languages and allows more than one", async ({ page, request }) => {
+    const s = await seed(request);   // cg1's plan: Mandarin, English
+    await useToken(page, s.cg1.token, "#/care/book");
+    await page.getByRole("button", { name: /Companionship/ }).click();
+    await page.getByRole("button", { name: /Planned/ }).click();
+    const group = page.locator("#langG2");
+    await expect(group.getByRole("button", { name: "Mandarin" })).toHaveClass(/sel/);
+    await expect(group.getByRole("button", { name: "English" })).toHaveClass(/sel/);
+    await expect(group.getByRole("button", { name: "Cantonese" })).toBeVisible();
+    await group.getByRole("button", { name: "Cantonese" }).click();
+    await expect(group.getByRole("button", { name: "Mandarin" })).toHaveClass(/sel/);   // multi-select keeps the others
+    await page.locator("#date").fill("2026-12-05");
+    await page.getByRole("button", { name: "Morning 9–12" }).click();
+    await page.getByRole("button", { name: "Request this visit" }).click();
+    await expect(page).toHaveURL(/#\/care\/visit\//);
+    await expect(page.locator(".appbar, .row").first()).toBeVisible();
+    await expect(page.getByText("English, Mandarin, Cantonese")).toBeVisible();
+  });
+});
+
 test.describe("caregiver", () => {
   test("home renders for an approved caregiver", async ({ page, request }) => {
     const s = await seed(request);

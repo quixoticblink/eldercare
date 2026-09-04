@@ -83,4 +83,4 @@ TRIGGERS = ["Helper left suddenly", "Spouse hospitalised", "My own emergency",
             "Discharge, no plan", "Sudden decline", "Loss of a spouse"]
 LOCKED_SERVICES = ["Medicine administration"]  # Tier 2 — visible, not bookable in v1
 TIERS = ["urgent", "soon", "planned"]
-LANGUAGES = ["English", "Mandarin", "Malay", "Tamil", "Hokkien"]
+LANGUAGES = ["English", "Mandarin", "Cantonese", "Hokkien", "Malay", "Tamil"]

@@ -639,6 +639,28 @@ assert c.get(f"/api/visits/{v16c['id']}", headers=ch).json()["on_way_at"]
 assert c.post(f"/api/visits/{v16c['id']}/on-the-way", headers=ch).status_code == 403
 assert c.post(f"/api/visits/{v16c['id']}/cancel", headers=ch).status_code == 200
 
+# [B1·8] languages: Cantonese exists, a visit can carry several, matching
+# credits any overlap, and the care plan's languages are what the booking
+# starts from (asked for on 21 Aug and by NCSS on 18 Aug).
+assert "Cantonese" in config.LANGUAGES
+assert "Cantonese" in c.get("/api/auth/me", headers=ch).json()["config"]["languages"]
+v16d = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-05",
+                                   "window": "Morning 9–12", "languages": ["Cantonese", "Mandarin"]}, headers=ch)
+assert v16d.status_code == 200, v16d.text
+v16d = v16d.json()
+assert v16d["languages"] == ["Cantonese", "Mandarin"] and v16d["language"] == "Cantonese", v16d
+# a kaki who speaks only Mandarin still counts as a language match
+assert c.put("/api/users/me", json={"languages": ["Mandarin"]}, headers=kh).status_code == 200
+_roster = c.get(f"/api/admin/kakis?visit_id={v16d['id']}", headers=ah).json()
+_me = next(r for r in _roster if r["id"] == kk["id"])
+assert _me["language_ok"] is True, _me
+from backend.services import matching as _matching
+assert _matching.score({"id": kk["id"]}, db.one("SELECT * FROM visits WHERE id = ?", [v16d["id"]]))["language_ok"]
+# the legacy single 'language' field still works on its own
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-05",
+                                   "window": "Morning 9–12", "language": "Hokkien"}, headers=ch).json()["languages"] == ["Hokkien"]
+assert c.post(f"/api/visits/{v16d['id']}/cancel", headers=ch).status_code == 200
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

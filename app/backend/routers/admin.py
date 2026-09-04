@@ -103,6 +103,9 @@ def kakis(visit_id: str | None = None, user=Depends(security.current_user)):
                            WHERE kaki_id = ? AND status = 'completed' GROUP BY household_id""", [r["id"]]):
             r["done_with"][row["household_id"]] = row["c"]
         r["availability"] = availability.summary(r["id"])
+        if visit:
+            _wanted = db.uj(visit.get("languages")) or ([visit["language"]] if visit.get("language") else [])
+            r["language_ok"] = any(l in r["languages"] for l in _wanted)
         r["fit"] = (availability.check(r["id"], visit.get("date"), visit.get("time_window"))
                     if visit else {"state": "unknown", "why": "no visit selected"})
 

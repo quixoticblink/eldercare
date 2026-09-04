@@ -100,6 +100,9 @@ def _init(c):
     # v1.6 · after the August feedback round.
     # M-VISITS: the kaki taps "I'm on my way"; the caregiver sees when.
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS on_way_at TIMESTAMP")
+    # M-VISITS: a visit may need more than one language; `language` stays as
+    # the first of them for older screens and the matcher's display.
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS languages TEXT DEFAULT '[]'")
 
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for

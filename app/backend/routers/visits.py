@@ -12,7 +12,8 @@ class VisitIn(BaseModel):
     tier: str
     date: str          # "2026-07-22" or "today"
     window: str        # "14:00–17:00" / "within the hour"
-    language: str
+    language: str | None = None        # legacy single value
+    languages: list[str] | None = None # v1.6: several; first one becomes `language`
     notes: str | None = ""
     trigger: str | None = ""   # urgent/soon path: what happened
 
@@ -103,7 +104,9 @@ def _enrich(v: dict) -> dict:
     plan = db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]])
     if plan:
         plan["languages"] = db.uj(plan.get("languages"))
+    langs = db.uj(v.get("languages")) or ([v["language"]] if v.get("language") else [])
     return {**v, "window": v.get("time_window"), "trigger": v.get("crisis_trigger") or "",
+            "languages": langs,
             "senior_name": h.get("senior_name"), "senior_age": h.get("senior_age"),
             "address": h.get("address"), "kaki": kaki, "caregiver": cg,
             "times_together": times_together, "estimate": _estimate(v.get("service")),
@@ -119,15 +122,21 @@ def create(body: VisitIn, user=Depends(security.current_user)):
         raise HTTPException(400, "Pick an urgency")
     if _window_has_passed(body.date, body.window):
         raise HTTPException(400, "That window has passed — pick a later one")
+    langs = [l for l in (body.languages or []) if l in config.LANGUAGES]
+    if not langs and body.language:
+        langs = [body.language]
+    if not langs:
+        raise HTTPException(400, "Pick at least one language")
+    language = langs[0]
     h = db.one("SELECT * FROM households WHERE caregiver_id = ?", [user["id"]])
     if not h:
         raise HTTPException(400, "Set up your household and care plan first")
     vid = db.new_id()
     otp = f"{random.randint(0, 9999):04d}"
-    db.run("""INSERT INTO visits(id, household_id, caregiver_id, service, tier, date, time_window, language, notes, otp_code, crisis_trigger)
-              VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
+    db.run("""INSERT INTO visits(id, household_id, caregiver_id, service, tier, date, time_window, language, languages, notes, otp_code, crisis_trigger)
+              VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
            [vid, h["id"], user["id"], body.service, body.tier, body.date, body.window,
-            body.language, body.notes or "", otp, body.trigger or ""])
+            language, db.j(langs), body.notes or "", otp, body.trigger or ""])
     db.audit(user["email"] or user["phone"], "visit_requested", f"{vid} {body.service} {body.tier}")
 
     # Auto-matching, when the coordinator has switched it on. It only ever picks

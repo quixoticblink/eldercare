@@ -41,7 +41,7 @@ const KakiView = (() => {
       UI.screen(`
         ${UI.appbar(v.service, `${v.date} · ${v.window || ""} · ${UI.esc(v.senior_name)}`, "#/kaki/home")}
         <div class="row">${UI.statusPill(v.status)}<span class="pill grey">${UI.TIER_LABEL[v.tier] || v.tier}</span>
-        <span class="pill green">${UI.esc(v.language)}</span></div>
+        <span class="pill green">${UI.esc((v.languages || [v.language]).join(", "))}</span></div>
         <div class="card" style="margin-top:12px">
           <h3>${UI.esc(v.senior_name)}${v.senior_age ? ", " + v.senior_age : ""}${v.times_together ? ` — you've visited ${v.times_together}×` : " — first visit"}</h3>
           <p>${UI.esc(v.address || "Pasir Ris")}</p>

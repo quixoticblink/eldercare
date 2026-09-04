@@ -166,9 +166,13 @@ const CareView = (() => {
     return [first, next ? next[0] : "Tomorrow, 9am–12"];
   }
 
-  function details() {
+  async function details() {
     if (!bookDraft.tier) return when();
     const planned = bookDraft.tier === "planned";
+    // Start from the care plan's languages — NCSS: "why type it again?"
+    let planLangs = [];
+    try { const hh = await Api.get("/care/household"); planLangs = (hh.plan && hh.plan.languages) || []; } catch (e) {}
+    const startLangs = planLangs.length ? planLangs : ["English"];
     const today = new Date().toISOString().slice(0, 10);
     const back = planned ? "#/care/book/when" : "#/care/book/trigger";
     UI.screen(`
@@ -182,8 +186,8 @@ const CareView = (() => {
       : `
         <label class="f-label">Arrival window <small>· required</small></label>
         ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0])}`}
-      <label class="f-label">Language with them <small>· required — seniors settle faster in their own language</small></label>
-      ${UI.chipGroup("langG2", App.config.languages, "English")}
+      <label class="f-label">Languages with them <small>· required — from the care plan; tap to change</small></label>
+      ${UI.chipMulti("langG2", App.config.languages, startLangs)}
       <label class="f-label">Anything the kaki should know? <small>· optional</small></label>
       <textarea class="f-input" id="notes" placeholder="e.g. Walks with a stick. Helper left suddenly."></textarea>
       <button class="btn gold" id="submitV">Request this visit</button>`);
@@ -192,7 +196,7 @@ const CareView = (() => {
         const v = await Api.post("/visits", {
           service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
           date: planned ? UI.el("date").value : ((UI.chipValue("winG") || "").startsWith("Tomorrow") ? "tomorrow" : "today"),
-          window: UI.chipValue("winG") || "", language: UI.chipValue("langG2") || "English",
+          window: UI.chipValue("winG") || "", languages: UI.chipValues("langG2"),
           notes: UI.el("notes").value });
         clearDraft();
         UI.toast("Request sent — the coordinator is matching a kaki");
@@ -221,7 +225,8 @@ const CareView = (() => {
       UI.screen(`
         ${UI.appbar(v.service, `${v.date} · ${v.window || ""} · ${UI.esc(v.senior_name)}`, "#/care/home")}
         <div class="row" style="flex-wrap:wrap">${UI.statusPill(v.status)}<span class="pill grey">${UI.TIER_LABEL[v.tier] || v.tier}</span>
-        ${v.trigger ? `<span class="pill gold">${UI.esc(v.trigger)}</span>` : ""}</div>
+        ${v.trigger ? `<span class="pill gold">${UI.esc(v.trigger)}</span>` : ""}
+        <span class="pill green">${UI.esc((v.languages || [v.language]).join(", "))}</span></div>
         ${v.kaki ? `
           <div class="kakipass">
             <div class="kp-top">

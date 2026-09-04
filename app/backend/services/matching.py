@@ -33,11 +33,13 @@ def score(kaki: dict, visit: dict) -> dict:
     total = 0
     total += {"available": 100, "unknown": 0, "unavailable": -1000}[fit["state"]]
     total += min(history, 5) * 20          # continuity matters most after availability
-    total += 15 if visit.get("language") in languages else 0
+    wanted = db.uj(visit.get("languages")) or ([visit["language"]] if visit.get("language") else [])
+    language_ok = any(l in languages for l in wanted)
+    total += 15 if language_ok else 0
     total += 10 if visit.get("service") in services else 0
     total -= active * 5                    # spread the load
     return {"total": total, "fit": fit, "history": history, "active": active,
-            "language_ok": visit.get("language") in languages,
+            "language_ok": language_ok,
             "service_ok": visit.get("service") in services}
 
 def rank(visit: dict) -> list[dict]:
