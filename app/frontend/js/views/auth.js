@@ -10,8 +10,8 @@ const AuthView = (() => {
       <div class="card tint"><p>Sign in with your email or mobile number — we'll send you a
       6-digit code. No password needed.</p></div>
       <label class="f-label" for="ident">Email or mobile number</label>
-      <input class="f-input" id="ident" type="text" inputmode="email" autocomplete="username"
-        placeholder="you@example.com or 9123 4567">
+      <div class="f-hint">Email address, or mobile number like 9123 4567</div>
+      <input class="f-input" id="ident" type="text" inputmode="email" autocomplete="username" placeholder="">
       <button class="btn" id="sendBtn">Send my code</button>
       <p class="initiative-link">Get to know more of this initiative at
         <a href="https://eldercare-rho.vercel.app/#" target="_blank" rel="noopener noreferrer">eldercare-rho.vercel.app</a></p>
@@ -91,9 +91,10 @@ const AuthView = (() => {
     UI.screen(`
       ${UI.appbar("Almost there, " + (user.name || "friend"), "Your account is waiting for approval")}
       <div class="card tint">
-        <h3>The coordinator is reviewing your account</h3>
-        <p>New ${user.role === "kaki" ? "kakis" : "caregivers"} are approved by the Pasir Ris coordinator —
-        usually within a day. You'll be able to ${user.role === "kaki" ? "see visits" : "book visits"} as soon as that's done.</p>
+        <h3>Nothing to do right now</h3>
+        <p>The coordinator is reviewing your account — we'll message you when you're approved,
+        usually within a day. You can close this page. Once approved you'll be able to
+        ${user.role === "kaki" ? "see visits" : "book visits"}.</p>
       </div>
       <button class="btn quiet" onclick="App.boot()">Check again</button>
       <button class="btn ghost" onclick="App.logout()">Sign out</button>
