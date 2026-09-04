@@ -1,7 +1,7 @@
 ---
 title: "Timeline — the sprint's chronological arc"
 status: live
-last_updated: 2026-07-11
+last_updated: 2026-09-04
 covers: 2026-05-19 to 2026-09-XX (Demo Day)
 ---
 
@@ -78,9 +78,25 @@ The cohort carousel. Reframe and research-first framing landed; micro-credential
 - **Care Corner** ([[../landscape/care-corner]]) — divide-and-conquer per NCSS's suggestion.
 - **Grab side** — GrabTask + AV-displaced-driver supply thread Lara is chasing.
 
+### 2026-08-03 · NCSS + Vanguard, and Himmat · [[../journal/2026-08-03-ncss-vanguard]] · [[../journal/2026-08-03-himmat-review]]
+
+Live-pilot ask countered with a tabletop exercise; scope narrows to chaperoning; supply named as the binding constraint. Later the same day Himmat argues the opposite on three of four points. Two validation plans in one window.
+
+### 2026-08-09 · Kakis v1.5 · [[../prototype/kakis-app]]
+
+Six build rounds in three weeks. Live at singaporekakis.com, security-hardened, 156 automated assertions.
+
+### 2026-08-18 · NCSS desk review · [[../journal/2026-08-18-ncss-app-review]]
+
+NCSS walks the live app as coordinator, caregiver and kaki. Thirty items, six of them about coordinator clicks; one reverses the start-code direction. Register: [[../prototype/ncss-app-review-2026-08-18]].
+
 ### 2026-08-20 · Prototype milestone
 
-SGLN prototype deadline. Whatever we build has to be running.
+SGLN prototype deadline. Met in substance the next day.
+
+### 2026-08-21 · Table Top Exercise, round 1 · [[../journal/2026-08-21-tabletop-vanguard-ncss]]
+
+Eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard and NCSS facilitating. The concept held; getting online, the approval wait and the subsidy rules did not. Every recommendation, mapped to app module, in [[../prototype/tabletop-2026-08-21-feedback]].
 
 ### 2026-08-26 · SUSS GIF 2026 · [[../landscape/suss-gif-2026]]
 

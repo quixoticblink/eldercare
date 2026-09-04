@@ -46,7 +46,7 @@ The pattern in the gaps: **there is no supply layer that can be booked task-by-t
 
 ## The solution direction: a matching platform, task-typed
 
-The convergent answer across the wiki — [[../strategy/respite-marketplace-concept]], [[../strategy/marketplace-2x2]], and the current [[../reframing/hmw-2026-07-08-post-vanguard|HMW]] — is a **matching platform between family caregivers and a curated supply of gig workers and community caregivers**, organised around specific task categories with matching trust requirements.
+The convergent answer across the wiki — [[../strategy/respite-marketplace-concept]], [[../strategy/marketplace-2x2]], and the current [[../reframing/hmw-current|HMW]] — is a **matching platform between family caregivers and a curated supply of gig workers and community caregivers**, organised around specific task categories with matching trust requirements.
 
 Concretely, the supply layer draws from three overlapping pools:
 
@@ -94,7 +94,7 @@ Three converging vectors make this the right moment.
 
 ## Connects to
 
-[[../eldercare]] is the problem-space overview this entry narrows from. [[../reframing/hmw-2026-07-08-post-vanguard]] is the working HMW this entry articulates the problem-side of. [[../strategy/respite-marketplace-concept]] is the solution-side companion. [[../strategy/marketplace-2x2]] is the framework for positioning the platform. [[../strategy/consistency-as-design-constraint]] is the load-bearing constraint. [[../landscape/vanguard]], [[../landscape/community-chaperone]], [[../landscape/aic]], [[../landscape/iccp-model]] are the partnership infrastructure. [[../landscape/luce-sg]] is the closest live competitor. [[../evidence/vanguard-operational-data]], [[../evidence/ncss-idi-findings]], [[../evidence/interview-round-1-findings]] are the evidence base.
+[[../eldercare]] is the problem-space overview this entry narrows from. [[../reframing/hmw-current]] is the working HMW this entry articulates the problem-side of. [[../strategy/respite-marketplace-concept]] is the solution-side companion. [[../strategy/marketplace-2x2]] is the framework for positioning the platform. [[../strategy/consistency-as-design-constraint]] is the load-bearing constraint. [[../landscape/vanguard]], [[../landscape/community-chaperone]], [[../landscape/aic]], [[../landscape/iccp-model]] are the partnership infrastructure. [[../landscape/luce-sg]] is the closest live competitor. [[../evidence/vanguard-operational-data]], [[../evidence/ncss-idi-findings]], [[../evidence/interview-round-1-findings]] are the evidence base.
 
 ## Proposed sibling / child entries
 

@@ -1,7 +1,7 @@
 ---
 title: "Kakis — the working app"
 status: live
-last_updated: 2026-08-09
+last_updated: 2026-09-04
 url: https://singaporekakis.com
 ---
 
@@ -94,13 +94,36 @@ working service.
 
 Live, hardened, and audited against ISO/IEC 5055 — see
 [[app/deploy/SECURITY-AUDIT|SECURITY-AUDIT.md]]. Rate limiting on sign-in, health
-data off world-readable permissions, security headers, pinned dependencies. 170
-automated assertions covering the full lifecycle.
+data off world-readable permissions, security headers, pinned dependencies. 156
+automated assertions covering the full lifecycle — a figure the test now derives
+from its own source, after the hand-maintained version of it drifted to six
+different numbers across five documents.
 
 Fit for a **supervised tabletop**, which is exactly what [[../journal/2026-08-03-ncss-vanguard|NCSS and Vanguard]]
 asked for on Aug 3. Not fit for unsupervised public launch: backups have never been
 restore-tested, there is no PDPA review or user-facing deletion path, and the pricing
 is still placeholder.
 
+**Two rounds of outside eyes since.** On Aug 18 NCSS desk-reviewed the app role by role
+— [[ncss-app-review-2026-08-18]] — and one of their thirty items reverses the start-code
+decision above: they want the kaki to read the code to the caregiver, as an identity check.
+The code as built proves admission, not identity; the register argues for both halves and a
+test on round 2.
+
+**And it has now had that Table Top Exercise.** On Aug 21 eight seniors ran the app on their own
+phones at a Care Corner AAC in Toa Payoh, with Vanguard and NCSS facilitating —
+[[../journal/2026-08-21-tabletop-vanguard-ncss]]. The lifecycle held end to end and the
+two hard rules survived contact (no ratings, the kaki never saw the code). What didn't
+hold was everything *around* the app: wifi, "what is a browser", the approval wait, a
+placeholder number in the phone field, and the subsidy figures that every screen labels
+illustrative and every participant asked about anyway. Three new field-level asks came
+out of it — kaki gender preference, kaki photo, dual-role sign-up — and cancellation
+turned from a pre-arrival action into a lifecycle question with a liability attached.
+The full register, mapped to modules, is [[tabletop-2026-08-21-feedback]]. Note what the
+session did not test: the six crisis triggers. It ran planned bookings.
+
 *Connects to:* [[README]] · [[kakis-build-plan]] · [[kakis-prototype-spec]] ·
-[[../journal/2026-08-03-ncss-vanguard]] · [[../reframing/hmw-current]]
+[[tabletop-2026-08-21-feedback]] · [[ncss-app-review-2026-08-18]] · [[../journal/2026-08-03-ncss-vanguard]] ·
+[[../journal/2026-08-21-tabletop-vanguard-ncss]] · [[../reframing/hmw-current]]
+
+*2026-09-04: added the Aug 18 NCSS review and the Aug 21 Table Top Exercise outcome to "Where it stands"; linked the recommendation register.*

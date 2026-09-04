@@ -57,15 +57,16 @@ strategy at pilot scale.
 | Service | Needed for | Get it at |
 |---|---|---|
 | **Resend** | email sign-in codes | resend.com — free tier fine; verify your sending domain |
-| **Anthropic API key** | the help chatbot (optional — falls back to a built-in guide) | console.anthropic.com |
+| **An LLM API key** | the help chatbot (optional — falls back to a built-in keyword guide). Anthropic is tried first if `ANTHROPIC_API_KEY` is set, then OpenAI if `OPENAI_API_KEY` is set | console.anthropic.com or platform.openai.com |
+| **Twilio** (or AWS SNS) | mobile sign-in codes — set `SMS_ENABLED=1` and `SMS_PROVIDER` | twilio.com |
 | **A VM** | backend + DuckDB | DigitalOcean/Lightsail/Hetzner, 1GB RAM is enough |
 | **A domain** | HTTPS + Resend domain verification | any registrar |
 | Vercel | only for shape B | vercel.com |
 
-Mobile OTP later = one SMS provider (e.g. Twilio) added to `services/emailer.py` — M-AUTH only, per SPEC.
+**Note (2026-08-09):** this page is the generic two-shape guide and its environment block above predates v1.2. Mobile OTP is no longer "later" — dual-channel sign-in shipped in v1.2 via `services/sms.py`, with SNS and Twilio both swappable through `SMS_PROVIDER`. For the complete, current variable list see `app/SPEC.md` section 6 or `backend/config.py`; for the box that is actually running, see `EC2-DEPLOYMENT.md`.
 
 ## Smoke test after any change
 
 ```bash
-cd app && python3 backend/tests/smoke.py   # 24 assertions, full lifecycle
+cd app && python3 backend/tests/smoke.py   # full lifecycle; prints its own assertion count
 ```

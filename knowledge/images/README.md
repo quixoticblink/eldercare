@@ -1,7 +1,7 @@
 ---
-title: "Field photo index — round 1 site visits"
+title: "Field photo index"
 status: live
-last_updated: 2026-05-24
+last_updated: 2026-09-04
 ---
 
 Photos from round 1 field visits to Toa Payoh (Care Corner Active Ageing Centre) and Thomson Lane (Lee Ah Mooi Old Age Home) in May 2026. Referenced from the humans and landscape entries below.
@@ -42,6 +42,15 @@ The photos capture in a single visual the pattern that shows up as "consistency 
 - Lee Ah Mooi is *quiet and time-stopped* — CNY decorations from months ago still up, volunteer memorabilia from three-plus years back still on display as recent history. That's the "struggling" pole, made tangible.
 
 Same city, ten kilometres apart. Same underlying population. Very different care experience.
+
+## Table Top Exercise, round 1 — Care Corner AAC (Care), Toa Payoh 261A, 2026-08-21
+
+Referenced from [[../journal/2026-08-21-tabletop-vanguard-ncss]]. WhatsApp originals, resized to 1600px on the long side. Participants are identifiable; the session ran under Care Corner's filming-and-photography notice (visible at the door in the fourth photo), but check before any of these go on the microsite or into a deck.
+
+- `2026-08-21-tte-01-room.jpg` — the room. Eight seniors around two tables, one participant mid-explanation, a tablet and phones on the table, Care Corner staff in the background. An AAC activity room, not a clinical setting.
+- `2026-08-21-tte-02-signing-in.jpg` — four participants signing in on their own phones, heads down. This is the moment the "wall before the product" showed up: wifi, browser, placeholder number.
+- `2026-08-21-tte-03-two-screens.jpg` — two participants, three screens and a notebook. Phone on the code-entry keypad, tablet on the booking form, a second phone on the visit screen. The paper notebook is where the start code went.
+- `2026-08-21-tte-04-care-corner-toa-payoh-261a.jpg` — the door. "Care Corner Active Ageing Centre (Care), Toa Payoh 261A", unit 01-03, with the AIC "join us as a volunteer today" Silver Guardian poster. A sister centre to the Toa Payoh 170 AAC photographed in May.
 
 ## Housekeeping
 

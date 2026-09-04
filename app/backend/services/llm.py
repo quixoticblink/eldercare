@@ -3,7 +3,7 @@ import httpx
 from .. import config
 
 HELP_GUIDE = {
-    "sign in": "Enter your email, then type the 6-digit code we send you. No password needed. New accounts wait for the coordinator's approval.",
+    "sign in": "Enter your email address or your mobile number, then type the 6-digit code we send you. No password needed. If you've signed in before, the six digits are all we ask for. New accounts wait for the coordinator's approval.",
     "approval": "After your first sign-in, the Kakis coordinator reviews and approves your account — usually within a day. You'll see the waiting screen until then.",
     "book": "Caregivers: Home → Book a visit → pick the service → pick when (Urgent / Soon / Planned) → add details → submit. The coordinator matches a kaki and you'll see it under Visits.",
     "urgent": "Urgent means you need someone within the hour — e.g. your helper left suddenly. The coordinator prioritises these requests first.",
@@ -21,7 +21,7 @@ SYSTEM_PROMPT = """You are the in-app helper for Kakis, a Singapore pilot app wh
 caregivers book trusted respite visits for elderly parents, trained "kakis" (respite givers)
 serve those visits, and a coordinator approves users and matches visits manually.
 Answer briefly (2-4 sentences), warmly, in plain language. App facts:
-- Sign-in: email + 6-digit code. New users need coordinator approval.
+- Sign-in: email address OR Singapore mobile number, then a 6-digit code sent to whichever they gave. Returning users are asked only for the code. New users need coordinator approval.
 - Caregivers: set up household + care plan; book visits (service -> urgency Urgent/Soon/Planned -> details); see assigned kaki; visit page shows a 4-digit start code to read to the kaki; get a report after.
 - Kakis: see assigned visits, accept, start with the code, end with a short report. Impact tab shows hours/earnings; weekly payout via Vanguard.
 - No payments in-app during the pilot (billed via ICCP account). No public ratings of kakis (MOH rule) - concerns go privately to the care team.

@@ -11,14 +11,25 @@ Working name *Kakis* remains provisional (Kampung Kakis collision — see wiki).
 ```
 app/
 ├── SPEC.md                ← this file (the contract)
+├── assumptions.json       ← every rate, hour and subsidy, with a source per figure
 ├── backend/               ← FastAPI + DuckDB, runs on the VM
 │   ├── main.py            ← app factory, CORS, static mount, router registration ONLY
 │   ├── config.py          ← env vars, constants ONLY
 │   ├── db.py              ← DuckDB connection, schema DDL, seed ONLY
-│   ├── security.py        ← token signing/verify, password-free auth helpers ONLY
+│   ├── security.py        ← token signing/verify, identifier classification ONLY
+│   ├── settings.py        ← DB-backed coordinator settings (automation toggles) ONLY
+│   ├── assumptions.py     ← read/write assumptions.json ONLY
+│   ├── requirements.txt   ← pinned dependencies (bump deliberately, then smoke-test)
 │   ├── services/
-│   │   ├── emailer.py     ← Resend integration (and future SMS) ONLY
-│   │   └── llm.py         ← Anthropic API proxy for the help chatbot ONLY
+│   │   ├── emailer.py     ← Resend integration ONLY
+│   │   ├── sms.py         ← SNS / Twilio, swappable via SMS_PROVIDER ONLY
+│   │   ├── notify.py      ← assignment notifications, channel selection ONLY
+│   │   ├── matching.py    ← candidate scoring for the coordinator roster ONLY
+│   │   ├── availability.py ← weekly pattern + dated exceptions ONLY
+│   │   ├── ratelimit.py   ← DB-backed sign-in caps ONLY
+│   │   └── llm.py         ← help-chatbot provider chain (Anthropic → OpenAI → guide) ONLY
+│   ├── tests/
+│   │   └── smoke.py       ← full-lifecycle assertions; prints its own count
 │   └── routers/
 │       ├── auth.py        ← M-AUTH   endpoints
 │       ├── users.py       ← M-USERS  endpoints
@@ -28,6 +39,8 @@ app/
 │       └── chat.py        ← M-HELP   endpoints
 ├── frontend/              ← static SPA, no build step
 │   ├── index.html         ← shell + screen containers
+│   ├── config.js          ← KAKIS_API base URL (set this when frontend is on Vercel)
+│   ├── vercel.json        ← frontend-on-Vercel config
 │   ├── css/kakis.css      ← the design system (ported from prototype v2)
 │   └── js/
 │       ├── api.js         ← fetch wrapper, token storage, error toasts ONLY
@@ -39,10 +52,14 @@ app/
 │       ├── views/admin.js     ← M-ADMIN screens
 │       └── views/help.js      ← M-HELP guide + chatbot widget
 └── deploy/
-    ├── README.md          ← VM + Vercel instructions
+    ├── EC2-DEPLOYMENT.md  ← the box that is actually running
+    ├── README.md          ← generic VM + Vercel instructions
+    ├── SECURITY-AUDIT.md  ← ISO/IEC 5055 self-assessment (v1.5)
     ├── kakis.service      ← systemd unit
     ├── Caddyfile          ← reverse proxy + TLS sample
-    └── vercel.json        ← frontend-on-Vercel config
+    ├── aws-sns-policy.json ← least-privilege IAM for SMS (sms-voice:*, not sns:*)
+    ├── preflight.py       ← pre-go-live environment check
+    └── set-secret.sh      ← writes a secret into the service environment
 ```
 
 **Data flow:** frontend (fetch + Bearer token) → FastAPI `/api/*` → DuckDB single file (`kakis.duckdb`). One backend process; DuckDB is embedded, so no separate DB server. Backend also serves `frontend/` at `/` so a single VM is a complete deployment; pointing Vercel at `frontend/` with `API_BASE` set is the split deployment.
@@ -59,7 +76,7 @@ app/
 | **M-VISITS** | visit requests, lifecycle, OTP start/end, reports, care notes | `routers/visits.py` | `views/caregiver.js`, `views/kaki.js` | services list, urgency tiers, status flow, report chips |
 | **M-ADMIN** | user approvals, **manual matching**, quality view, counts | `routers/admin.py` | `views/admin.js` | matching (→ automated scoring lands HERE and only here), approval rules |
 | **M-HELP** | help guide content, chatbot | `routers/chat.py`, `services/llm.py` | `views/help.js` | LLM provider/key, guide content |
-| **M-CORE** | app wiring, DB schema, design system | `main.py`, `config.py`, `db.py` | `app.js`, `api.js`, `ui.js`, `kakis.css` | env vars, schema migrations, theme |
+| **M-CORE** | app wiring, DB schema, design system, coordinator settings | `main.py`, `config.py`, `db.py`, `settings.py` | `app.js`, `api.js`, `ui.js`, `kakis.css` | env vars, schema migrations, theme, automation toggles |
 
 Cross-module rule: routers never import each other; shared logic lives in `db.py`/`security.py`/`services/`. Frontend views never call `fetch` directly — always through `api.js`.
 
@@ -67,32 +84,49 @@ Cross-module rule: routers never import each other; shared logic lives in `db.py
 
 ## 3. Roles, auth, approval
 
-- **Login:** email → 6-digit code (Resend) → verify → signed token (HMAC, 30-day). No passwords. `DEV_MODE=1` returns the code in the API response so the app works before Resend is configured.
+- **Login:** one box takes an **email address or a Singapore mobile number** (v1.2). `security.classify` normalises it — bare 8-digit numbers get `DEFAULT_COUNTRY_CODE` (`+65`) and become E.164. A 6-digit code goes out by Resend (email) or the configured SMS provider (`SMS_ENABLED=1`), expires in `OTP_MINUTES` (10) and is single-use. Verify returns a signed token (HMAC, `TOKEN_DAYS` = 30). No passwords.
+- **Returning users are asked only for the six digits.** `/auth/request-code` returns `known` and `needs_profile`; name and role are collected once, at first sign-in. An account can hold both channels, tracked in `users.email_verified` / `users.phone_verified`. Phone-only accounts store `email = NULL` — an empty string would collide under the UNIQUE constraint as soon as a second one appeared.
 - **Roles:** `admin` · `caregiver` · `kaki`. Chosen at first login (except admin); stored on the user.
-- **Admin is hardcoded** via `ADMIN_EMAILS` env (comma-separated). Admin logins are auto-approved with role `admin`.
-- **Everyone else lands `pending`** and sees a waiting screen until the admin approves them (M-ADMIN). Approval assigns/confirms the role.
-- Mobile OTP: planned, M-AUTH only (`sms` provider in `emailer.py` + one endpoint).
+- **Admin is hardcoded** via `ADMIN_EMAILS` **or `ADMIN_PHONES`** (comma-separated; phones in full E.164), so a coordinator can run the pilot from a phone with no email. Admin logins are auto-approved with role `admin`.
+- **Everyone else lands `pending`** and sees a waiting screen until the admin approves them (M-ADMIN). Approval assigns/confirms the role, overriding what the person chose.
+- **Rate limits (v1.5, DB-backed so a deploy cannot reset them):** 5 code requests per identifier, 20 per IP, 5 failed verifications — all per 15 minutes.
+- **`DEV_MODE=1`** returns the code in the API response so the app works before Resend or SMS is configured. **`DEMO_IDENTIFIERS`** does the same for named identifiers *even when `DEV_MODE=0`* — every entry is effectively a shared password, so it must never hold a real user's identifier and should be emptied once SMS delivery works.
 
 ## 4. Data model (DuckDB)
 
-`users` (id, email, name, phone, role, status[pending|approved|suspended], created_at) · `kaki_profiles` (user_id, services[], languages[], area, tier) · `households` (id, caregiver_id, senior_name, senior_age, address) · `care_plans` (household_id, meds, mobility, languages[], contacts, notes) · `visits` (id, household_id, caregiver_id, kaki_id?, service, tier[urgent|soon|planned], date, window, language, notes, status, otp_code, timestamps…) · `visit_reports` (visit_id, chips[], text, meds_confirmed) · `care_notes` (id, household_id, visit_id?, author_id, chips[], text) · `otp_codes` (email, code, expires) · `audit_log` (ts, actor, action, detail).
+`users` (id, email?, name, phone, role, status[pending|approved|suspended], email_verified, phone_verified, created_at) · `kaki_profiles` (user_id, services[], languages[], area, tier, weekly_slots, availability_note) · `availability_exceptions` (id, user_id, date, half_day[morning|afternoon|all], available, note) · `households` (id, caregiver_id, senior_name, senior_age, address) · `care_plans` (household_id, meds, mobility, languages[], contacts, notes) · `visits` (id, household_id, caregiver_id, kaki_id?, service, tier[urgent|soon|planned], date, time_window, language, notes, status, otp_code, crisis_trigger, timestamps…) · `visit_reports` (visit_id, chips[], text, meds_confirmed) · `care_notes` (id, household_id, visit_id?, author_id, chips[], text) · `otp_codes` (identifier, channel, code, expires) · `auth_attempts` (kind, key, ts) · `settings` (key, value, updated_at) · `audit_log` (ts, actor, action, detail).
+
+`users.email` is nullable — a phone-only account stores NULL, because empty strings collide under the UNIQUE constraint. **Migrations:** `ALTER TABLE … ADD COLUMN IF NOT EXISTS` in `db.py`, followed by a `CHECKPOINT` — an un-checkpointed `ADD COLUMN … DEFAULT` leaves a WAL entry that DuckDB 1.5.5 crash-loops replaying after an unclean shutdown.
 
 **Visit lifecycle (M-VISITS):** `requested → assigned → accepted → in_progress → completed` (+ `cancelled`, `declined→requested`). Assignment is **manual by admin** in v1. Start requires the visit OTP (shown to the caregiver, entered by the kaki). Completion requires a report.
 
 ## 5. API contract (all under `/api`)
 
-- `POST /auth/request-code` {email} · `POST /auth/verify` {email, code, role?} → {token, user} · `GET /auth/me`
+- `POST /auth/request-code` {identifier} → {known, needs_profile} · `POST /auth/verify` {identifier, code, role?, name?} → {token, user} · `GET /auth/me`
 - `PUT /users/me` profile+prefs · `GET /users/kakis` (admin)
 - `GET|PUT /care/household` · `GET|PUT /care/plan`
 - `POST /visits` create request · `GET /visits` (role-scoped list) · `GET /visits/{id}` · `POST /visits/{id}/accept|decline|start{otp}|complete{report}|cancel` · `POST /visits/{id}/care-note`
 - `GET /admin/overview` counts · `GET /admin/pending-users` · `POST /admin/users/{id}/approve|suspend` · `POST /admin/visits/{id}/assign` {kaki_id} · `GET /admin/quality` reports+notes
-- `POST /chat` {message, history[]} → {reply} (LLM if `ANTHROPIC_API_KEY` set, else keyword help)
+- `POST /chat` {message, history[]} → {reply, source} — auth **optional**: signed in reaches the LLM (`source: assistant`), signed out or bad token gets the keyword guide (`source: guide`) and never calls a paid provider
 
 Errors: `{detail}` with proper status codes; frontend surfaces via toast.
 
 ## 6. Environment
 
-`JWT_SECRET` (required in prod) · `ADMIN_EMAILS` (default `abhishekkaul@gmail.com`) · `RESEND_API_KEY` + `MAIL_FROM` (else DEV_MODE prints codes) · `DEV_MODE` (default 1) · `ANTHROPIC_API_KEY` + `LLM_MODEL` (default claude-sonnet; chatbot falls back to static guide without it) · `DB_PATH` (default `./kakis.duckdb`) · `CORS_ORIGINS` (Vercel URL) · `PORT` (default 8000).
+`backend/config.py` is the single source of truth — it is env vars only, no logic, so it reads as the reference. Grouped:
+
+| Group | Variables |
+|---|---|
+| **Core** | `JWT_SECRET` (required in prod) · `DB_PATH` (default `./kakis.duckdb`) · `CORS_ORIGINS` (default `*`; tighten to the frontend origin) · `PORT` (default 8000) · `DEV_MODE` (default 1) |
+| **Admin** | `ADMIN_EMAILS` (default `abhishekkaul@gmail.com`) · `ADMIN_PHONES` (E.164, comma-separated) |
+| **Email (M-AUTH)** | `RESEND_API_KEY` · `MAIL_FROM` (default `Kakis <onboarding@resend.dev>`) · `MAIL_REPLY_TO` — Resend sends via DNS records, not a mailbox, so `MAIL_FROM` may be unable to receive; without a reply-to, replies bounce |
+| **SMS (M-AUTH)** | `SMS_ENABLED` (default 0) · `SMS_PROVIDER` (`sns` \| `twilio`, default `sns`) · `DEFAULT_COUNTRY_CODE` (default `+65`) |
+| ↳ AWS SNS | `AWS_REGION` (default `ap-southeast-1`) · `SMS_SENDER_ID` (default `Kakis`; clear it — Singapore carriers drop unregistered alphanumeric sender IDs) |
+| ↳ Twilio | `TWILIO_ACCOUNT_SID` · `TWILIO_AUTH_TOKEN` · `TWILIO_FROM` · `TWILIO_MESSAGING_SERVICE_SID` (takes precedence over `TWILIO_FROM`) |
+| **Help bot (M-HELP)** | `ANTHROPIC_API_KEY` + `LLM_MODEL` (default `claude-sonnet-4-5`) · `OPENAI_API_KEY` + `OPENAI_MODEL` (default `gpt-4o-mini`) |
+| **Demo backdoor** | `DEMO_IDENTIFIERS` — see section 3. Each entry is a shared password. Empty it once SMS works. |
+
+Constants that are *not* env-configurable live in the same file: `TOKEN_DAYS` (30), `OTP_MINUTES` (10), `TRIGGERS`, `LOCKED_SERVICES`, `TIERS`, `LANGUAGES`, `HALF_DAYS`, `WEEKDAYS`. The bookable services and every rate come from `assumptions.json`, not from config.
 
 ## 7. Frontend rules
 
@@ -226,10 +260,17 @@ staff, per MOH guidance.
 
 The **?** button opens a guide plus a chatbot, on every screen.
 
-- **Signed in** → OpenAI (`gpt-4o-mini`) with the app's rules as context.
-- **Signed out** → the built-in keyword guide only. It still answers "how do I
-  sign in?", which is the question that gets asked there, and never calls a
-  paid provider.
+- **Signed in** → a provider call with the app's rules as context, returning
+  `source: assistant`. `services/llm.py` tries **Anthropic first if
+  `ANTHROPIC_API_KEY` is set, then OpenAI if `OPENAI_API_KEY` is set**, then
+  falls through to the keyword guide. The live box runs OpenAI
+  (`gpt-4o-mini`) because only that key is configured on it; set the Anthropic
+  key and it switches with no code change.
+- **Signed out** → the built-in keyword guide only, returning `source: guide`.
+  It still answers "how do I sign in?", which is the question that gets asked
+  there, and never calls a paid provider.
+- **Bad or expired token** → same as signed out. It degrades rather than
+  returning 401, which is the v1.5 bug.
 - **No key configured** → the keyword guide for everyone. The app degrades; it
   does not break.
 
@@ -243,7 +284,8 @@ The **?** button opens a guide plus a chatbot, on every screen.
 
 ## 10. Change log
 
-- **v1.5 (2026-08-09) — hardening, and the help bot fixed.** Security audit against ISO/IEC 5055; findings and residual risk in [`deploy/SECURITY-AUDIT.md`](deploy/SECURITY-AUDIT.md). Auth gained rate limiting (5 code requests per identifier, 20 per IP, 5 failed verifications, all per 15 min, DB-backed so a deploy cannot reset them); `/api/docs` closed; HSTS/CSP/frame headers added in Caddy; the DuckDB file and backups taken off world-readable while holding medication data; uvicorn moved to loopback; dependencies pinned. **M-HELP bug:** `/api/chat` required a token, but the help button is reachable from the sign-in screen — a signed-out caregiver asking "how do I sign in?" got a 401 rendered as "I couldn't reach the helper". Auth is now optional: signed in reaches the LLM, signed out gets the keyword guide and never touches a paid provider. Sign-in screen links out to the initiative microsite. Smoke test: 133 → 170 assertions, including the four endpoints (decline, cancel, suspend, admin user list) that had no coverage at all.
+- **Doc pass (2026-08-09) — the SPEC caught up with the code.** No behaviour change; sections 1, 3, 4, 5, 6 and 9.4 had drifted behind v1.2–v1.5 and were describing an app that no longer existed. Section 1 gained the five missing service modules (`sms`, `notify`, `matching`, `availability`, `ratelimit`), plus `assumptions.py`, `settings.py`, `requirements.txt` and `tests/`; `vercel.json` corrected from `deploy/` to `frontend/`. Section 3 replaced "login: email" and "mobile OTP: planned" with the dual-channel reality, plus `ADMIN_PHONES`, the rate limits, and the `DEMO_IDENTIFIERS` backdoor warning. Section 4 gained `availability_exceptions`, `auth_attempts`, `settings`, the columns added by migration, and the checkpoint rule. Section 5 corrected the auth and chat contracts. Section 6 became a grouped table generated from `config.py` — it had listed 10 of the 24 variables that actually exist. Section 9.4 corrected the help-bot provider: the chain is **Anthropic if keyed, then OpenAI, then the keyword guide**, and the live box runs OpenAI only because that is the key it has. Separately, `smoke.py` now counts its own assertions instead of carrying a hand-maintained number, which had reached six different values across five documents (24 / 30 / 52 / 133 / 148 / 170; the real figure is 156). One `assert` sharing a line with an assignment was split onto its own line so the derived count is exact rather than approximate.
+- **v1.5 (2026-08-09) — hardening, and the help bot fixed.** Security audit against ISO/IEC 5055; findings and residual risk in [`deploy/SECURITY-AUDIT.md`](deploy/SECURITY-AUDIT.md). Auth gained rate limiting (5 code requests per identifier, 20 per IP, 5 failed verifications, all per 15 min, DB-backed so a deploy cannot reset them); `/api/docs` closed; HSTS/CSP/frame headers added in Caddy; the DuckDB file and backups taken off world-readable while holding medication data; uvicorn moved to loopback; dependencies pinned. **M-HELP bug:** `/api/chat` required a token, but the help button is reachable from the sign-in screen — a signed-out caregiver asking "how do I sign in?" got a 401 rendered as "I couldn't reach the helper". Auth is now optional: signed in reaches the LLM, signed out gets the keyword guide and never touches a paid provider. Sign-in screen links out to the initiative microsite. Smoke test extended to cover the four endpoints (decline, cancel, suspend, admin user list) that had no coverage at all. *(Amended in the 2026-08-09 doc pass: this line originally read "133 → 170 assertions". Both figures were hand-maintained and wrong — the file has 155 `assert` statements. The banner now derives the count instead.)*
 - **v1.4 (2026-08-08) — notifications, automation, editable pricing.** Assignment notifies both kaki and caregiver on whichever channel they signed in with. Coordinator settings (DB-backed, no restart): auto-approve per role and auto-match, all default off. Auto-matching assigns only kakis whose availability positively covers the visit; anything unfillable stays for a human. Per-service pricing editable from the admin panel and written back to `assumptions.json`. PayNow details surfaced to caregivers.
 - **v1.3 (2026-07-31) — availability, assumptions, safer matching.** Kaki availability as a recurring Mon–Sun × half-day pattern plus dated exceptions; the matching roster is scored per visit and sorted available → unknown → unavailable. Every money and time figure moved into `assumptions.json` with a stated source per value. Matching rebuilt from one-tap chips to explicit selection with confirmation — the previous UI made mis-assignment silent and indistinguishable from a broken feature.
 - **v1.2 (2026-07-30) — dual-channel sign-in.** M-AUTH: one sign-in box now takes an **email or a mobile number**; whichever the person types is normalised (`security.classify` → E.164, `+65` assumed for bare 8-digit numbers) and the code is delivered by Resend or **AWS SNS** (`services/sms.py`, `SMS_ENABLED=1`). `/auth/request-code` returns `known` and `needs_profile`, so **returning users are only asked for the 6 digits** — never their name or role again. An account can hold both channels: the second one is captured at signup and marked verified the first time it is used to sign in, tracked in `users.email_verified` / `users.phone_verified`. Admins may be listed by `ADMIN_EMAILS` or `ADMIN_PHONES`. Phone-only accounts store `email = NULL` (an empty string would collide under the UNIQUE constraint the moment a second one appeared). `otp_codes` is rekeyed from `email` to `(identifier, channel)`. M-CORE: `UI.contact(user)` for display where either field may be empty. Smoke test: 30 → 52 assertions.

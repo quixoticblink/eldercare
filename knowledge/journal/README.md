@@ -1,7 +1,7 @@
 ---
 title: Journal — the running log
 status: live
-last_updated: 2026-07-11
+last_updated: 2026-09-04
 ---
 
 The most boring folder in the wiki and the most important one. This is where the arc of the sprint gets recorded, one working session at a time. Six months from now, the rubric line *"evidence of learning, adaptation & resilience over 6 months"* is scored from here.
@@ -28,3 +28,8 @@ Retros go in the same folder with the suffix `-retro.md` (e.g., `2026-06-15-retr
 - [[2026-06-25-solutioning]] — HMW pivots to caregiver respite. Marketplace 2×2 sketched. Blue-sky data-labeling → humanoid overlay proposed. Strategy folder activates.
 - [[2026-07-07-vanguard-prep]] — Vanguard site-visit prep. Lara's skin-in-the-game reframe changes the shape of the partner ask. Entity/counterparty question opened.
 - [[2026-07-08-vanguard-visit]] — the in-person meeting. Crisis-activation wedge emerges. Vanguard volunteers a Pasir Ris pilot. Marketplace framing softens. New HMW iteration follows.
+- [[2026-07-20-masterclass]] — SGLN cohort carousel. Reframe validated; prototype milestone re-aimed at caregiver testing.
+- [[2026-08-03-ncss-vanguard]] — live-pilot ask countered with a tabletop. Scope narrows to chaperoning. Supply named as the binding constraint; three framings left unreconciled.
+- [[2026-08-03-himmat-review]] — same day, the opposite advice: real app in real hands early, demand is the constraint, don't narrow.
+- [[2026-08-18-ncss-app-review]] — NCSS desk-reviews the live app role by role. Thirty items; one reverses the start-code direction. Register in [[../prototype/ncss-app-review-2026-08-18]].
+- [[2026-08-21-tabletop-vanguard-ncss]] — Table Top Exercise, round 1. Eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard and NCSS facilitating. Concept held; onboarding didn't. Full recommendation register in [[../prototype/tabletop-2026-08-21-feedback]].

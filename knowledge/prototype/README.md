@@ -1,7 +1,7 @@
 ---
 title: Prototype
 status: active
-last_updated: 2026-07-11
+last_updated: 2026-09-04
 ---
 
 Woke up on 2026-07-11, ahead of the 2026-08-20 SGLN prototype milestone. Working name: **Kakis** (provisional — Singlish for trusted companions).
@@ -11,8 +11,24 @@ Woke up on 2026-07-11, ahead of the 2026-08-20 SGLN prototype milestone. Working
 database that persists. The HTML prototype below stays as the design record; the app is
 now the thing people actually touch.
 
+**Update 2026-09-04: the app has been in seniors' hands.** Table Top Exercise, round 1, ran on
+2026-08-21 — eight seniors, own phones, Care Corner AAC Toa Payoh 261A, Vanguard and NCSS facilitating. The
+session record is [[../journal/2026-08-21-tabletop-vanguard-ncss]]; every recommendation,
+mapped to the SPEC module that would own it, is in [[tabletop-2026-08-21-feedback]].
+
+Three days earlier NCSS had desk-reviewed the app role by role — [[../journal/2026-08-18-ncss-app-review]],
+register in [[ncss-app-review-2026-08-18]]. The two registers cross-reference each other and
+should be worked as one list.
+
 What's here:
 
+- **`ncss-app-review-2026-08-18.md`** — NCSS's thirty-item desk review, by role, mapped to
+  modules and cross-referenced to the Aug 21 register. Includes the start-code direction
+  question, the one item that reverses a design decision.
+- **`tabletop-2026-08-21-feedback.md`** — the recommendation register from the first
+  Table Top Exercise: 40-odd items across onboarding, language, booking, notifications,
+  verification, money, cancellation and coordinator tooling, each with source, module,
+  current status and a first-pass priority. Start here before touching the app.
 - **`kakis-app.md`** — the live app: architecture, the design decisions worth
   remembering, and the three failures that cost real time (a crash that only appeared
   on the second boot, a "broken" matcher that was assigning correctly to the wrong

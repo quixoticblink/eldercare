@@ -108,7 +108,8 @@ assert c.post(f"/api/visits/{vid}/accept", headers=kh).status_code == 200
 
 # caregiver DOES see the otp
 cv = c.get(f"/api/visits/{vid}", headers=ch).json()
-otp = cv["otp_code"]; assert otp and cv["status"] == "accepted" and cv["kaki"]["name"] == "Tan Bee Lian"
+otp = cv["otp_code"]
+assert otp and cv["status"] == "accepted" and cv["kaki"]["name"] == "Tan Bee Lian"
 
 # start: wrong code fails, right code works
 assert c.post(f"/api/visits/{vid}/start", json={"otp":"0000" if otp != "0000" else "1111"}, headers=kh).status_code == 400
@@ -549,4 +550,9 @@ assert bad.status_code == 200 and bad.json()["source"] == "guide", bad.text
 # signed in, it reaches the assistant path
 assert c.post("/api/chat", json={"message": "how do I book?"}, headers=ch).json()["source"] == "assistant"
 
-print("ALL SMOKE TESTS PASSED ✓  (v1.5 — 170 assertions)")
+# Count the assertions from the source rather than hardcoding a number. Four
+# separate docs had four different figures because the banner was a string
+# somebody had to remember to bump. This one cannot go stale.
+_n = sum(1 for _line in open(os.path.abspath(__file__), encoding="utf-8")
+         if _line.lstrip().startswith("assert "))
+print(f"ALL SMOKE TESTS PASSED ✓  (v1.5 — {_n} assertions)")

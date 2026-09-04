@@ -308,7 +308,7 @@ healthy every time.
 
 ## Verification performed
 
-- `backend/tests/smoke.py` — 30/30 assertions pass on the server
+- `backend/tests/smoke.py` — all assertions pass on the server (the run prints its own count)
 - `GET /` and `GET /api/health` → 200, `{"ok":true,"dev_mode":true}`
 - 4× `systemctl restart` and 1× `SIGKILL` → recovers healthy each time
 - Backup timer fired manually; snapshot written to `/home/kakis/backups/`

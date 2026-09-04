@@ -14,7 +14,7 @@ Each map is a view over the wiki, not a copy. When individual entries change, th
 
 - **[[timeline]]** — the sprint's chronological arc, from Day 1 (2026-05-19) to Demo Day. Every journal entry threads onto this timeline plus the milestones between them. Read this first if you want to understand *how the thinking evolved.*
 - **[[actors]]** — the ecosystem map. Who's on our team, who's a partner (NCSS, AIC, Vanguard, Care Corner), who's a competitor (Luce, Homage, Jagami), who convenes us (SGLN, SUSS), and how they relate to each other. Read this if you want to understand *the political geography.*
-- **[[hmw-evolution]]** — the HMW's journey from broad companionship to narrow crisis-activation. Four iterations, four turning points, the evidence that moved us at each step. Read this if you want to understand *why the question changed.*
+- **[[hmw-evolution]]** — the HMW's journey from broad companionship to caregiver-activated respite. Five iterations, four narrowings and one deliberate widening, with the evidence that moved us at each step. Read this if you want to understand *why the question changed.*
 - **[[rubric-and-folders]]** — the four-part SGLN rubric mapped against the wiki's folder structure. Which folder feeds which rubric line. What's currently thin, what's currently overfed. Read this if you want to understand *what the wiki is optimising for.*
 - **[[proposed-stubs]]** — the registry of dangling `[[wiki-links]]` that don't yet have entries. Ranked by inbound-link count so future writing can target the highest-leverage gaps. Read this if you want to know *what to write next.*
 

@@ -192,8 +192,15 @@ Neither warrants change now — flagged so they are chosen deliberately later.
 Module boundaries in `SPEC.md` are respected: routers never import each other,
 shared logic sits in `services/`, and the frontend never calls `fetch` outside
 `api.js`. Money and time constants live in exactly one place
-(`assumptions.json`) with provenance per figure. The 148-assertion smoke test
-covers the full lifecycle and now isolates itself from live pricing.
+(`assumptions.json`) with provenance per figure. The smoke test (156 assertions
+at time of audit) covers the full lifecycle and now isolates itself from live
+pricing.
+
+**Fixed after the audit:** the assertion count was a hand-maintained string in
+`smoke.py` and had drifted to four different values across the documentation
+(24, 30, 148, 170). The banner now counts its own `assert` lines at runtime, so
+the figure is derived rather than remembered — a CWE-1041-adjacent
+maintainability defect resolved at the source rather than by editing the docs.
 
 **Remaining:** inline event handlers block a strict CSP (above); most pricing
 in `assumptions.json` is still marked `PLACEHOLDER`.

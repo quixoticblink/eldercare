@@ -71,14 +71,14 @@ Rough sense of where the wiki is thick vs thin as of 2026-07-11:
 | `landscape/` | ★★★★☆ | 13 entries including all key partners and competitors. Some stubs remain. |
 | `evidence/` | ★★★★☆ | Six entries plus a proper `sources/` folder. Missing: independent top-down sizing exercise. |
 | `humans/` | ★★★★☆ | Six conversation notes plus canonical empathy map. Missing: caregiver-persona empathy map, round-2 interviews. |
-| `reframing/` | ★★★★★ | Four HMW iterations, devil's advocate at 14 critiques. Excellent for Leadership Journey and Quality of Thinking. |
+| `reframing/` | ★★★★★ | Five HMW iterations, devil's advocate at 15 critiques. Excellent for Leadership Journey and Quality of Thinking. |
 | `strategy/` | ★★★★☆ | Marketplace 2×2, respite marketplace concept, consistency-as-design-constraint. Missing: multi-payer stack write-up, crisis-activation wedge write-up. |
 | `problem/` | ★★☆☆☆ | Mostly lives in `eldercare.md`. Folder itself is thin. |
 | `artifacts/` | ★★★☆☆ | Three pptx files, README. Good for tracking; not decision-relevant on its own. |
 | `images/` | ★★★★☆ | 13 field-visit photos, well-indexed and cross-linked into interview notes. |
 | `maps/` | ★★★★☆ | New. Five files including this one. |
-| `prototype/` | ☆☆☆☆☆ | Dormant. Wakes up before August 20. |
-| `pitch/` | ☆☆☆☆☆ | Dormant. Wakes up close to Demo Day. |
+| `prototype/` | ★★★★★ | Woke 2026-07-11. Design brief, build plan, v2 spec, the HTML prototype — and `kakis-app.md`, the running app at singaporekakis.com. The strongest single answer to the MVP rubric line. |
+| `pitch/` | ★★★☆☆ | Woke 2026-07-11. 16-slide Demo Day deck, first draft, built against the 4×25 rubric. Missing: rehearsal notes, and whatever the Aug 17 tabletop produces. |
 
 ## Highest-leverage gaps for the rubric
 

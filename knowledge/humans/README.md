@@ -1,7 +1,7 @@
 ---
 title: Humans — empathy and conversation notes
 status: live
-last_updated: 2026-05-25
+last_updated: 2026-09-04
 ---
 
 This folder holds two kinds of artifacts:
@@ -25,6 +25,10 @@ Six interviews. Synthesis: [[../evidence/interview-round-1-findings]].
 - [x] [[2026-05-25-elderly-gentleman-toa-payoh-aac]] — elderly man, field interview at a Toa Payoh Active Ageing Centre.
 - [x] [[2026-05-25-frontline-caretaker-old-age-home]] — caretaker at Lee Ah Mooi Old Age Home (short).
 - [x] [[2026-05-25-elderly-resident-rc-centre]] — elderly resident with a structured day around the RC centre.
+
+## Seniors who used the live app — 2026-08-21
+
+Not interviews, but the closest thing this folder has to round 2: eight AAC members at Care Corner Toa Payoh 261A ran the Kakis app on their own phones in the first [[../journal/2026-08-21-tabletop-vanguard-ncss|Table Top Exercise]]. Their words and what they did with the screens are in that entry; the full list of what they asked for is [[../prototype/tabletop-2026-08-21-feedback]]. No conversation notes were written per person — if we do round 2, we should.
 
 ## Still to reach (round 2)
 

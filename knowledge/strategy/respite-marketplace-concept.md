@@ -6,7 +6,7 @@ last_updated: 2026-06-25
 based_on: [2026-06-25-solutioning, 2026-07-07-vanguard-prep, Solutioning Brainstorming pptx 2026-06-25, Padlet 2026-06-23/25]
 ---
 
-This is the working concept the team consolidated over two sessions in late June. It's not the final solution — it's a concrete-enough sketch to argue against, take to Vanguard, and iterate on. Consistent with the current HMW ([[../reframing/hmw-2026-06-25-caregiver-respite]]).
+This is the working concept the team consolidated over two sessions in late June. It's not the final solution — it's a concrete-enough sketch to argue against, take to Vanguard, and iterate on. Written against the Jun 25 HMW ([[../reframing/hmw-2026-06-25-caregiver-respite]]); still consistent with the current one ([[../reframing/hmw-current]]), which narrowed the activation moment and named the operator without changing the marketplace shape.
 
 ## The concept, in one line
 

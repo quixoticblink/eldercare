@@ -1,7 +1,7 @@
 ---
 title: "Purpose & Importance of the Eldercare Sprint"
 status: solid
-last_updated: 2026-07-11
+last_updated: 2026-09-04
 ---
 
 # Purpose & Importance of the Eldercare Sprint
@@ -38,6 +38,8 @@ Modern infrastructure has begun addressing (1) and (2). It has barely touched (3
 This question emerged from the convergence of five individual team perspectives and one week of observation-first discovery. It is deliberately not a solution. It is a reframe—insisting that the unit of success is *experienced connection*, not *delivered services*.
 
 The question will sharpen as more fieldwork is done. It is treated as a living hypothesis, not a locked brief.
+
+**Note (2026-08-09):** this remains the *north star* — the outcome we are ultimately arguing for. It is no longer the *working* HMW. Fieldwork moved the working question to the caregiver, and from companionship to respite: see [[reframing/hmw-current]] and the five dated iterations in [[reframing/README]]. Keeping both is deliberate — the north star is what makes the narrow wedge worth doing.
 
 ---
 
@@ -102,13 +104,14 @@ Each joined the sprint with family experience of eldercare—caregiving decision
 
 This section is a snapshot; the living record is at [[maps/timeline]] and updates every week.
 
-As of mid-July 2026 (roughly seven weeks in):
+As of 4 September 2026 (roughly fifteen weeks in):
 
 - **Round 1 field interviews** (six conversations) completed and synthesized ([[evidence/interview-round-1-findings]]).
-- **HMW has gone through four iterations.** Now at *"How might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a crisis hits — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof"* ([[reframing/hmw-2026-07-08-post-vanguard]]).
+- **HMW has gone through five iterations.** Now at *"How might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a need arises — planned or urgent — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof"* ([[reframing/hmw-2026-07-11-broader-need]]). The Jul 8 iteration had narrowed this to crisis-only; we caught that as too tight three days later.
 - **Partnership frame is real.** NCSS convenes, Vanguard operationally anchors, AIC provides the sector-level demand data. Vanguard has volunteered a Pasir Ris pilot by year-end. See [[maps/actors]].
 - **Strategy activated.** Marketplace 2×2 framework, respite marketplace concept, consistency-as-design-constraint all written up in [[strategy/README|strategy/]].
-- **Prototype window opening.** SGLN masterclass on 20 July, prototype milestone 20 August, Demo Day in September. `prototype/` and `pitch/` folders wake up as we build.
+- **The prototype became a running app.** [[prototype/kakis-app]] — live at **https://singaporekakis.com**, three roles, real sign-in codes to real phones, audited against ISO/IEC 5055. `prototype/` and `pitch/` are both awake.
+- **The pilot became a tabletop, and the tabletop happened.** On 3 August Vanguard countered our live-pilot ask with a supervised tabletop exercise ([[journal/2026-08-03-ncss-vanguard]]); no operational pilot inside the Demo Day window, scope narrows to chaperoning. On 18 August NCSS desk-reviewed the app role by role ([[journal/2026-08-18-ncss-app-review]]), and on 21 August eight seniors ran it on their own phones at Care Corner's Toa Payoh 261A AAC with Vanguard and NCSS facilitating ([[journal/2026-08-21-tabletop-vanguard-ncss]]). The concept held; the onboarding around it did not. Two recommendation registers, mapped to app modules: [[prototype/ncss-app-review-2026-08-18]] and [[prototype/tabletop-2026-08-21-feedback]].
 
 Key early findings that still hold:
 
@@ -120,9 +123,16 @@ Key early findings that still hold:
 
 Sharper findings from July:
 
-- The wedge is **crisis activation** (helper runaway, spousal-couple emergency, discharge scramble), not routine chaperone. Vanguard's own chaperone service runs at 20–30 appointments/month across four centres — small. The real pain sits elsewhere. See [[evidence/vanguard-operational-data]].
+- The sharpest pain is **crisis activation** (helper runaway, spousal-couple emergency, discharge scramble), not routine chaperone. Vanguard's own chaperone service runs at 20–30 appointments/month across four centres — small. See [[evidence/vanguard-operational-data]]. *Corrected Jul 11:* crisis is the sharpest moment, not the whole product — planned respite is the same service with a longer lead time, and building for crisis alone yields a product that disappears for eleven months of the year.
 - The moat is **not code.** Certification, trust, ecosystem density — none of which is software.
 - A **multi-payer stack** (private pay + healthcare fund + philanthropic capital + corporate partners) is required because willingness-to-pay is broken at the senior-facing layer.
+
+Added in August:
+
+- **Supply, not demand, is the binding constraint** — the inverse of the usual marketplace assumption, and it reframes the product. Certification gates supply hard: mobility training → on-the-job training → activation, with CPR cohorts a month or more out. A booking promise the operator can't honour is a harm to a vulnerable person, not a bad user experience. See [[journal/2026-08-03-ncss-vanguard]].
+- **Three framings are live at once and nobody has reconciled them:** caregiver relief (ours), resilient caregiving (NCSS), and operational digitisation of an existing manual service (implied by Vanguard's proposed success metric, "lessen your administrative burden", which quietly moves the primary user from the caregiver to the coordinator). This is the most important unresolved thing in the sprint and it is not on anyone's action list.
+- **The wall is before the product.** From the 21 August session: wifi, "what is a browser", the approval wait, a placeholder number in a form field. None of it is in the app's module table and all of it decides whether a senior ever reaches the booking screen. Language is a gate, not a localisation ticket — participants understood English and still asked for Mandarin. And every money question was about the *rules* of subsidy, none about the price.
+- **The start code proves the wrong thing for NCSS's threat model.** Built to prove a visit was admitted; read by NCSS as an identity check, which it isn't. Both halves are needed. Decide by testing on round 2.
 
 ---
 
@@ -131,3 +141,9 @@ Sharper findings from July:
 That a small team, starting from genuine curiosity and honest fieldwork, can produce a more useful and more human understanding of elderly loneliness than desk research alone—and that the understanding can be turned into something testable and worth building.
 
 If it works, the artefacts here become a model for how to approach hard social problems: not with a solution in search of a problem, but with a question rigorous enough to find its own answer.
+
+---
+
+*2026-08-09: re-cut the "Where we are now" snapshot, which had been stuck at mid-July and was still quoting the superseded crisis-only HMW as current. Marked the May 19 question explicitly as the north star rather than the working HMW. Added the running app, the Aug 3 tabletop counter-proposal, the supply-constraint finding, and the three-unreconciled-framings problem.*
+
+*2026-09-04: snapshot re-cut to 4 September. Added the 18 Aug NCSS review, the 21 Aug Table Top Exercise, and the two findings that came out of them (the wall before the product; the start-code direction).*

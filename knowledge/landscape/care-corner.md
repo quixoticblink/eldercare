@@ -2,13 +2,15 @@
 title: "Care Corner Seniors Services"
 aliases: [Care Corner, Care Corner AAC, Care Corner Active Ageing Centre]
 status: draft
-last_updated: 2026-05-24
+last_updated: 2026-09-04
 url: https://www.carecorner.org.sg
 ---
 
 Care Corner is one of Singapore's larger Social Service Agencies (SSAs), and it's been showing up in our wiki since the NCSS conversation on 2026-06-15. NCSS's late-2025 IDIs went through Care Corner's network to reach seniors and caregivers. The Toa Payoh 170 Active Ageing Centre is where several of our round 1 interviews happened. And under the emerging [[iccp-model]], Care Corner is the kind of sub-region-native operator that a caregiver-respite marketplace has to work through.
 
 We visited the Toa Payoh 170 site during round 1 fieldwork on 2026-05-24 — see the photos in [[../images/README]].
+
+**Update 2026-08-21:** Care Corner hosted the first [[../journal/2026-08-21-tabletop-vanguard-ncss|Table Top Exercise]] of the Kakis app at its **Toa Payoh 261A** Active Ageing Centre (Care), with Vanguard and NCSS facilitating and eight AAC members as participants. Photos in [[../images/README]]. That makes Care Corner the first operator whose members have used the live app, which is not the same thing as the Pasir Ris ICCP population the HMW names.
 
 ## What Care Corner runs
 
@@ -70,10 +72,12 @@ If we get a Care Corner meeting (per the divide-and-conquer plan from [[../journ
 
 ## Connects to
 
-[[ncss]] introduced us to Care Corner as a validated SSA. [[../evidence/ncss-idi-findings]] draws partly from their participant pool. [[../humans/2026-05-25-elderly-gentleman-toa-payoh-aac]] is the round-1 interview at their site. [[../images/README]] holds the field-visit photos. [[iccp-model]] is the operating context. [[../reframing/hmw-2026-07-08-post-vanguard]] is the current HMW that would need Care Corner as a second-node partner. [[singapore-care-taxonomy]] categorises AACs. [[vanguard]] is the parallel operator.
+[[ncss]] introduced us to Care Corner as a validated SSA. [[../evidence/ncss-idi-findings]] draws partly from their participant pool. [[../humans/2026-05-25-elderly-gentleman-toa-payoh-aac]] is the round-1 interview at their site. [[../images/README]] holds the field-visit photos. [[iccp-model]] is the operating context. [[../reframing/hmw-current]] is the current HMW, which would need Care Corner as a second-node partner. [[singapore-care-taxonomy]] categorises AACs. [[vanguard]] is the parallel operator.
 
 ## Proposed sibling / child entries
 
 - [[caring-sg]] — the other NCSS-validated SSA.
 - [[cal-caregiver-alliance]] — the third NCSS-validated SSA.
 - [[care-corner-meeting]] — placeholder for the divide-and-conquer follow-up meeting.
+
+*2026-09-04: added the Aug 21 Table Top Exercise at the Toa Payoh 261A centre.*

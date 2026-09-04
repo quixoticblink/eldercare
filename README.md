@@ -42,7 +42,7 @@ Wiki links on the site are **absolute GitHub URLs** (`https://github.com/quixoti
 **The app** runs on one small VM — backend serves the frontend, DuckDB is a single file, Caddy handles TLS. [`app/deploy/EC2-DEPLOYMENT.md`](app/deploy/EC2-DEPLOYMENT.md) documents the box that's actually live; [`app/deploy/README.md`](app/deploy/README.md) is the generic two-shape guide (note: its environment block predates v1.2, so check `app/backend/config.py` for the current variable list). Smoke test before any deploy:
 
 ```bash
-cd app && python3 backend/tests/smoke.py    # 170 assertions, full lifecycle
+cd app && python3 backend/tests/smoke.py    # full lifecycle; prints its own assertion count
 ```
 
 ---
@@ -379,7 +379,7 @@ The prototype became a real thing. `app/` is a deployed application at **[singap
 | [`app/deploy/SECURITY-AUDIT.md`](app/deploy/SECURITY-AUDIT.md) | ISO/IEC 5055 self-assessment (v1.5, 9 Aug 2026), findings closed, residual risk, and what "fit for a supervised pilot" excludes |
 | [`knowledge/prototype/kakis-app.md`](knowledge/prototype/kakis-app.md) | The wiki entry — why it's built this way, and the three failures that cost real time |
 
-**Status:** live, hardened, 170 automated assertions covering the full lifecycle. Fit for a **supervised tabletop**, which is exactly what NCSS and Vanguard asked for on Aug 3. Not fit for unsupervised public launch — backups have never been restore-tested, there's no PDPA review or user-facing deletion path, and the pricing is still placeholder.
+**Status:** live, hardened, 156 automated assertions covering the full lifecycle. Fit for a **supervised tabletop**, which is exactly what NCSS and Vanguard asked for on Aug 3. Not fit for unsupervised public launch — backups have never been restore-tested, there's no PDPA review or user-facing deletion path, and the pricing is still placeholder.
 
 ---
 
@@ -511,11 +511,13 @@ The microsite is the substantive showcase of all four — it's literally what th
 - ✅ SGLN masterclass (Jul 20, 2026) — reframe validated by the cohort; prototype milestone re-aimed at caregiver testing; devil's advocate at 15 critiques.
 - ✅ Kakis app built and deployed (Jul 21 – Aug 9, 2026) — six rounds, v1 → v1.5: initial build, prototype-sync, dual-channel sign-in, kaki availability + sourced assumptions, assignment notifications and automation toggles, then ISO 5055 security hardening. Live at [singaporekakis.com](https://singaporekakis.com).
 - ✅ NCSS + Vanguard (Aug 3, 2026) — our live-pilot ask countered with a **tabletop exercise**: two separate sessions, roughly five sets of staff + micro-jobber + senior run as two or three groups. Scope narrows to chaperoning. Supply, not demand, named as the binding constraint.
-- ☐ Tabletop sessions (week of Aug 17, 2026) — Vanguard arranges one, NCSS/Care Corner the other. Certification-tracking module and participant demo accounts due first.
-- ☐ Prototype milestone (Aug 20, 2026) — the app pressure-tested against Vanguard's six crisis triggers and real caregiver testing.
+- ✅ NCSS desk review (Aug 18, 2026) — the live app walked role by role, thirty items, one reversing the start-code direction. [journal/2026-08-18-ncss-app-review.md](knowledge/journal/2026-08-18-ncss-app-review.md); register in [prototype/ncss-app-review-2026-08-18.md](knowledge/prototype/ncss-app-review-2026-08-18.md).
+- ✅ Table Top Exercise, round 1 (Aug 21, 2026) — eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard + NCSS facilitating. Lifecycle held; onboarding around it didn't. Session record in [journal/2026-08-21-tabletop-vanguard-ncss.md](knowledge/journal/2026-08-21-tabletop-vanguard-ncss.md); every recommendation, mapped to app module, in [prototype/tabletop-2026-08-21-feedback.md](knowledge/prototype/tabletop-2026-08-21-feedback.md).
+- ✅ Prototype milestone (Aug 20, 2026) — met in substance by the Aug 21 session. Not yet tested against the six crisis triggers; the session ran planned bookings.
+- ☐ Table Top Exercise, round 2 — same group, to validate the changes. NCSS/Care Corner's own session still to be arranged.
 - ☐ Demo Day (September 2026) — pilot design + pitch.
 
-**Current phase:** build shipped, tabletop next. **Anchor partner:** Vanguard (MOH Holdings), convened by NCSS. **Current HMW:** [reframing/hmw-current.md](knowledge/reframing/hmw-current.md). **Live app:** [singaporekakis.com](https://singaporekakis.com).
+**Current phase:** Table Top Exercise done, SPEC amendments and round 2 next. **Anchor partner:** Vanguard (MOH Holdings), convened by NCSS. **Current HMW:** [reframing/hmw-current.md](knowledge/reframing/hmw-current.md). **Live app:** [singaporekakis.com](https://singaporekakis.com).
 
 **The most important unresolved thing:** three framings are live at once and nobody has reconciled them — caregiver relief (ours), resilient caregiving (NCSS), and operational digitisation of an existing manual service (Vanguard's proposed success metric, "lessen your administrative burden", which quietly moves the primary user from the caregiver to the coordinator). See [journal/2026-08-03-ncss-vanguard.md](knowledge/journal/2026-08-03-ncss-vanguard.md).
 

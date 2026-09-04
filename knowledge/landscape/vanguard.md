@@ -95,7 +95,7 @@ Both pilots have real operational data now (see [[../evidence/vanguard-operation
 
 ## Connects to
 
-[[ncss]] introduced us to Vanguard. [[community-chaperone]] and [[night-respite-vanguard]] are their two most-relevant pilots. [[iccp-model]] is the framework Vanguard operates within. [[aic]] is the sector-level demand-data holder we need to meet next. [[singapore-care-taxonomy]] documents the AAC/SCC/AL/HC/NH definitions Vanguard walked us through. [[../evidence/vanguard-operational-data]] holds the numbers. [[../reframing/hmw-2026-07-08-post-vanguard]] is the current HMW. [[../strategy/respite-marketplace-concept]] is the design direction Vanguard shaped. [[../journal/2026-07-08-vanguard-visit]] is the meeting itself.
+[[ncss]] introduced us to Vanguard. [[community-chaperone]] and [[night-respite-vanguard]] are their two most-relevant pilots. [[iccp-model]] is the framework Vanguard operates within. [[aic]] is the sector-level demand-data holder we need to meet next. [[singapore-care-taxonomy]] documents the AAC/SCC/AL/HC/NH definitions Vanguard walked us through. [[../evidence/vanguard-operational-data]] holds the numbers. [[../reframing/hmw-2026-07-08-post-vanguard]] is the iteration this visit produced; [[../reframing/hmw-current]] is where the question stands now. [[../strategy/respite-marketplace-concept]] is the design direction Vanguard shaped. [[../journal/2026-07-08-vanguard-visit]] is the meeting itself.
 
 ## Proposed sibling / child entries
 

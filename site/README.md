@@ -47,7 +47,7 @@ Most updates over the six-month sprint will be:
 - A new knowledge-base card (add an `<a class="kb-card">` block under `#wiki`). See SPEC Recipe 3.
 - A new HMW iteration (add a step to the `.hmw-history` chronology and update the `.hmw-statement` + `.hmw-grid` cells to the new current). See SPEC Recipe 2.
 - A new team member or role change (edit a `.team-card`). See SPEC Recipe 4.
-- Activating a dormant knowledge card (remove the `.dormant` class). See SPEC Recipe 5. Strategy has already been activated (2026-06-25); prototype and pitch remain dormant.
+- Activating a dormant knowledge card (remove the `.dormant` class). See SPEC Recipe 5. As of 2026-07-11 there are **no dormant cards left** — strategy was activated in the reframe pass, prototype and pitch in a second pass the same day. Keep the recipe for the next folder that gets added.
 
 Anything bigger — a new top-level section, a new component, a palette extension — should start with a SPEC change, not a code change. SPEC section 9 has the pattern.
 

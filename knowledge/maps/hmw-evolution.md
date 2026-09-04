@@ -1,10 +1,10 @@
 ---
 title: "HMW evolution — how the question changed"
 status: live
-last_updated: 2026-07-11
+last_updated: 2026-08-09
 ---
 
-Four iterations, ~seven weeks. Each one narrower than the last. Not a straight line — an inheritance chain where each iteration keeps what still works and drops what field evidence broke. This map shows what changed at each step and why.
+Five iterations, ~seven weeks. Each one narrower than the last — until the fifth, which deliberately widens the fourth back out. Not a straight line: an inheritance chain where each iteration keeps what still works and drops what field evidence broke, and one place where we corrected our own overshoot three days later. This map shows what changed at each step and why.
 
 ## Iteration 0 — 2026-05-19 · [[../reframing/hmw-current]] (May 19 synthesis)
 
@@ -52,7 +52,7 @@ Aditi conceded on-camera: *"Your problem statement is a lot more specific than o
 
 **What triggered it:** the June 25 solutioning session ([[../journal/2026-06-25-solutioning]]). Aditi's Padlet formulation ("HMW offer on-demand respite to caregivers for the relatively healthy elderly") became the team's working draft. Abhishek's [[../strategy/marketplace-2x2]] framework put the marketplace positioning debate on rails.
 
-## Iteration 3 — 2026-07-08 · [[../reframing/hmw-2026-07-08-post-vanguard]] (current working HMW)
+## Iteration 3 — 2026-07-08 · [[../reframing/hmw-2026-07-08-post-vanguard]]
 
 > How might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a crisis hits — a hospitalisation, a helper runaway, a spouse in decline — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof.
 
@@ -71,9 +71,26 @@ Aditi conceded on-camera: *"Your problem statement is a lot more specific than o
 
 **What's still weak:** ownership after September is still unresolved. Consistency-vs-on-demand tension has an operational hint (Vanguard's phone-triage pattern, [[../landscape/community-chaperone]]) but not a scaled answer.
 
+## Iteration 4 — 2026-07-11 · [[../reframing/hmw-2026-07-11-broader-need]] (current working HMW)
+
+> How might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a need arises — planned or urgent — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof.
+
+The only iteration that *widens* rather than narrows, and the only one triggered by us rather than by a partner.
+
+**What moved:**
+- **DO** — from "when a crisis hits" to "when a need arises — planned or urgent." Planned respite (an office meeting overlapping a medical appointment, a vacation needing daily check-ins, a wedding or work travel) is the same service with a longer lead time.
+
+**What stayed:** everything else. Same WHO, same WHERE (Pasir Ris ICCP), same WHEN (year-end 2026), same six crisis triggers — they're now the urgent half of the demand curve rather than the whole of it.
+
+**What triggered it:** us, three days later, with no new external evidence. The Jul 8 sentence was faithful to what Vanguard named as their sharpest pain, and we mistook *sharpest* for *whole*. Crisis-only is where willingness-to-pay is clearest but volume is thinnest — a product that occupies mind-share on the day it's needed and then disappears for eleven months is hard to remember, staff, or economically justify.
+
+**What's still weak:** two demand curves now live in one product. Planned, low-urgency respite and urgent, high-stakes activation may want different UX, different SLAs, different prices. Nothing has tested that they can share a surface.
+
+**Worth noting for the rubric:** this is the clearest single piece of evidence for the "learning and adaptation" line — a correction we made against our own three-day-old work, and against the framing of the partner we most wanted to please.
+
 ## What ties the iterations together
 
-Three threads run through all four:
+Three threads run through all five:
 
 **Consistency as the sharpest constraint.** Named quietly at May 19 (Zheng Wei's "80% AI, 20% human" hedge), sharpened at June 15 by NCSS's IDIs, canonised at July 8 in Vanguard's operational pattern. Now written up as [[../strategy/consistency-as-design-constraint]].
 
@@ -86,6 +103,7 @@ Three threads run through all four:
 - May 19 → June 15: our own round 1 field interviews ([[../evidence/interview-round-1-findings]]) plus NCSS's IDIs ([[../evidence/ncss-idi-findings]]).
 - June 15 → June 25: sitting with the reframe signal for ten days; the marketplace 2×2 debate on June 25.
 - June 25 → July 8: Vanguard's operational reality ([[../evidence/vanguard-operational-data]]) and the six crisis triggers named in the meeting.
+- July 8 → July 11: no new evidence at all — a team re-reading of our own sentence. The only iteration produced by argument rather than fieldwork.
 
 ## What's next
 
@@ -96,7 +114,7 @@ The next iteration — likely after AIC ([[../landscape/aic]]) and Care Corner (
 
 ## Devil's advocate carried across iterations
 
-The critique list at [[../reframing/devils-advocate]] has grown from five (May 19) to fourteen (July 8). Critiques 11 (ownership) and 12 (partner over-optimism) have partially softened after Vanguard. Critiques 6 (AI half-life), 8 (algorithm not the moat), 13 (marketplace framing doesn't fit home care), and 14 (MOH won't allow preference-matching UX) are now design constraints rather than open questions. Critiques 7 (deck same as one year ago) and 10 (latent demand, awareness gap) remain active.
+The critique list at [[../reframing/devils-advocate]] has grown from five (May 19) to fourteen (July 8), and to fifteen after the Jul 20 masterclass — critique 15 being the facilitator's *"your prototype must go to the caregivers, not Vanguard."* Critiques 11 (ownership) and 12 (partner over-optimism) have partially softened after Vanguard. Critiques 6 (AI half-life), 8 (algorithm not the moat), 13 (marketplace framing doesn't fit home care), and 14 (MOH won't allow preference-matching UX) are now design constraints rather than open questions. Critiques 7 (deck same as one year ago) and 10 (latent demand, awareness gap) remain active.
 
 ## Related maps
 
