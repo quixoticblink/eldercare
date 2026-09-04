@@ -15,6 +15,7 @@ const KakiView = (() => {
           : `<div class="card tint"><h3>No visits assigned yet</h3>
              <p>The coordinator matches visits to you based on your services and languages.
              Keep your profile current — and you'll hear as soon as a family needs you.</p></div>`}
+        <p class="f-hint" style="margin:6px 4px 10px">You don't need to keep the app open — we message you when a visit is assigned or anything changes.</p>
         <div class="card tint" style="margin-top:10px">
           <div class="row"><div class="grow"><h3>Your impact</h3>
           <p>${done.length} visit${done.length === 1 ? "" : "s"} · ${hours} hrs · ~$${earned.toFixed(2)} earned</p></div>

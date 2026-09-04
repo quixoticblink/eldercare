@@ -9,7 +9,7 @@ that triggered it — an assignment that happened is still an assignment, and th
 coordinator can always phone. Every attempt is written to audit_log so a missed
 message can be traced afterwards.
 """
-from .. import db
+from .. import assumptions, db
 from . import emailer, sms
 
 def channel_for(user: dict) -> str | None:
@@ -54,15 +54,22 @@ def visit_assigned(visit: dict, kaki: dict, caregiver: dict, senior_name: str = 
     when = f"{visit.get('date', '')} {visit.get('time_window') or ''}".strip()
     service = visit.get("service", "a visit")
     who = senior_name or "the senior"
+    # Hours and a one-line task description, so the kaki knows what they are
+    # saying yes to before they open the app (asked for by every source on 21 Aug).
+    meta = assumptions.service(service) or {}
+    hours = visit.get("hours") or meta.get("hours") or assumptions.default_hours()
+    hours_txt = f"{hours:g} hr{'' if hours == 1 else 's'}"
+    task = (meta.get("note") or "").strip()
 
     kaki_res = notify(
         kaki,
-        subject=f"You've been matched: {service}",
-        sms_text=(f"Kakis: you've been matched to a {service.lower()} for {who}, {when}. "
-                  f"Open the app to accept."),
+        subject=f"You've been matched: {service} · {hours_txt}",
+        sms_text=(f"Kakis: {service} for {who}, {when} ({hours_txt}). {task} "
+                  f"Open the app to accept.").replace("  ", " "),
         email_html=(f"<p>You've been matched to a <b>{service}</b> visit for {who}.</p>"
-                    f"<p><b>When:</b> {when}</p>"
-                    f"<p>Open Kakis to accept or pass it back to the coordinator.</p>"),
+                    f"<p><b>When:</b> {when} · <b>{hours_txt}</b></p>"
+                    + (f"<p><b>The task:</b> {task}</p>" if task else "")
+                    + f"<p>Open Kakis to accept or pass it back to the coordinator.</p>"),
     )
     cg_res = notify(
         caregiver,

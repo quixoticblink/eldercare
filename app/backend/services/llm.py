@@ -15,6 +15,8 @@ HELP_GUIDE = {
     "pay": "During the pilot there's nothing to pay in the app — billing runs through the Vanguard / ICCP account.",
     "earnings": "Kakis: your Impact tab shows hours and amounts. Payouts run weekly via Vanguard during the pilot.",
     "contact": "Stuck? Call the Pasir Ris ICCP coordinator at 6XXX XXXX.",
+    "open": "You don't need to keep the app open. We send you an SMS or email message when a visit is assigned, confirmed, or changes — open the app when one arrives.",
+    "notification": "You don't need to keep the app open. We send you an SMS or email message when a visit is assigned, confirmed, or changes.",
 }
 
 SYSTEM_PROMPT = """You are the in-app helper for Kakis, a Singapore pilot app where family

@@ -605,6 +605,23 @@ assert any("cancel" in t.lower() for t in _texts_to("beelian@example.com")), _se
 # nothing was sent to the wrong side
 assert not _texts_to("priya@example.com"), _sent
 
+# [B1·6] the kaki's assignment message says the hours and what the task is.
+# "when kaki receive a request, they should know the hours as well" — 21 Aug.
+v16b = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-03",
+                                   "window": "Morning 9–12", "language": "English"}, headers=ch).json()
+_sent.clear()
+assert c.post(f"/api/admin/visits/{v16b['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+_kaki_msgs = _texts_to("beelian@example.com")
+assert _kaki_msgs, _sent
+_m = " ".join(_kaki_msgs)
+assert "Companionship" in _m and "2026-12-03" in _m, _m
+assert "2 hr" in _m, "hours missing from the kaki's message: " + _m
+assert "Conversation" in _m, "task description missing from the kaki's message: " + _m
+assert c.post(f"/api/visits/{v16b['id']}/cancel", headers=ch).status_code == 200
+# the help guide answers the 'do I keep the app open' question
+_g = c.post("/api/chat", json={"message": "do I need to keep the app open?"}).json()
+assert "open" in _g["reply"].lower() and "message" in _g["reply"].lower(), _g
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.
