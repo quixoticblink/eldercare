@@ -1,0 +1,9 @@
+node_modules/
+test-results/
+playwright-report/
+.playwright-mcp/
+*.duckdb
+*.duckdb.wal
+.venv/
+__pycache__/
+package-lock.json

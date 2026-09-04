@@ -1,0 +1,14 @@
+{
+  "name": "kakis-app",
+  "version": "1.6.0",
+  "private": true,
+  "description": "Kakis — end-to-end tests (backend and frontend are served by FastAPI; this package only carries Playwright)",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:smoke": ".venv/bin/python backend/tests/smoke.py"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}
