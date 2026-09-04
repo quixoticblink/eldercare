@@ -22,6 +22,11 @@ should be worked as one list.
 
 What's here:
 
+- **`feature-buckets-2026-09-04.md`** — the cut. Both registers sorted into three
+  buckets by repetition, feasibility against v1.5, and what Homage and CaregiverAsia
+  already ship. Bucket 1 and 2 are the next build; Bucket 3 waits on a decision. Two
+  decisions recorded: prorated pricing at the same rate, and identity both ways (kaki
+  photo + kaki code, then the caregiver's start code).
 - **`ncss-app-review-2026-08-18.md`** — NCSS's thirty-item desk review, by role, mapped to
   modules and cross-referenced to the Aug 21 register. Includes the start-code direction
   question, the one item that reverses a design decision.

@@ -514,6 +514,7 @@ The microsite is the substantive showcase of all four — it's literally what th
 - ✅ NCSS desk review (Aug 18, 2026) — the live app walked role by role, thirty items, one reversing the start-code direction. [journal/2026-08-18-ncss-app-review.md](knowledge/journal/2026-08-18-ncss-app-review.md); register in [prototype/ncss-app-review-2026-08-18.md](knowledge/prototype/ncss-app-review-2026-08-18.md).
 - ✅ Table Top Exercise, round 1 (Aug 21, 2026) — eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard + NCSS facilitating. Lifecycle held; onboarding around it didn't. Session record in [journal/2026-08-21-tabletop-vanguard-ncss.md](knowledge/journal/2026-08-21-tabletop-vanguard-ncss.md); every recommendation, mapped to app module, in [prototype/tabletop-2026-08-21-feedback.md](knowledge/prototype/tabletop-2026-08-21-feedback.md).
 - ✅ Prototype milestone (Aug 20, 2026) — met in substance by the Aug 21 session. Not yet tested against the six crisis triggers; the session ran planned bookings.
+- ☐ Build round v1.6 — Buckets 1 and 2 of [prototype/feature-buckets-2026-09-04.md](knowledge/prototype/feature-buckets-2026-09-04.md), each feature behind a Playwright test and a smoke assertion.
 - ☐ Table Top Exercise, round 2 — same group, to validate the changes. NCSS/Care Corner's own session still to be arranged.
 - ☐ Demo Day (September 2026) — pilot design + pitch.
 

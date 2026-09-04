@@ -120,7 +120,8 @@ illustrative and every participant asked about anyway. Three new field-level ask
 out of it — kaki gender preference, kaki photo, dual-role sign-up — and cancellation
 turned from a pre-arrival action into a lifecycle question with a liability attached.
 The full register, mapped to modules, is [[tabletop-2026-08-21-feedback]]. Note what the
-session did not test: the six crisis triggers. It ran planned bookings.
+session did not test: the six crisis triggers. It ran planned bookings. What gets built
+next, and in what order, is [[feature-buckets-2026-09-04]].
 
 *Connects to:* [[README]] · [[kakis-build-plan]] · [[kakis-prototype-spec]] ·
 [[tabletop-2026-08-21-feedback]] · [[ncss-app-review-2026-08-18]] · [[../journal/2026-08-03-ncss-vanguard]] ·
