@@ -7,3 +7,4 @@ app/.venv/
 app/.env
 app/.env.sh
 __pycache__/
+.playwright-mcp/
