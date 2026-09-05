@@ -36,10 +36,17 @@ def update_me(body: ProfileIn, user=Depends(security.current_user)):
                 phone = security.normalise_phone(phone)
             except ValueError as e:
                 raise HTTPException(400, str(e))
-            owner = db.one("SELECT id FROM users WHERE phone = ? AND id <> ?", [phone, user["id"]])
-            if owner:
+        if phone != (user.get("phone") or ""):
+            # A phone-only account signs in BY this number. Letting them retype
+            # it is letting them lock themselves out; that change goes through
+            # the coordinator.
+            if not (user.get("email") or "").strip():
+                raise HTTPException(400, "This number is how you sign in — call the coordinator to change it")
+            if phone and db.one("SELECT id FROM users WHERE phone = ? AND id <> ?", [phone, user["id"]]):
                 raise HTTPException(400, "That mobile number is already linked to another account")
-        db.run("UPDATE users SET phone = ? WHERE id = ?", [phone, user["id"]])
+            # A new number has not been proved yet; it is proved the first time
+            # a sign-in code is used on it (M-AUTH).
+            db.run("UPDATE users SET phone = ?, phone_verified = FALSE WHERE id = ?", [phone, user["id"]])
     if user["role"] == "kaki":
         if not db.one("SELECT 1 FROM kaki_profiles WHERE user_id = ?", [user["id"]]):
             db.run("INSERT INTO kaki_profiles(user_id) VALUES (?)", [user["id"]])

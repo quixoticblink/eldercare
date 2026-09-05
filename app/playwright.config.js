@@ -17,6 +17,8 @@ module.exports = defineConfig({
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
     viewport: { width: 390, height: 844 },
+    timezoneId: "Asia/Singapore",
+    locale: "en-SG",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

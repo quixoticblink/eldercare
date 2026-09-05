@@ -7,6 +7,9 @@ Type=simple
 User=kakis
 WorkingDirectory=/home/kakis/eldercare/app
 EnvironmentFile=/home/kakis/eldercare/app/.env
+# The box runs UTC; every wall-clock rule in the app is a Singapore rule, and
+# DuckDB's current_timestamp follows this too (v1.6, "on the way since 18:07").
+Environment=TZ=Asia/Singapore
 # Bind to loopback only. Caddy terminates TLS and proxies here; before this the
 # app listened on 0.0.0.0, so anything that opened port 8000 in the security
 # group would have exposed it unencrypted (CWE-319).

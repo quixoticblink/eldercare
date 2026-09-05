@@ -71,6 +71,13 @@ const UI = (() => {
       ${esc(d.long || "figures are pilot estimates, not billed amounts.")}</p>`;
   }
 
+  /* YYYY-MM-DD in the phone's local time — never toISOString(), which is UTC and
+     is yesterday until 8am in Singapore. */
+  function ymd(d = new Date()) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function ymdIn(days) { const d = new Date(); d.setDate(d.getDate() + days); return ymd(d); }
+
   /* "HH:MM" in the phone's local time from a server timestamp; "" if unparseable. */
   function hhmm(ts) {
     if (!ts) return "";
@@ -82,5 +89,5 @@ const UI = (() => {
   const TIER_LABEL = { urgent: "Urgent · within the hour", soon: "Soon · within 2 hours", planned: "Planned" };
 
   return { el, esc, toast, screen, spin, appbar, chipGroup, pick, chipValue,
-           chipMulti, chipValues, statusPill, initials, contact, moneyNote, hhmm, TIER_LABEL };
+           chipMulti, chipValues, statusPill, initials, contact, moneyNote, hhmm, ymd, ymdIn, TIER_LABEL };
 })();

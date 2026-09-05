@@ -12,6 +12,7 @@ export ADMIN_EMAILS="admin@e2e.test"
 export JWT_SECRET="e2e-not-secret"
 export PORT="${E2E_PORT:-8100}"
 export SMS_ENABLED=0
+export TZ=Asia/Singapore
 
 rm -f "$DB_PATH" "$DB_PATH.wal"
 TMP="$(mktemp -d /tmp/kakis-e2e-assumptions.XXXXXX)"

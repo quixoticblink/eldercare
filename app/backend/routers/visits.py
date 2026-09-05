@@ -1,7 +1,7 @@
 """M-VISITS · request → assigned → accepted → in_progress → completed, reports, care notes."""
-import datetime, random, re
+import datetime, random, re, zoneinfo
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from .. import assumptions, config, db, security, settings
 from ..services import matching, notify
 
@@ -15,7 +15,7 @@ class VisitIn(BaseModel):
     language: str | None = None        # legacy single value
     languages: list[str] | None = None # v1.6: several; first one becomes `language`
     notes: str | None = ""
-    trigger: str | None = ""   # urgent/soon path: what happened
+    trigger: str | None = Field(default="", max_length=120)   # urgent/soon path: what happened
 
 class StartIn(BaseModel):
     otp: str
@@ -30,8 +30,11 @@ class NoteIn(BaseModel):
     text: str = ""
 
 def _now() -> datetime.datetime:
-    """Wall clock, as a function so tests can pin it."""
-    return datetime.datetime.now()
+    """Singapore wall clock (config.TZ), naive, as a function so tests can pin it."""
+    try:
+        return datetime.datetime.now(zoneinfo.ZoneInfo(config.TZ)).replace(tzinfo=None)
+    except Exception:
+        return datetime.datetime.now()
 
 def window_end_hour(window: str) -> int | None:
     """End hour (0-23) of a preset window like 'Afternoon 2–5', 'Today, 6–9pm',
@@ -39,7 +42,7 @@ def window_end_hour(window: str) -> int | None:
     Bare numbers 1–8 read as pm; 9–12 as am; 'pm' forces pm."""
     if not window:
         return None
-    m = re.search(r"(\d{1,2})\s*[–\-]\s*(\d{1,2})\s*(am|pm)?", window.lower())
+    m = re.search(r"(\d{1,2})\s*(?:am|pm)?\s*[–\-]\s*(\d{1,2})\s*(am|pm)?", window.lower())
     if not m:
         return None
     end, ampm = int(m.group(2)), m.group(3)
@@ -84,6 +87,15 @@ def _parties(v: dict) -> tuple[dict | None, dict | None, str]:
     cg = db.one("SELECT * FROM users WHERE id = ?", [v["caregiver_id"]])
     h = db.one("SELECT senior_name FROM households WHERE id = ?", [v["household_id"]]) or {}
     return kaki, cg, h.get("senior_name") or ""
+
+def _out(v: dict, user: dict) -> dict:
+    """Every visit response goes through here. The kaki never receives the
+    start code — not on the visit page, not in the list, not in the response
+    to their own accept/start/complete. SPEC §9.5."""
+    out = _enrich(v)
+    if user.get("role") == "kaki":
+        out.pop("otp_code", None)
+    return out
 
 def _enrich(v: dict) -> dict:
     h = db.one("SELECT * FROM households WHERE id = ?", [v["household_id"]]) or {}
@@ -159,7 +171,7 @@ def create(body: VisitIn, user=Depends(security.current_user)):
         except Exception as e:
             print(f"[kakis] auto-match failed for {vid}: {e}")   # booking still stands
 
-    return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
+    return _out(db.one("SELECT * FROM visits WHERE id = ?", [vid]), user)
 
 @router.get("")
 def list_visits(user=Depends(security.current_user)):
@@ -170,7 +182,7 @@ def list_visits(user=Depends(security.current_user)):
         rows = db.q("SELECT * FROM visits WHERE kaki_id = ? ORDER BY created_at DESC", [user["id"]])
     else:  # admin
         rows = db.q("SELECT * FROM visits ORDER BY created_at DESC")
-    return [_enrich(v) for v in rows]
+    return [_out(v, user) for v in rows]
 
 @router.get("/{vid}")
 def get_visit(vid: str, user=Depends(security.current_user)):
@@ -180,10 +192,7 @@ def get_visit(vid: str, user=Depends(security.current_user)):
         raise HTTPException(404, "Visit not found")
     if user["role"] != "admin" and user["id"] not in (v["caregiver_id"], v.get("kaki_id")):
         raise HTTPException(403, "Not your visit")
-    out = _enrich(v)
-    if user["role"] == "kaki":
-        out.pop("otp_code", None)   # kaki gets the code from the senior/caregiver in person
-    return out
+    return _out(v, user)   # the kaki gets the code from the family in person, never from the API
 
 def _transition(vid, user, allowed_roles, from_states, to_state, stamp_col=None):
     v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
@@ -207,7 +216,7 @@ def accept(vid: str, user=Depends(security.current_user)):
     security.approved_user(user)
     v = _transition(vid, user, ["kaki"], ["assigned"], "accepted", "accepted_at")
     notify.visit_accepted(v, *_parties(v))
-    return _enrich(v)
+    return _out(v, user)
 
 @router.post("/{vid}/decline")
 def decline(vid: str, user=Depends(security.current_user)):
@@ -216,7 +225,7 @@ def decline(vid: str, user=Depends(security.current_user)):
     kaki, cg, senior = _parties(v)          # before the kaki is cleared
     db.run("UPDATE visits SET kaki_id = NULL, assigned_at = NULL WHERE id = ?", [vid])
     notify.visit_declined(v, kaki, cg, senior)
-    return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
+    return _out(db.one("SELECT * FROM visits WHERE id = ?", [vid]), user)
 
 @router.post("/{vid}/on-the-way")
 def on_the_way(vid: str, user=Depends(security.current_user)):
@@ -236,7 +245,7 @@ def on_the_way(vid: str, user=Depends(security.current_user)):
         db.audit(user["email"] or user["phone"], "visit_on_the_way", vid)
         v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
         notify.visit_on_the_way(v, *_parties(v))
-    return _enrich(v)
+    return _out(v, user)
 
 @router.post("/{vid}/start")
 def start(vid: str, body: StartIn, user=Depends(security.current_user)):
@@ -249,7 +258,7 @@ def start(vid: str, body: StartIn, user=Depends(security.current_user)):
     v = _transition(vid, user, ["kaki"], ["accepted", "assigned"], "in_progress", "started_at")
     kaki, _cg, senior = _parties(v)
     notify.visit_started_contact(v, kaki, senior, db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]]))
-    return _enrich(v)
+    return _out(v, user)
 
 @router.post("/{vid}/complete")
 def complete(vid: str, body: ReportIn, user=Depends(security.current_user)):
@@ -260,15 +269,15 @@ def complete(vid: str, body: ReportIn, user=Depends(security.current_user)):
            [vid, db.j(body.chips), body.text, body.meds_confirmed])
     kaki, _cg, senior = _parties(v)
     notify.visit_finished_contact(v, kaki, senior, db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]]))
-    return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
+    return _out(db.one("SELECT * FROM visits WHERE id = ?", [vid]), user)
 
 @router.post("/{vid}/cancel")
 def cancel(vid: str, user=Depends(security.current_user)):
     security.approved_user(user)
     v = _transition(vid, user, ["caregiver"], ["requested", "assigned", "accepted"], "cancelled")
     if v.get("kaki_id"):
-        notify.visit_cancelled(v, "caregiver", *_parties(v))
-    return _enrich(v)
+        notify.visit_cancelled(v, user["role"], *_parties(v))
+    return _out(v, user)
 
 @router.post("/{vid}/care-note")
 def care_note(vid: str, body: NoteIn, user=Depends(security.current_user)):

@@ -62,6 +62,10 @@ OPENAI_API_KEY = env("OPENAI_API_KEY")
 LLM_MODEL      = env("LLM_MODEL", "claude-sonnet-4-5")
 OPENAI_MODEL   = env("OPENAI_MODEL", "gpt-4o-mini")
 DB_PATH        = env("DB_PATH", "./kakis.duckdb")
+# Wall-clock rules (a window that has passed, the booking horizon, "on the way
+# since 18:07") are Singapore rules. The pilot VM runs UTC, so the app must
+# name its zone rather than trust the box.
+TZ             = env("TZ", "Asia/Singapore")
 CORS_ORIGINS   = [o.strip() for o in env("CORS_ORIGINS", "*").split(",")]
 PORT           = int(env("PORT", "8000"))
 TOKEN_DAYS     = 30

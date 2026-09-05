@@ -57,7 +57,10 @@ def visit_assigned(visit: dict, kaki: dict, caregiver: dict, senior_name: str = 
     # Hours and a one-line task description, so the kaki knows what they are
     # saying yes to before they open the app (asked for by every source on 21 Aug).
     meta = assumptions.service(service) or {}
-    hours = visit.get("hours") or meta.get("hours") or assumptions.default_hours()
+    try:
+        hours = float(visit.get("hours") or meta.get("hours") or assumptions.default_hours())
+    except (TypeError, ValueError):
+        hours = float(assumptions.default_hours())
     hours_txt = f"{hours:g} hr{'' if hours == 1 else 's'}"
     task = (meta.get("note") or "").strip()
 
@@ -127,6 +130,12 @@ def visit_cancelled(visit: dict, by_role: str, kaki: dict, caregiver: dict,
             email_html=(f"<p>The family cancelled the <b>{visit.get('service')}</b> visit for {who}, "
                         f"{_when(visit)}.{why}</p><p>No need to travel.</p>"),
         )
+    if by_role == "admin":
+        cg_res = notify(caregiver, subject=f"Cancelled by the coordinator: {visit.get('service', 'your visit')}",
+                        sms_text=f"Kakis: the coordinator cancelled the {(visit.get('service') or 'visit').lower()} for {who}, {_when(visit)}.{why} Call 6XXX XXXX with any questions.")
+        notify(kaki, subject=f"Cancelled by the coordinator: {visit.get('service', 'visit')} for {who}",
+               sms_text=f"Kakis: the coordinator cancelled the {(visit.get('service') or 'visit').lower()} for {who}, {_when(visit)}.{why} No need to travel.")
+        return cg_res
     name = (kaki or {}).get("name") or "Your kaki"
     return notify(
         caregiver,

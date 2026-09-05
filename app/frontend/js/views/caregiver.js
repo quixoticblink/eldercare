@@ -216,9 +216,9 @@ const CareView = (() => {
     let planLangs = [];
     try { const hh = await Api.get("/care/household"); planLangs = (hh.plan && hh.plan.languages) || []; } catch (e) {}
     const startLangs = planLangs.length ? planLangs : ["English"];
-    const today = new Date().toISOString().slice(0, 10);
+    const today = UI.ymd();
     const horizon = App.config.max_advance_days || 30;
-    const maxDate = new Date(Date.now() + horizon * 86400000).toISOString().slice(0, 10);
+    const maxDate = UI.ymdIn(horizon);
     const back = planned ? "#/care/book/when" : "#/care/book/trigger";
     UI.screen(`
       ${UI.appbar("The details", `${bookDraft.service} · ${UI.TIER_LABEL[bookDraft.tier]}${bookDraft.trigger ? " · " + bookDraft.trigger : ""}`, back)}

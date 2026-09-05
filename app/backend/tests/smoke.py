@@ -563,6 +563,8 @@ assert c.post("/api/chat", json={"message": "how do I book?"}, headers=ch).json(
 # Each block below is one feature from knowledge/prototype/feature-buckets-2026-09-04.md.
 # [B1·4] a same-day window that has already passed is refused, whatever the tier.
 # Seniors saw "Today, 2–5pm" offered for an urgent visit at 6pm on 21 Aug.
+assert _visits.window_end_hour("Today, 9am–12") == 12 and _visits.window_end_hour("Afternoon 2–5") == 17
+assert _visits.window_end_hour("Today, 6–9pm") == 21 and _visits.window_end_hour("Within the hour") is None
 _visits._now = lambda: _dt.datetime(2026, 7, 25, 18, 30)
 late = c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today",
                                    "window": "Today, 2–5pm", "language": "English"}, headers=ch)
@@ -641,6 +643,10 @@ assert otw.status_code == 200 and otw.json()["on_way_at"], otw.text
 assert any("on the way" in t.lower() or "on their way" in t.lower() for t in _texts_to("priya@example.com")), _sent
 # the caregiver's view carries it; the caregiver cannot press it
 assert c.get(f"/api/visits/{v16c['id']}", headers=ch).json()["on_way_at"]
+# the kaki never receives the start code, on ANY response — review finding B1
+assert "otp_code" not in otw.json(), otw.json().keys()
+assert all("otp_code" not in v for v in c.get("/api/visits", headers=kh).json())
+assert "otp_code" not in c.post(f"/api/visits/{v16c['id']}/on-the-way", headers=kh).json()
 assert c.post(f"/api/visits/{v16c['id']}/on-the-way", headers=ch).status_code == 403
 assert c.post(f"/api/visits/{v16c['id']}/cancel", headers=ch).status_code == 200
 
@@ -681,6 +687,11 @@ _prof = c.put("/api/users/me", json={"name": "Priya Nathan", "phone": "9333 4444
 assert _prof.status_code == 200 and _prof.json()["name"] == "Priya Nathan", _prof.text
 assert c.get("/api/auth/me", headers=ch).json()["user"]["name"] == "Priya Nathan"
 assert _prof.json()["phone"] == "+6593334444", _prof.json()
+# a phone-only account cannot retype its own sign-in number (it would lock them out)
+assert c.put("/api/users/me", json={"phone": "9555 6666"}, headers=ph).status_code == 400
+assert c.get("/api/auth/me", headers=ph).json()["user"]["phone"] == "+6591234567"
+# a changed number on an email account is stored unverified until a code is used on it
+assert c.get("/api/auth/me", headers=ch).json()["user"]["phone_verified"] is False
 # a number that belongs to someone else is refused (the kaki's number was set in v1.2 tests)
 assert c.put("/api/users/me", json={"phone": "9123 4567"}, headers=ch).status_code == 400
 

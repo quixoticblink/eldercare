@@ -126,8 +126,7 @@ test.describe("'Other' trigger and booking horizon (Bucket 1 · 10)", () => {
     await page.getByRole("button", { name: /Companionship/ }).click();
     await page.getByRole("button", { name: /Planned/ }).click();
     const max = await page.locator("#date").getAttribute("max");
-    const expected = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
-    expect(max).toBe(expected);
+    expect(max).toBe(dateIn(30));
     await expect(page.getByText("up to 30 days ahead")).toBeVisible();
   });
 });
