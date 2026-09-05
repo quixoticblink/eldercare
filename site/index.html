@@ -251,7 +251,7 @@
         <div class="date">September 5, 2026 · Build</div>
         <h3>The August feedback, built in</h3>
         <p>Eighteen of the seventy recommendations, chosen for how often they were repeated and for what the app could absorb without a rewrite, shipped as v1.6 — one commit each, each behind an end-to-end test that drives the real screens. The one that changes what happens at the door: the kaki now shows a photo and a code of their own, the family enters it, and only then does their start code appear. NCSS wanted proof of identity; we had proof of admission; now it is both. Also: exact times charged by the half hour, languages pre-filled from the care plan, a female-or-male preference and &ldquo;the same kaki again&rdquo;, cancellation with reasons on both sides, certificates the coordinator reads before approving, and the small things that stopped eight people on 21 August — no placeholder number, a waiting screen that says there is nothing to do, no 2–5pm offered at six in the evening.</p>
-        <p>Two review passes found what the tests could not: the kaki had been receiving the start code in the API all along (the screen never showed it), and every wall-clock rule was running on a UTC server. Both fixed, both now tested. What is still deliberately not built: Mandarin, the subsidy rule, dual-role accounts.</p>
+        <p>Two review passes found what the tests could not: the kaki had been receiving the start code in the API all along (the screen never showed it), and every wall-clock rule was running on a UTC server. Both fixed, both now tested. What is still deliberately not built: the subsidy rule, dual-role accounts.</p>
         <div class="arc">
           <span class="step">two registers, one list</span>
           <span class="step">18 features, 18 commits</span>
@@ -261,10 +261,23 @@
         </div>
       </div>
 
+      <div class="entry">
+        <div class="date">September 5, 2026 · Language</div>
+        <h3>The same app, in Mandarin</h3>
+        <p>The biggest single ask from the eight seniors went out the same evening. One button at the top of every caregiver and kaki screen switches the app between English and Simplified Chinese — sign-in, the waiting screen, booking, the door check, the kaki&rsquo;s visit page, the help panel, and the messages a person receives. The choice is remembered on the phone and on the account. What a person types stays exactly as typed, and what the app stores stays English underneath. The coordinator&rsquo;s console stays English by design: one language across the console, the audit log and every message subject, whatever the person on the other end chose. Round 2 now tests the door changes and the Mandarin screens together; a senior who struggles is switched back with one tap, so the observation stays about the flow.</p>
+        <div class="arc">
+          <span class="step">one dictionary, no build step</span>
+          <span class="step">a glossary before the strings</span>
+          <span class="step">console stays English</span>
+          <span class="step">a shared-phone rule</span>
+          <span class="step final">v1.7 live</span>
+        </div>
+      </div>
+
       <div class="entry future">
         <div class="date">September 2026 · Round 2</div>
         <h3>Same seniors, changed app</h3>
-        <p>v1.6 back in front of the same group, to validate the changes rather than discover new ones. Round 1 ran planned bookings; round 2 has to run the crisis triggers.</p>
+        <p>v1.7 back in front of the same group — the door and booking changes and the Mandarin screens together — to validate rather than discover. Round 1 ran planned bookings; round 2 has to run the crisis triggers.</p>
       </div>
 
       <div class="entry future">
@@ -610,18 +623,18 @@
   </div>
 
   <div class="narrow">
-    <h3 class="sub-h">What changed in v1.6, and what is next</h3>
+    <h3 class="sub-h">What changed in v1.6 and v1.7, and what is next</h3>
     <div class="strategy-grid">
       <div class="strategy-card">
         <div class="strat-label">Shipped · 5 September 2026</div>
-        <h4>Eighteen things the August feedback asked for</h4>
-        <p><strong>At the door:</strong> the kaki shows a photo and a code of their own; the family enters it before their start code appears. <strong>Booking:</strong> exact start and end times in half-hour steps, charged by the half hour with a one-hour minimum; languages pre-filled from the care plan, Cantonese added; a female-or-male preference; &ldquo;the same kaki again&rdquo;; an &ldquo;other&rdquo; reason; no window offered after it has passed. <strong>Around the visit:</strong> messages when a kaki confirms, is on the way, or cancels; the emergency contact told at start and finish; cancellation with reasons on both sides. <strong>Kakis:</strong> working hours per day, certificates the coordinator reads before approving, household-help visits that show only what the task needs. <strong>Getting in:</strong> no placeholder number, a waiting screen that says there is nothing to do, required fields marked, a refresh that keeps your place.</p>
-        <p class="strat-source"><a href="https://github.com/quixoticblink/eldercare/blob/main/app/SPEC.md#10-change-log">app/SPEC.md · change log</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-05-v1.6-build.md">journal/2026-09-05-v1.6-build.md</a></p>
+        <h4>Eighteen things the August feedback asked for, and the app in Mandarin</h4>
+        <p><strong>中文 (v1.7):</strong> every caregiver and kaki screen, the help panel and the messages, with one tap; remembered on the phone and the account; the coordinator console stays English by design. <strong>At the door:</strong> the kaki shows a photo and a code of their own; the family enters it before their start code appears. <strong>Booking:</strong> exact start and end times in half-hour steps, charged by the half hour with a one-hour minimum; languages pre-filled from the care plan, Cantonese added; a female-or-male preference; &ldquo;the same kaki again&rdquo;; an &ldquo;other&rdquo; reason; no window offered after it has passed. <strong>Around the visit:</strong> messages when a kaki confirms, is on the way, or cancels; the emergency contact told at start and finish; cancellation with reasons on both sides. <strong>Kakis:</strong> working hours per day, certificates the coordinator reads before approving, household-help visits that show only what the task needs. <strong>Getting in:</strong> no placeholder number, a waiting screen that says there is nothing to do, required fields marked, a refresh that keeps your place.</p>
+        <p class="strat-source"><a href="https://github.com/quixoticblink/eldercare/blob/main/app/SPEC.md#10-change-log">app/SPEC.md · change log</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-05-v1.6-build.md">journal/2026-09-05-v1.6-build.md</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-05-v1.7-language.md">journal/2026-09-05-v1.7-language.md</a></p>
       </div>
       <div class="strategy-card">
         <div class="strat-label">Roadmap · deliberately not yet</div>
         <h4>What waits on a decision, not on code</h4>
-        <p><strong>Mandarin, then Malay.</strong> The biggest single ask from the seniors; sequenced after the door and booking changes so round 2 tests one thing at a time. <strong>Subsidy rules.</strong> Gross and net shown before a family confirms, once Vanguard and NCSS set the test (means, flat type, opt-out). <strong>Dual-role accounts</strong> and an owner role above the coordinator. <strong>Live updates</strong> without refreshing. <strong>Further out:</strong> live location during chaperone visits, an SOS path someone can answer at 2am, specialisation-based matching once certificates carry it, calendar sync. Not on the roadmap, by rule: any public rating of a kaki.</p>
+        <p><strong>Malay.</strong> The same dictionary as the Mandarin screens; waits for a Malay-speaking reviewer. <strong>Subsidy rules.</strong> Gross and net shown before a family confirms, once Vanguard and NCSS set the test (means, flat type, opt-out). <strong>Dual-role accounts</strong> and an owner role above the coordinator. <strong>Live updates</strong> without refreshing. <strong>Further out:</strong> live location during chaperone visits, an SOS path someone can answer at 2am, specialisation-based matching once certificates carry it, calendar sync. Not on the roadmap, by rule: any public rating of a kaki.</p>
         <p class="strat-source"><a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/prototype/roadmap.md">prototype/roadmap.md</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/prototype/feature-buckets-2026-09-04.md">feature-buckets-2026-09-04.md</a></p>
       </div>
     </div>
@@ -907,7 +920,7 @@
     <div>
       <h4>Eldercare Sprint</h4>
       <p>A six-month leadership sprint working out how caregivers of the relatively healthy elderly in Singapore can activate trusted respite when a need arises — planned or urgent. Started May 19, 2026. Five people. Public journey. Anchored on Vanguard&rsquo;s Pasir Ris pilot from July 8 onward.</p>
-      <p class="colophon">Updated 2026-09-05 · Singapore</p>
+      <p class="colophon">Updated 2026-09-05 (evening) · Singapore</p>
     </div>
     <div>
       <h4>Find your way</h4>

@@ -11,10 +11,12 @@ Woke up on 2026-07-11, ahead of the 2026-08-20 SGLN prototype milestone. Working
 database that persists. The HTML prototype below stays as the design record; the app is
 now the thing people actually touch.
 
-**Update 2026-09-05: v1.6 is live.** Buckets 1 and 2 of [[feature-buckets-2026-09-04]]
+**Update 2026-09-05: v1.6 and v1.7 are live.** Buckets 1 and 2 of [[feature-buckets-2026-09-04]]
 shipped to singaporekakis.com — eighteen features, each behind a Playwright test and a
-smoke assertion. The plan that was executed is [[plans/v1.6-buckets-1-2]]; what went
-wrong on the way is in [[kakis-app]].
+smoke assertion — and, the same evening, the Mandarin UI for caregivers and kakis (the
+coordinator console stays English by design). The plans executed are
+[[plans/v1.6-buckets-1-2]] and [[plans/v1.7-language-switch]]; what went wrong on the
+way is in [[kakis-app]].
 
 **Update 2026-09-04: the app has been in seniors' hands.** Table Top Exercise, round 1, ran on
 2026-08-21 — eight seniors, own phones, Care Corner AAC Toa Payoh 261A, Vanguard and NCSS facilitating. The
@@ -55,4 +57,4 @@ Deliberate scope cuts, documented in the brief: no real matching algorithm, no p
 
 The rubric line this feeds: *"Human centricity of the solution (not just slides)"* — the prototype runs, and each design choice traces to a human in `humans/` or a constraint in `strategy/`.
 
-Next for this folder: Table Top Exercise round 2 on the crisis triggers with v1.6; the Bucket 3 decisions in [[roadmap]]; a print/voice artifact concept for the senior.
+Next for this folder: Table Top Exercise round 2 on the crisis triggers with v1.7 (v1.6 and Mandarin together); the Bucket 3 decisions in [[roadmap]]; a print/voice artifact concept for the senior.

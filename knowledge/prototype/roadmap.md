@@ -12,6 +12,23 @@ running summary, updated every release. The version that people can use is alway
 
 ## Shipped
 
+### v1.7 — 2026-09-05 · 中文 on the caregiver and kaki screens
+
+The biggest single ask from the seniors on Aug 21, built the same day v1.6 went out.
+One button at the top of every caregiver and kaki screen switches the whole app
+between English and Simplified Chinese — sign-in, the waiting screen, booking, the
+door check, the kaki's visit page, profile, availability, the help panel, and the
+SMS and email messages a person receives. The choice is remembered on the phone and
+on the account, so it is the same next time and on a second phone; a phone already set
+to Chinese starts in Chinese. Names, notes, reasons and anything a person types stay
+exactly as typed, and every value the app stores stays English underneath. **The
+coordinator console stays English by design**: one language across the console, the
+audit log and every message subject, whatever the person on the other end chose.
+
+Eight new Playwright specs (a full Chinese lifecycle with a no-English-leak check on
+every screen) and 26 smoke assertions. Detail in `app/SPEC.md` §7 and §10;
+[[../journal/2026-09-05-v1.7-language]].
+
 ### v1.6 — 2026-09-05 · the August feedback round
 
 Eighteen features, all from Buckets 1 and 2 of [[feature-buckets-2026-09-04]], each
@@ -68,10 +85,15 @@ the crisis triggers — the one thing the HMW is about that round 1 didn't exerc
 us, with Care Corner and Vanguard. The open question from round 1 is still open: whether
 a Vanguard-side session with ICCP participants is owed as well.
 
-**Mandarin UI, then Malay.** The biggest single ask from the seniors. Deferred on
-2026-09-04 by choice, so that round 2 tests the door and booking changes without a
-language change confounding it. Technically a string dictionary; the frontend has no
-build step, so it is a day's work plus translation.
+**Malay UI.** Mandarin shipped as v1.7 (above), which reverses the 2026-09-04 decision
+to keep language out of round 2. Round 2 now tests v1.6 and the Mandarin screens
+together. That is acceptable because the two are separable in the room: the door check,
+exact times and cancellation are the same flow in either language, so a senior who
+struggles can be switched to English with one tap and the observation is still about
+the flow, and a senior who succeeds in Chinese has tested both at once. What is
+confounded is only the *onboarding* reading — whether a screen was hard because of the
+words or because of the step — and the facilitators note the language each senior used.
+Malay is the same dictionary mechanism and waits for a Malay-speaking reviewer.
 
 **Subsidy rules.** Every money question on Aug 21 was about the *rules* — means test,
 flat type, can I decline — and none about the price. The app already shows an
@@ -101,5 +123,5 @@ is the cut into three buckets with the reasoning; this page is the outcome. When
 ships, its items move up here; when a decision unblocks a roadmap line, it moves into the
 next bucket.
 
-*Connects to:* [[kakis-app]] · [[feature-buckets-2026-09-04]] · [[plans/v1.6-buckets-1-2]] ·
+*Connects to:* [[kakis-app]] · [[feature-buckets-2026-09-04]] · [[plans/v1.6-buckets-1-2]] · [[plans/v1.7-language-switch]] · [[../journal/2026-09-05-v1.7-language]] ·
 [[../journal/2026-09-05-v1.6-build]] · [[../journal/2026-08-21-tabletop-vanguard-ncss]]

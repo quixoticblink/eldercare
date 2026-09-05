@@ -122,8 +122,8 @@ function in the frontend again.
 Live, hardened, and audited against ISO/IEC 5055 — see
 [[app/deploy/SECURITY-AUDIT|SECURITY-AUDIT.md]]. Rate limiting on sign-in and on both
 door codes, health data off world-readable permissions, security headers, pinned
-dependencies. 368 smoke assertions and 24 Playwright end-to-end specs covering the full
-lifecycle — the smoke figure derives from its own source, after the hand-maintained
+dependencies. 394 smoke assertions and 32 Playwright end-to-end specs covering the full
+lifecycle, in English and in Chinese — the smoke figure derives from its own source, after the hand-maintained
 version drifted to six different numbers across five documents.
 
 Fit for a **supervised tabletop**, which is exactly what [[../journal/2026-08-03-ncss-vanguard|NCSS and Vanguard]]
@@ -166,8 +166,20 @@ nothing to do, required fields marked, a refresh that keeps your place, and no
 
 Every feature has a Playwright test (24 specs, `app/tests/e2e/`) and a smoke assertion
 (156 → 368), one commit each, and two review passes whose findings are in the change
-log. The build plan, task by task, is [[plans/v1.6-buckets-1-2]]. Still not built, by
-decision: Mandarin UI, subsidy rules, dual-role accounts, live updates — Bucket 3.
+log. The build plan, task by task, is [[plans/v1.6-buckets-1-2]].
+
+**v1.7 shipped the same evening** — the Mandarin UI, the first item pulled out of
+Bucket 3. A button in the brand bar switches every caregiver and kaki screen, the help
+panel and the person's messages to Simplified Chinese; the coordinator console stays
+English by design. It is a string dictionary (`frontend/js/i18n.js`, about four hundred
+ids) behind `UI.t()`, with display names for data values so that what the app stores
+never changes, and a `users.lang` column so the choice follows the person to another
+phone and decides the language of their SMS. Two things the reviews caught that the
+tests had not: a shared phone could flip the next person's message language (the
+server's record now wins), and names had been reaching emails unescaped since v1.4.
+The plan is [[plans/v1.7-language-switch]]; the journal entry
+[[../journal/2026-09-05-v1.7-language]]. Still not built, by decision: Malay, subsidy
+rules, dual-role accounts, live updates — Bucket 3.
 
 *Connects to:* [[README]] · [[kakis-build-plan]] · [[kakis-prototype-spec]] ·
 [[tabletop-2026-08-21-feedback]] · [[ncss-app-review-2026-08-18]] · [[../journal/2026-08-03-ncss-vanguard]] ·
@@ -175,3 +187,4 @@ decision: Mandarin UI, subsidy rules, dual-role accounts, live updates — Bucke
 
 *2026-09-04: added the Aug 18 NCSS review and the Aug 21 Table Top Exercise outcome to "Where it stands"; linked the recommendation register.*
 *2026-09-05: v1.6 shipped — Buckets 1 and 2; two new entries under "what went wrong" (the start-code leak, the UTC box).*
+*2026-09-05, later: v1.7 shipped — the Mandarin UI for caregivers and kakis; console English by design.*

@@ -31,7 +31,16 @@ entered to start the visit. Both halves, not one or the other.
 
 **Status 2026-09-05:** Buckets 1 and 2 are live as v1.6. Bucket 2 item 1 shipped with
 30-minute input steps (not 15); item 5 keeps mobility and the emergency contact visible
-to a household-help kaki and hides age, medications and notes.
+to a household-help kaki and hides age, medications and notes. Later the same day the
+first Bucket 3 item moved up: the Mandarin UI shipped as v1.7 — see below.
+
+## v1.7 — shipped (2026-09-05)
+
+- Mandarin UI — caregiver and kaki screens; coordinator console stays English by design.
+  Sign-in, waiting screen and help panel included; notifications and the help bot follow
+  the person's language; the choice persists on the phone and on the account. Malay stays
+  in Bucket 3. (M-CORE, M-USERS, M-AUTH, M-CARE, M-VISITS, M-HELP; plan in
+  [[plans/v1.7-language-switch]])
 
 ## Bucket 1 — days each, mostly one module, no or trivial schema change
 
@@ -63,7 +72,7 @@ In this order.
 
 ## Bucket 3 — defer, or decide something first
 
-- Mandarin UI, then Malay. The biggest single ask from the seniors; deferred by decision on 2026-09-04, not by difficulty. (M-CORE)
+- Malay UI. Mandarin shipped as v1.7 (above); Malay is the same dictionary mechanism plus translation, and waits for a Malay-speaking reviewer. (M-CORE)
 - Gross and net cost with the rule shown, and an opt-out toggle. Needs the subsidy test from Vanguard and NCSS first. (M-VISITS, `assumptions.json`)
 - Dual-role accounts (caregiver and kaki) with admin restricted to work email. Touches auth. (M-AUTH, M-USERS)
 - Live-updating screens via polling; real push later. (M-CORE)

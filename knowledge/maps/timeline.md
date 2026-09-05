@@ -108,6 +108,10 @@ Optional exhibition at Suntec — potential venue if prototype is demo-ready fou
 
 Buckets 1 and 2 of the August feedback built and shipped: the door check both ways, exact times, preferences, cancellation lifecycle, certificates, and the onboarding fixes. 24 Playwright specs, 368 smoke assertions.
 
+### 2026-09-05 · Kakis v1.7 · [[../journal/2026-09-05-v1.7-language]]
+
+The same evening: 中文 on every caregiver and kaki screen, the help panel and the messages, with the coordinator console kept English by design. Round 2 of the Table Top Exercise now tests v1.6 and Mandarin together. 32 Playwright specs, 394 smoke assertions.
+
 ### 2026-09-XX · SGLN Demo Day
 
 The rubric event. Four dimensions × 25 pts = 100:

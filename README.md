@@ -43,7 +43,7 @@ Wiki links on the site are **absolute GitHub URLs** (`https://github.com/quixoti
 
 ```bash
 cd app && python3 backend/tests/smoke.py    # full lifecycle; prints its own assertion count
-cd app && npx playwright test              # 24 end-to-end specs against a throwaway backend on :8100
+cd app && npx playwright test              # 32 end-to-end specs (English and Chinese) against a throwaway backend on :8100
 ```
 
 ---
@@ -381,7 +381,7 @@ The prototype became a real thing. `app/` is a deployed application at **[singap
 | [`knowledge/prototype/kakis-app.md`](knowledge/prototype/kakis-app.md) | The wiki entry — why it's built this way, and the failures that cost real time |
 | [`knowledge/prototype/roadmap.md`](knowledge/prototype/roadmap.md) | What shipped in each version and what's next, ordered by the decision each item waits on |
 
-**Status:** v1.6, live, hardened, 368 smoke assertions plus a 24-spec Playwright suite (`cd app && npm i && npx playwright test`) covering the full lifecycle. Fit for a **supervised tabletop**, which is exactly what NCSS and Vanguard asked for on Aug 3. Not fit for unsupervised public launch — backups have never been restore-tested, there's no PDPA review or user-facing deletion path, and the pricing is still placeholder.
+**Status:** v1.7, live, hardened, 394 smoke assertions plus a 32-spec Playwright suite (English and Chinese) (`cd app && npm i && npx playwright test`) covering the full lifecycle. Fit for a **supervised tabletop**, which is exactly what NCSS and Vanguard asked for on Aug 3. Not fit for unsupervised public launch — backups have never been restore-tested, there's no PDPA review or user-facing deletion path, and the pricing is still placeholder.
 
 ---
 
@@ -517,10 +517,11 @@ The microsite is the substantive showcase of all four — it's literally what th
 - ✅ Table Top Exercise, round 1 (Aug 21, 2026) — eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard + NCSS facilitating. Lifecycle held; onboarding around it didn't. Session record in [journal/2026-08-21-tabletop-vanguard-ncss.md](knowledge/journal/2026-08-21-tabletop-vanguard-ncss.md); every recommendation, mapped to app module, in [prototype/tabletop-2026-08-21-feedback.md](knowledge/prototype/tabletop-2026-08-21-feedback.md).
 - ✅ Prototype milestone (Aug 20, 2026) — met in substance by the Aug 21 session. Not yet tested against the six crisis triggers; the session ran planned bookings.
 - ✅ Build round v1.6 (Sep 5, 2026) — Buckets 1 and 2 of [prototype/feature-buckets-2026-09-04.md](knowledge/prototype/feature-buckets-2026-09-04.md), eighteen features, each behind a Playwright test (24 specs) and a smoke assertion (368). Identity both ways at the door, exact times, gender and same-kaki preferences, cancellation lifecycle, certificates. Live.
-- ☐ Table Top Exercise, round 2 — same group, to validate the changes. NCSS/Care Corner's own session still to be arranged.
+- ✅ Build round v1.7 (Sep 5, 2026, evening) — the app in Mandarin for caregivers and kakis; coordinator console English by design. 8 more Playwright specs (32) and 26 smoke assertions (394). [journal/2026-09-05-v1.7-language.md](knowledge/journal/2026-09-05-v1.7-language.md). Live.
+- ☐ Table Top Exercise, round 2 — same group, v1.6 and the Mandarin screens together, to validate the changes. NCSS/Care Corner's own session still to be arranged.
 - ☐ Demo Day (September 2026) — pilot design + pitch.
 
-**Current phase:** v1.6 shipped, Table Top Exercise round 2 next. **Anchor partner:** Vanguard (MOH Holdings), convened by NCSS. **Current HMW:** [reframing/hmw-current.md](knowledge/reframing/hmw-current.md). **Live app:** [singaporekakis.com](https://singaporekakis.com).
+**Current phase:** v1.7 shipped, Table Top Exercise round 2 next. **Anchor partner:** Vanguard (MOH Holdings), convened by NCSS. **Current HMW:** [reframing/hmw-current.md](knowledge/reframing/hmw-current.md). **Live app:** [singaporekakis.com](https://singaporekakis.com).
 
 **The most important unresolved thing:** three framings are live at once and nobody has reconciled them — caregiver relief (ours), resilient caregiving (NCSS), and operational digitisation of an existing manual service (Vanguard's proposed success metric, "lessen your administrative burden", which quietly moves the primary user from the caregiver to the coordinator). See [journal/2026-08-03-ncss-vanguard.md](knowledge/journal/2026-08-03-ncss-vanguard.md).
 
