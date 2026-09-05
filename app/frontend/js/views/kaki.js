@@ -50,7 +50,8 @@ const KakiView = (() => {
           ${v.estimate ? `<div class="divider"></div><div class="row"><span class="pill gold">You receive ~$${(v.estimate.kaki_fee + v.estimate.transport).toFixed(2)}</span><span class="pill green">Cashless · weekly via Vanguard</span></div>${UI.moneyNote()}` : ""}
         </div>
         <div class="card tint">
-          <h3>Care plan — read before you go</h3>
+          <h3>${v.minimised ? "What you need for this visit" : "Care plan — read before you go"}</h3>
+          ${v.minimised ? `<p class="f-hint" style="margin:0 0 8px">Care plan not shared for household visits — the family will tell you what they'd like done. Ask them or the coordinator if you need more.</p>` : ""}
           <p>${plan.meds ? "💊 " + UI.esc(plan.meds) + "<br>" : ""}
              ${plan.mobility ? "🚶 " + UI.esc(plan.mobility) + "<br>" : ""}
              ${(plan.languages || []).length ? "🗣 " + plan.languages.map(UI.esc).join(", ") + "<br>" : ""}

@@ -893,6 +893,35 @@ assert _matching.rank(db.one("SELECT * FROM visits WHERE id = ?", [_vp["id"]]))[
 assert _matching.best_available(db.one("SELECT * FROM visits WHERE id = ?", [_vp["id"]]))["id"] == kk["id"]
 assert c.post(f"/api/visits/{_vp['id']}/cancel", headers=ch).status_code == 200
 
+# [B2·5] the kaki sees what the task needs. Household help: name, address,
+# task, mobility, emergency contact — not age, meds or the family's notes.
+# Every other service: the full care plan. (21 Aug: "may not need to know the
+# age of the elderly if doing household chores".)
+assert c.put("/api/care/plan", json={"meds": "Metformin 2pm", "mobility": "Bedridden", "languages": ["Tamil"],
+                                     "contact_name": "Ravi", "contact_relationship": "Son", "contact_phone": "9111 2222",
+                                     "notes": "Gets anxious with new faces"}, headers=ch).status_code == 200
+assert c.put("/api/users/me", json={"services": ["Companionship", "Household help", "Chaperone"]}, headers=kh).status_code == 200
+def _kaki_view(service):
+    v = c.post("/api/visits", json={"service": service, "tier": "planned", "date": "2026-08-18",
+                                    "start_time": "09:30", "end_time": "10:30", "language": "English"}, headers=ch).json()
+    assert c.post(f"/api/admin/visits/{v['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+    out = c.get(f"/api/visits/{v['id']}", headers=kh).json()
+    return v["id"], out
+_hid, _hh = _kaki_view("Household help")
+assert _hh["senior_name"] == "Mr Nathan" and _hh["address"], _hh
+assert _hh["senior_age"] is None and _hh["minimised"] is True, _hh
+assert _hh["care_plan"]["meds"] is None and _hh["care_plan"]["notes"] is None, _hh["care_plan"]
+assert _hh["care_plan"]["mobility"] == "Bedridden" and _hh["care_plan"]["contact_phone"] == "+6591112222", _hh["care_plan"]
+# the caregiver and the coordinator still see everything on the same visit
+assert c.get(f"/api/visits/{_hid}", headers=ch).json()["senior_age"] == 78
+assert c.get(f"/api/visits/{_hid}", headers=ah).json()["care_plan"]["meds"] == "Metformin 2pm"
+_cid, _cc = _kaki_view("Companionship")
+assert _cc["senior_age"] == 78 and _cc["minimised"] is False and _cc["care_plan"]["meds"] == "Metformin 2pm", _cc
+# the list view is minimised the same way
+assert next(v for v in c.get("/api/visits", headers=kh).json() if v["id"] == _hid)["senior_age"] is None
+for _x in (_hid, _cid):
+    assert c.post(f"/api/visits/{_x}/cancel", headers=ch).status_code == 200
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

@@ -74,6 +74,21 @@ test.describe("profile photo (Bucket 2 · 2)", () => {
   });
 });
 
+test.describe("household help shows less (Bucket 2 · 5)", () => {
+  test("a household-help visit hides the meds and age from the kaki", async ({ page, request }) => {
+    const s = await seed(request);
+    const v = await api(request, "POST", "/visits", { token: s.cg1.token, data: {
+      service: "Household help", tier: "planned", date: dateIn(5), start_time: "09:00", end_time: "10:00", language: "English" } });
+    await api(request, "POST", `/admin/visits/${v.body.id}/assign`, { token: s.admin.token, data: { kaki_id: s.k1.user.id } });
+    await useToken(page, s.k1.token, `#/kaki/visit/${v.body.id}`);
+    await expect(page.getByText("Care plan not shared for household visits")).toBeVisible();
+    const text = await page.locator("#screen").textContent();
+    expect(text).not.toContain("Metformin");
+    expect(text).not.toContain("Mr Nathan, 78");
+    expect(text).toContain("Mr Nathan");
+  });
+});
+
 test.describe("kaki", () => {
   test("home and profile render for an approved kaki", async ({ page, request }) => {
     const s = await seed(request);

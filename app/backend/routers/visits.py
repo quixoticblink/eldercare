@@ -123,14 +123,33 @@ def _parties(v: dict) -> tuple[dict | None, dict | None, str]:
     h = db.one("SELECT senior_name FROM households WHERE id = ?", [v["household_id"]]) or {}
     return kaki, cg, h.get("senior_name") or ""
 
+# Services where the kaki does not need the medical side of the care plan.
+# Household help is chores: the kaki needs the address, mobility (so they know
+# whether the senior can move out of the way), and who to call — not age,
+# medications, or the family's private notes about the senior (v1.6, B2·5).
+MINIMISED_SERVICES = {"Household help"}
+
+def _minimise_for_kaki(out: dict) -> dict:
+    if out.get("service") not in MINIMISED_SERVICES:
+        out["minimised"] = False
+        return out
+    out["minimised"] = True
+    out["senior_age"] = None
+    plan = out.get("care_plan")
+    if plan:
+        out["care_plan"] = {**plan, "meds": None, "notes": None, "contacts": None}
+    return out
+
 def _out(v: dict, user: dict) -> dict:
     """Every visit response goes through here. The kaki never receives the
     start code — not on the visit page, not in the list, not in the response
-    to their own accept/start/complete. SPEC §9.5."""
+    to their own accept/start/complete. SPEC §9.5. For household help the
+    kaki also gets only what the task needs."""
     out = _enrich(v)
     role = user.get("role")
     if role == "kaki":
         out.pop("otp_code", None)            # never; they get it from the family in person
+        out = _minimise_for_kaki(out)
     elif role == "caregiver":
         out.pop("kaki_code", None)           # they have to ask the kaki for it
         if not v.get("kaki_verified_at"):
