@@ -208,4 +208,10 @@ def quality(user=Depends(security.current_user)):
         x["chips"] = db.uj(x.get("chips"))
     for n in notes:
         n["chips"] = db.uj(n.get("chips"))
-    return {"reports": reports, "notes": notes}
+    # v1.6: who cancelled what, and why — the pattern the coordinator needs to
+    # see before anyone decides a compensation rule.
+    cancellations = db.q("""SELECT v.id, v.service, v.date, v.time_window, v.status, v.cancelled_by,
+                                   v.cancelled_by_name, v.cancel_reason, v.cancelled_at, h.senior_name
+                            FROM visits v LEFT JOIN households h ON h.id = v.household_id
+                            WHERE v.cancelled_by <> '' ORDER BY v.cancelled_at DESC LIMIT 50""")
+    return {"reports": reports, "notes": notes, "cancellations": cancellations}

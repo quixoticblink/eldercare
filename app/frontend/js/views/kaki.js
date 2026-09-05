@@ -85,6 +85,14 @@ const KakiView = (() => {
           ${plan.meds ? `<div class="chips" id="medsG" style="margin-top:10px">
             <button type="button" class="chip sel" onclick="this.classList.toggle('sel')" data-v="meds">Meds confirmed ✓</button></div>` : ""}
           <button class="btn" id="endV">Complete visit</button></div>` : ""}
+        ${["accepted", "in_progress"].includes(v.status) ? `
+          <button class="btn ghost" id="cancelK">I have to cancel</button>
+          <div class="card" id="cancelBox" hidden>
+            <label class="f-label" for="cancelWhy">Tell the family why <small>· required</small></label>
+            <textarea class="f-input" id="cancelWhy" placeholder="e.g. Fever this morning" maxlength="300"></textarea>
+            <p class="f-hint">${v.status === "in_progress" ? "The visit ends now and is marked cancelled." : "The visit goes back to the coordinator to re-match."} Whether anything is paid for a cancelled visit is decided by the coordinator, not the app.</p>
+            <button class="btn danger" id="cancelGo">Cancel this visit</button>
+          </div>` : ""}
         ${v.status === "completed" && v.report ? `
           <div class="card tint"><h3>Your report</h3><p>${UI.esc(v.report.text || "")}</p></div>
           <button class="li" id="flagC"><div class="face gold">⚑</div>
@@ -111,6 +119,15 @@ const KakiView = (() => {
             meds_confirmed: UI.el("medsG") ? UI.chipValues("medsG").includes("meds") : false });
           UI.toast("Visit completed — thank you 🌱"); visit(id);
         } catch (e) { UI.toast(e.message, true); }
+      };
+      const ck = UI.el("cancelK");
+      if (ck) ck.onclick = () => { UI.el("cancelBox").hidden = false; ck.hidden = true; UI.el("cancelWhy").focus(); };
+      const cg = UI.el("cancelGo");
+      if (cg) cg.onclick = async () => {
+        const reason = UI.el("cancelWhy").value.trim();
+        if (!reason) return UI.toast("A few words for the family, please", true);
+        try { await Api.post(`/visits/${id}/cancel`, { reason }); UI.toast("Cancelled — the family and coordinator have been told"); location.hash = "#/kaki/home"; }
+        catch (e) { UI.toast(e.message, true); }
       };
       const f = UI.el("flagC");
       if (f) f.onclick = async () => {

@@ -89,6 +89,24 @@ test.describe("household help shows less (Bucket 2 · 5)", () => {
   });
 });
 
+test.describe("cancel after accepting (Bucket 2 · 6)", () => {
+  test("a kaki cancels with a reason; the family sees why and the visit goes back to matching", async ({ page, request }) => {
+    const s = await seed(request);
+    const v = await api(request, "POST", "/visits", { token: s.cg1.token, data: {
+      service: "Companionship", tier: "planned", date: dateIn(6), start_time: "09:00", end_time: "10:00", language: "English" } });
+    await api(request, "POST", `/admin/visits/${v.body.id}/assign`, { token: s.admin.token, data: { kaki_id: s.k1.user.id } });
+    await api(request, "POST", `/visits/${v.body.id}/accept`, { token: s.k1.token });
+    await useToken(page, s.k1.token, `#/kaki/visit/${v.body.id}`);
+    await page.getByRole("button", { name: "I have to cancel" }).click();
+    await page.locator("#cancelWhy").fill("Fever this morning");
+    await page.getByRole("button", { name: "Cancel this visit" }).click();
+    await expect(page).toHaveURL(/#\/kaki\/home/);
+    await useToken(page, s.cg1.token, `#/care/visit/${v.body.id}`);
+    await expect(page.getByText("Finding a kaki")).toBeVisible();
+    await expect(page.getByText("Tan Bee Lian had to cancel: Fever this morning")).toBeVisible();
+  });
+});
+
 test.describe("kaki", () => {
   test("home and profile render for an approved kaki", async ({ page, request }) => {
     const s = await seed(request);

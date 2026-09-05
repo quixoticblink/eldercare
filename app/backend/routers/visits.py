@@ -27,6 +27,9 @@ class StartIn(BaseModel):
 class KakiCodeIn(BaseModel):
     code: str
 
+class CancelIn(BaseModel):
+    reason: str = Field(default="", max_length=300)
+
 class ReportIn(BaseModel):
     chips: list[str] = []
     text: str = ""
@@ -179,8 +182,11 @@ def _enrich(v: dict) -> dict:
     langs = db.uj(v.get("languages")) or ([v["language"]] if v.get("language") else [])
     preferred = (db.one("SELECT id, name FROM users WHERE id = ?", [v["preferred_kaki_id"]])
                  if v.get("preferred_kaki_id") else None)
+    last_cancellation = ({"by": v["cancelled_by"], "by_name": v.get("cancelled_by_name") or "",
+                          "reason": v.get("cancel_reason") or "", "at": v.get("cancelled_at")}
+                         if v.get("cancelled_by") else None)
     return {**v, "window": v.get("time_window"), "trigger": v.get("crisis_trigger") or "",
-            "languages": langs, "preferred_kaki": preferred,
+            "languages": langs, "preferred_kaki": preferred, "last_cancellation": last_cancellation,
             "senior_name": h.get("senior_name"), "senior_age": h.get("senior_age"),
             "address": h.get("address"), "kaki": kaki, "caregiver": cg,
             "times_together": times_together, "estimate": _estimate(v.get("service"), v.get("hours")),
@@ -387,12 +393,57 @@ def complete(vid: str, body: ReportIn, user=Depends(security.current_user)):
     return _out(db.one("SELECT * FROM visits WHERE id = ?", [vid]), user)
 
 @router.post("/{vid}/cancel")
-def cancel(vid: str, user=Depends(security.current_user)):
+def cancel(vid: str, body: CancelIn | None = None, user=Depends(security.current_user)):
+    """Cancellation as a lifecycle, not a pre-arrival button (v1.6).
+
+    caregiver: any non-final state → cancelled; the kaki is told.
+    kaki:      assigned/accepted → back to requested with the kaki cleared, a
+               reason required, the caregiver told; in_progress → cancelled
+               with a reason. Passing an assigned visit back without a reason
+               is still `decline`.
+    admin:     any non-final state → cancelled; both sides told.
+    Who and why are recorded on the visit; compensation is a policy question."""
     security.approved_user(user)
-    v = _transition(vid, user, ["caregiver"], ["requested", "assigned", "accepted"], "cancelled")
-    if v.get("kaki_id"):
-        notify.visit_cancelled(v, user["role"], *_parties(v))
-    return _out(v, user)
+    body = body or CancelIn()
+    reason = (body.reason or "").strip()
+    v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+    if not v:
+        raise HTTPException(404, "Visit not found")
+    role = user["role"]
+    if role == "caregiver" and v["caregiver_id"] != user["id"]:
+        raise HTTPException(403, "Not your visit")
+    if role == "kaki" and v.get("kaki_id") != user["id"]:
+        raise HTTPException(403, "Not your visit")
+    if v["status"] in ("completed", "cancelled"):
+        raise HTTPException(400, f"Can't cancel — visit is {v['status']}")
+    kaki, cg, senior = _parties(v)
+    stamp = "cancelled_by = ?, cancelled_by_name = ?, cancel_reason = ?, cancelled_at = current_timestamp"
+    if role == "kaki":
+        if not reason:
+            raise HTTPException(400, "Tell the family why, in a few words — they'll be looking for you")
+        if v["status"] in ("assigned", "accepted"):
+            # Back to the queue for a new match; the family is told who and why.
+            db.run(f"""UPDATE visits SET status = 'requested', kaki_id = NULL, assigned_at = NULL,
+                       accepted_at = NULL, on_way_at = NULL, kaki_code = '', kaki_verified_at = NULL, {stamp}
+                       WHERE id = ?""", ["kaki", user.get("name") or "", reason, vid])
+            db.audit(user["email"] or user["phone"], "visit_kaki_cancelled", f"{vid}: {reason}")
+            v2 = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+            notify.visit_cancelled(v2, "kaki", kaki, cg, senior, reason)
+            return _out(v2, user)
+        db.run(f"UPDATE visits SET status = 'cancelled', {stamp} WHERE id = ?",
+               ["kaki", user.get("name") or "", reason, vid])
+        db.audit(user["email"] or user["phone"], "visit_cancelled_mid", f"{vid}: {reason}")
+        v2 = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+        notify.visit_cancelled(v2, "kaki", kaki, cg, senior, reason)
+        return _out(v2, user)
+    # caregiver or admin
+    db.run(f"UPDATE visits SET status = 'cancelled', {stamp} WHERE id = ?",
+           [role, user.get("name") or "", reason, vid])
+    db.audit(user["email"] or user["phone"], "visit_cancelled", f"{vid}: {reason}")
+    v2 = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+    if v2.get("kaki_id"):
+        notify.visit_cancelled(v2, role, kaki, cg, senior, reason)
+    return _out(v2, user)
 
 @router.post("/{vid}/care-note")
 def care_note(vid: str, body: NoteIn, user=Depends(security.current_user)):

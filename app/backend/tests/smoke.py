@@ -922,6 +922,50 @@ assert next(v for v in c.get("/api/visits", headers=kh).json() if v["id"] == _hi
 for _x in (_hid, _cid):
     assert c.post(f"/api/visits/{_x}/cancel", headers=ch).status_code == 200
 
+# [B2·6] cancellation is a lifecycle, not a pre-arrival button. Either side,
+# after accept and after start, with a reason and who-cancelled recorded.
+# Compensation stays a policy question for Vanguard/NCSS.
+def _booked_and_accepted():
+    v = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                    "start_time": "09:30", "end_time": "10:30", "language": "English"}, headers=ch).json()
+    assert c.post(f"/api/admin/visits/{v['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+    assert c.post(f"/api/visits/{v['id']}/accept", headers=kh).status_code == 200
+    return v["id"]
+# kaki cancels an accepted visit → back to 'requested', kaki cleared, reason kept, caregiver told
+_x = _booked_and_accepted(); _sent.clear()
+assert c.post(f"/api/visits/{_x}/cancel", json={}, headers=kh).status_code == 400          # a reason is required from the kaki
+_r = c.post(f"/api/visits/{_x}/cancel", json={"reason": "Fever"}, headers=kh)
+assert _r.status_code == 200 and _r.json()["status"] == "requested" and _r.json()["kaki"] is None, _r.text
+_row = db.one("SELECT * FROM visits WHERE id = ?", [_x])
+assert _row["cancelled_by"] == "kaki" and _row["cancel_reason"] == "Fever" and _row["kaki_id"] is None, _row
+assert any("Fever" in t and "cancel" in t.lower() for t in _texts_to("priya@example.com")), _sent
+assert c.get(f"/api/visits/{_x}", headers=ch).json()["last_cancellation"]["by"] == "kaki"
+# the same visit can be re-matched and the old kaki code is gone
+assert c.post(f"/api/admin/visits/{_x}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+assert c.post(f"/api/visits/{_x}/cancel", json={"reason": "Change of plan"}, headers=ch).status_code == 200
+# caregiver cancels mid-visit → 'cancelled', who and why recorded, kaki told
+_y = _booked_and_accepted()
+assert c.post(f"/api/visits/{_y}/start", json={"otp": reveal_start_code(_y, ch, kh)}, headers=kh).status_code == 200
+_sent.clear()
+_r = c.post(f"/api/visits/{_y}/cancel", json={"reason": "Feeling unwell, please go"}, headers=ch)
+assert _r.status_code == 200 and _r.json()["status"] == "cancelled", _r.text
+_row = db.one("SELECT * FROM visits WHERE id = ?", [_y])
+assert _row["cancelled_by"] == "caregiver" and "unwell" in _row["cancel_reason"] and _row["cancelled_at"], _row
+assert any("cancel" in t.lower() for t in _texts_to("beelian@example.com")), _sent
+# kaki cancels mid-visit → 'cancelled' with reason; the coordinator sees it in quality
+_z = _booked_and_accepted()
+assert c.post(f"/api/visits/{_z}/start", json={"otp": reveal_start_code(_z, ch, kh)}, headers=kh).status_code == 200
+assert c.post(f"/api/visits/{_z}/cancel", json={"reason": "Family asked me to leave early"}, headers=kh).status_code == 200
+assert db.one("SELECT status, cancelled_by FROM visits WHERE id = ?", [_z]) == {"status": "cancelled", "cancelled_by": "kaki"}
+_q = c.get("/api/admin/quality", headers=ah).json()
+assert any(x["id"] == _z for x in _q["cancellations"]), _q.keys()
+# nobody can cancel a completed visit
+assert c.post(f"/api/visits/{_hid}/cancel", json={"reason": "x"}, headers=ch).status_code == 400   # already cancelled above
+# admin can cancel with a reason
+_w = _booked_and_accepted()
+assert c.post(f"/api/visits/{_w}/cancel", json={"reason": "Coordinator: kaki reassigned"}, headers=ah).status_code == 200
+assert db.one("SELECT cancelled_by FROM visits WHERE id = ?", [_w])["cancelled_by"] == "admin"
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

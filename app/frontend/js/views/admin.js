@@ -192,6 +192,12 @@ const AdminView = (() => {
           <div class="body"><b>${(n.chips || []).map(UI.esc).join(" · ") || "Note"}</b>
           <span>${UI.esc(n.text || "")}</span></div></div>`).join("")
         : `<div class="card tint"><p>No care notes yet.</p></div>`}
+        <div class="eyebrow">Cancellations</div>
+        ${(q.cancellations || []).length ? q.cancellations.map(x => `
+          <div class="li"><div class="face">✕</div>
+          <div class="body"><b>${UI.esc(x.service)} · ${UI.esc(x.senior_name || "")} · ${UI.esc(x.date)}</b>
+          <span>by ${UI.esc(x.cancelled_by_name || x.cancelled_by)} (${UI.esc(x.cancelled_by)})${x.cancel_reason ? " — " + UI.esc(x.cancel_reason) : ""} · now ${UI.esc(x.status)}</span></div></div>`).join("")
+        : `<div class="card tint"><p>No cancellations yet.</p></div>`}
         <div class="eyebrow">Visit reports</div>
         ${q.reports.length ? q.reports.map(r => `
           <div class="li"><div class="face">📝</div>

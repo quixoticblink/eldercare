@@ -323,6 +323,8 @@ const CareView = (() => {
           ${steps.map(([b, done, s], i) => `<li class="${done ? "done" : (i === steps.findIndex(x => !x[1]) ? "now" : "")}">
             <div><b>${b}</b>${s ? `<span>${UI.esc(s)}</span>` : ""}</div></li>`).join("")}
         </ul>
+        ${v.status === "requested" && v.last_cancellation && v.last_cancellation.by === "kaki" ? `
+          <div class="card warn"><p><b>${UI.esc(v.last_cancellation.by_name || "Your kaki")} had to cancel: ${UI.esc(v.last_cancellation.reason)}</b><br>The coordinator is finding someone else.</p></div>` : ""}
         ${v.status === "requested" ? `
           <div class="card tint"><h3>Usually matched ${MATCH_ETA[v.tier] || "soon"}</h3>
           <p>We'll message you the moment a kaki is confirmed — you don't need to keep checking.</p></div>` : ""}
@@ -366,7 +368,7 @@ const CareView = (() => {
             ${UI.chipMulti("noteChips", ["All fine", "Tired after visit", "Refused meds", "Fall concern", "New confusion"], [])}
             <textarea class="f-input" id="noteTxt" style="margin-top:10px" placeholder="Anything else…"></textarea>
             <button class="btn quiet" id="sendNote">Send care note</button></div>` : ""}
-        ${["requested", "assigned", "accepted"].includes(v.status) ? `<button class="btn danger" id="cancelV">Cancel this visit</button>` : ""}
+        ${["requested", "assigned", "accepted", "in_progress"].includes(v.status) ? `<button class="btn danger" id="cancelV">${v.status === "in_progress" ? "End this visit early" : "Cancel this visit"}</button>` : ""}
       `);
       [0,1,2,3].forEach(i => { const o = UI.el("k" + i); if (o) o.oninput = () => { if (o.value && i < 3) UI.el("k" + (i + 1)).focus(); }; });
       const vk = UI.el("verifyK");
@@ -384,8 +386,11 @@ const CareView = (() => {
       };
       const cv = UI.el("cancelV");
       if (cv) cv.onclick = async () => {
-        if (!confirm("Cancel this visit?")) return;
-        try { await Api.post(`/visits/${id}/cancel`); UI.toast("Visit cancelled"); location.hash = "#/care/home"; }
+        const reason = prompt(v.status === "in_progress"
+          ? "End the visit now? Tell the kaki why (a few words):"
+          : "Cancel this visit? A few words on why helps the coordinator:");
+        if (reason === null) return;
+        try { await Api.post(`/visits/${id}/cancel`, { reason: reason.trim() }); UI.toast("Visit cancelled"); location.hash = "#/care/home"; }
         catch (e) { UI.toast(e.message, true); }
       };
     } catch (e) { UI.toast(e.message, true); }

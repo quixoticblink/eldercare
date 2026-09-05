@@ -125,6 +125,12 @@ def _init(c):
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS kaki_gender_pref TEXT DEFAULT 'any'")
     # M-VISITS: "the same person again" — consistency is the product.
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS preferred_kaki_id TEXT DEFAULT ''")
+    # M-VISITS: cancellation after accept and after start, by either side, with
+    # who and why. Compensation is policy, not code.
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS cancelled_by TEXT DEFAULT ''")
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS cancelled_by_name TEXT DEFAULT ''")
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS cancel_reason TEXT DEFAULT ''")
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMP")
 
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for
