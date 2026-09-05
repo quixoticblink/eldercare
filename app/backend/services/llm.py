@@ -8,7 +8,10 @@ HELP_GUIDE = {
     "book": "Caregivers: Home → Book a visit → pick the service → pick when (Urgent / Soon / Planned) → add details → submit. The coordinator matches a kaki and you'll see it under Visits.",
     "urgent": "Urgent means you need someone within the hour — e.g. your helper left suddenly. The coordinator prioritises these requests first.",
     "otp": "When the kaki arrives, the caregiver's visit page shows a 4-digit start code. The kaki enters it to start the visit — that's how we confirm they're really there.",
-    "start code": "Open the visit in your Visits tab — the start code is on the visit page. Read it to your kaki when they arrive.",
+    "start code": "Caregivers: when your kaki arrives, first enter the 4-digit kaki code from their screen under 'Check it's them' — your start code then appears on the visit page. Read it to your kaki to start the visit.",
+    "kaki code": "Kakis: your visit page shows a 4-digit code for the family. Show it (with your photo) at the door; the family enters it, then reads you their start code.",
+    "photo": "Kakis: add a photo on your Profile — families see it on the visit page so they know it's you at the door.",
+    "certificate": "Kakis: add certificates (CPR + AED, mobility training) on your Profile, as a PDF or a photo. The coordinator checks them before approving you.",
     "report": "Kakis: after ending a visit, tick the chips and add a short note. Caregivers see the report on the visit page.",
     "care plan": "Caregivers: Home → Care plan. Keep meds, mobility and languages current — every kaki sees it before a visit.",
     "cancel": "Open the visit and tap Cancel. Please cancel at least 2 hours ahead so the kaki isn't already travelling.",
@@ -24,8 +27,11 @@ caregivers book trusted respite visits for elderly parents, trained "kakis" (res
 serve those visits, and a coordinator approves users and matches visits manually.
 Answer briefly (2-4 sentences), warmly, in plain language. App facts:
 - Sign-in: email address OR Singapore mobile number, then a 6-digit code sent to whichever they gave. Returning users are asked only for the code. New users need coordinator approval.
-- Caregivers: set up household + care plan; book visits (service -> urgency Urgent/Soon/Planned -> details); see assigned kaki; visit page shows a 4-digit start code to read to the kaki; get a report after.
-- Kakis: see assigned visits, accept, start with the code, end with a short report. Impact tab shows hours/earnings; weekly payout via Vanguard.
+- Caregivers: set up household + care plan; book visits (service -> urgency Urgent/Soon/Planned -> details with exact start/end times for planned visits, charged by the half hour, minimum 1 hour); can ask for a female or male kaki, or for a kaki who has visited before; get messages when a kaki is matched, confirms, is on the way, or cancels.
+- At the door (v1.6): the kaki shows their photo and a 4-digit KAKI CODE on their screen; the caregiver enters it on the visit page ("Check it's them"); only then does the caregiver's 4-digit START CODE appear, which the caregiver reads to the kaki to start the visit. The kaki never sees the start code in their app; the caregiver never sees the kaki code in theirs.
+- Cancelling: either side can cancel after accepting or even mid-visit, with a short reason; the other side and the coordinator are told. Whether anything is paid for a cancelled visit is the coordinator's decision, not the app's.
+- Kakis: profile photo, gender, certificates (PDF or photo) that the coordinator checks before approving; working hours per day; see assigned visits, accept, tap "I'm on my way", start with the family's start code, end with a short report. Household-help visits show the kaki only what the task needs (no medications or age). Impact tab shows hours/earnings; weekly payout via Vanguard.
+- You don't need to keep the app open: SMS or email arrives when anything changes.
 - No payments in-app during the pilot (billed via ICCP account). No public ratings of kakis (MOH rule) - concerns go privately to the care team.
 - Coordinator phone: 6XXX XXXX. If you don't know, say so and point to the coordinator."""
 
