@@ -1,5 +1,10 @@
-/* M-CARE + caregiver side of M-VISITS. */
+/* M-CARE + caregiver side of M-VISITS.
+   v1.7: every sentence is UI.t(...); every data value shown through UI.v(...)
+   so what goes to the API is unchanged. Names, notes and reasons are never
+   translated. */
 const CareView = (() => {
+  const t = (id, vars) => UI.t(id, vars);
+  const v = (kind, val) => UI.v(kind, val);
   /* The booking draft survives a refresh. Seniors reload pages; losing three
      steps of input to a reload is what happened on 21 Aug. */
   const DRAFT_KEY = "kakis_book";
@@ -17,54 +22,54 @@ const CareView = (() => {
       const open = visits.filter(v => !["completed", "cancelled"].includes(v.status));
       const done = visits.filter(v => v.status === "completed").slice(0, 3);
       UI.screen(`
-        ${UI.appbar("Hello, " + (App.user.name || "there"), "Caring for " + household.senior_name)}
-        <button class="btn gold" style="min-height:60px;font-size:1.05rem" onclick="location.hash='#/care/book'">Book a visit for ${UI.esc(household.senior_name)}</button>
-        <div class="eyebrow">Care plan</div>
+        ${UI.appbar(t("cg.hello", { name: App.user.name || t("cg.there") }).replace(/[,，]\s*$/, ""), t("cg.caring", { name: household.senior_name }))}
+        <button class="btn gold" style="min-height:60px;font-size:1.05rem" onclick="location.hash='#/care/book'">${t("cg.bookfor", { name: UI.esc(household.senior_name) })}</button>
+        <div class="eyebrow">${t("cg.careplan")}</div>
         <button class="li" onclick="location.hash='#/care/plan'">
           <div class="face">📋</div>
-          <div class="body"><b>${UI.esc(household.senior_name)}'s care plan</b>
-          <span>${UI.esc(plan?.meds || "Add medications")} · ${UI.esc(plan?.mobility || "mobility")} — every kaki sees this before a visit</span></div>
-          <span class="pill green">Edit</span>
+          <div class="body"><b>${t("cg.plan.of", { name: UI.esc(household.senior_name) })}</b>
+          <span>${UI.esc(plan?.meds || t("cg.plan.addmeds"))} · ${UI.esc(v("mobility", plan?.mobility) || t("cg.plan.mobility"))} — ${t("cg.plan.every")}</span></div>
+          <span class="pill green">${t("common.edit")}</span>
         </button>
-        ${open.length ? `<div class="eyebrow">Current visits</div>` + open.map(vRow).join("") : ""}
-        ${done.length ? `<div class="eyebrow">Recent</div>` + done.map(vRow).join("") : ""}
+        ${open.length ? `<div class="eyebrow">${t("cg.current")}</div>` + open.map(vRow).join("") : ""}
+        ${done.length ? `<div class="eyebrow">${t("cg.recent")}</div>` + done.map(vRow).join("") : ""}
         <button class="li" onclick="location.hash='#/care/profile'">
           <div class="face">${UI.initials(App.user.name)}</div>
-          <div class="body"><b>Your profile</b><span>${UI.esc(App.user.name || "")} · ${UI.esc(UI.contact(App.user))}</span></div>
-          <span class="pill grey">Edit</span>
+          <div class="body"><b>${t("cg.profile")}</b><span>${UI.esc(App.user.name || "")} · ${UI.esc(UI.contact(App.user))}</span></div>
+          <span class="pill grey">${t("common.edit")}</span>
         </button>
-        <div class="helpline">Need help? Call <b>Pasir Ris ICCP · 6XXX XXXX</b></div>`);
-    } catch (e) { UI.toast(e.message, true); }
+        <div class="helpline">${t("common.helpline.need")} <b>${t("common.iccp")}</b></div>`);
+    } catch (e) { UI.toast(UI.terr(e), true); }
   }
 
-  function vRow(v) {
-    const who = v.kaki ? `with ${v.kaki.name}` : "matching in progress";
-    return `<button class="li" onclick="location.hash='#/care/visit/${v.id}'">
-      <div class="face${v.tier === "urgent" ? " gold" : ""}">${v.kaki ? UI.initials(v.kaki.name) : "…"}</div>
-      <div class="body"><b>${UI.esc(v.service)} · ${UI.esc(v.date)} ${UI.esc(v.window || "")}</b>
+  function vRow(v0) {
+    const who = v0.kaki ? t("cg.with", { name: v0.kaki.name }) : t("cg.matching");
+    return `<button class="li" onclick="location.hash='#/care/visit/${v0.id}'">
+      <div class="face${v0.tier === "urgent" ? " gold" : ""}">${v0.kaki ? UI.initials(v0.kaki.name) : "…"}</div>
+      <div class="body"><b>${UI.esc(v("service", v0.service))} · ${UI.esc(v0.date)} ${UI.esc(v("window", v0.window || ""))}</b>
       <span>${UI.esc(who)}</span></div>
-      <div class="end">${UI.statusPill(v.status)}</div></button>`;
+      <div class="end">${UI.statusPill(v0.status)}</div></button>`;
   }
 
   function setup() {
     UI.screen(`
-      ${UI.appbar("Set up your care circle", "Who are you caring for?")}
-      <label class="f-label">Their name</label>
-      <input class="f-input" id="sn" placeholder="e.g. Mr Nathan">
-      <label class="f-label">Their age</label>
-      <input class="f-input" id="sa" inputmode="numeric" placeholder="e.g. 78">
-      <label class="f-label">Address <small>· Pasir Ris pilot area</small></label>
-      <input class="f-input" id="ad" placeholder="Blk & street">
-      <button class="btn" id="saveHh">Continue</button>`);
+      ${UI.appbar(t("setup.title"), t("setup.sub"))}
+      <label class="f-label">${t("setup.name")}</label>
+      <input class="f-input" id="sn" placeholder="${UI.esc(t("setup.name.ph"))}">
+      <label class="f-label">${t("setup.age")}</label>
+      <input class="f-input" id="sa" inputmode="numeric" placeholder="${UI.esc(t("setup.age.ph"))}">
+      <label class="f-label">${t("setup.addr")} <small>${t("setup.addr.small")}</small></label>
+      <input class="f-input" id="ad" placeholder="${UI.esc(t("setup.addr.ph"))}">
+      <button class="btn" id="saveHh">${t("setup.go")}</button>`);
     UI.el("saveHh").onclick = async () => {
       const name = UI.el("sn").value.trim();
-      if (!name) return UI.toast("Their name, please", true);
+      if (!name) return UI.toast(t("setup.needname"), true);
       try {
         await Api.put("/care/household", { senior_name: name,
           senior_age: parseInt(UI.el("sa").value) || null, address: UI.el("ad").value.trim() });
-        UI.toast("Saved — now the care plan");
+        UI.toast(t("setup.saved"));
         location.hash = "#/care/plan";
-      } catch (e) { UI.toast(e.message, true); }
+      } catch (e) { UI.toast(UI.terr(e), true); }
     };
   }
 
@@ -74,21 +79,21 @@ const CareView = (() => {
       const { household, plan } = await Api.get("/care/household");
       if (!household) return setup();
       UI.screen(`
-        ${UI.appbar(household.senior_name + "'s care plan", "Every kaki arrives briefed — keep this current", "#/care/home")}
-        <label class="f-label">Medications & times</label>
-        <textarea class="f-input" id="meds" placeholder="e.g. Metformin — 2:00pm daily, with food">${UI.esc(plan?.meds)}</textarea>
-        <label class="f-label">Mobility</label>
-        ${UI.chipGroup("mobG", ["Independent", "Walks with a stick", "Walking frame", "Wheelchair", "Bedridden"], plan?.mobility || null)}
-        <label class="f-label">Languages they speak</label>
-        ${UI.chipMulti("langG", App.config.languages, plan?.languages || [])}
-        <label class="f-label">Emergency contact <small>· gets a message when a visit starts and ends</small></label>
-        <input class="f-input" id="cName" value="${UI.esc(plan?.contact_name)}" placeholder="Name" aria-label="Contact name">
-        <input class="f-input" id="cRel" value="${UI.esc(plan?.contact_relationship)}" placeholder="Relationship, e.g. son" aria-label="Contact relationship">
-        <input class="f-input" id="cPhone" inputmode="tel" value="${UI.esc(plan?.contact_phone)}" placeholder="Mobile number" aria-label="Contact mobile number">
-        ${plan?.contacts ? `<textarea class="f-input" id="contacts" aria-label="Other contacts">${UI.esc(plan.contacts)}</textarea>` : `<input type="hidden" id="contacts" value="">`}
-        <label class="f-label">Notes for any kaki</label>
-        <textarea class="f-input" id="notes" placeholder="e.g. Gets anxious with new faces — introduce slowly">${UI.esc(plan?.notes)}</textarea>
-        <button class="btn" id="savePlan">Save care plan</button>`);
+        ${UI.appbar(t("cg.plan.of", { name: household.senior_name }), t("plan.sub"), "#/care/home")}
+        <label class="f-label">${t("plan.meds")}</label>
+        <textarea class="f-input" id="meds" placeholder="${UI.esc(t("plan.meds.ph"))}">${UI.esc(plan?.meds)}</textarea>
+        <label class="f-label">${t("plan.mobility")}</label>
+        ${UI.chipGroup("mobG", ["Independent", "Walks with a stick", "Walking frame", "Wheelchair", "Bedridden"], plan?.mobility || null, "mobility")}
+        <label class="f-label">${t("plan.langs")}</label>
+        ${UI.chipMulti("langG", App.config.languages, plan?.languages || [], "language")}
+        <label class="f-label">${t("plan.contact")} <small>${t("plan.contact.small")}</small></label>
+        <input class="f-input" id="cName" value="${UI.esc(plan?.contact_name)}" placeholder="${UI.esc(t("plan.contact.name"))}" aria-label="Contact name">
+        <input class="f-input" id="cRel" value="${UI.esc(plan?.contact_relationship)}" placeholder="${UI.esc(t("plan.contact.rel"))}" aria-label="Contact relationship">
+        <input class="f-input" id="cPhone" inputmode="tel" value="${UI.esc(plan?.contact_phone)}" placeholder="${UI.esc(t("plan.contact.phone"))}" aria-label="Contact mobile number">
+        ${plan?.contacts ? `<textarea class="f-input" id="contacts" aria-label="${UI.esc(t("plan.other"))}">${UI.esc(plan.contacts)}</textarea>` : `<input type="hidden" id="contacts" value="">`}
+        <label class="f-label">${t("plan.notes")}</label>
+        <textarea class="f-input" id="notes" placeholder="${UI.esc(t("plan.notes.ph"))}">${UI.esc(plan?.notes)}</textarea>
+        <button class="btn" id="savePlan">${t("plan.save")}</button>`);
       UI.el("savePlan").onclick = async () => {
         try {
           await Api.put("/care/plan", {
@@ -96,11 +101,11 @@ const CareView = (() => {
             languages: UI.chipValues("langG"), contacts: UI.el("contacts").value,
             contact_name: UI.el("cName").value, contact_relationship: UI.el("cRel").value,
             contact_phone: UI.el("cPhone").value, notes: UI.el("notes").value });
-          UI.toast("Care plan saved ✓");
+          UI.toast(t("plan.saved"));
           location.hash = "#/care/home";
-        } catch (e) { UI.toast(e.message, true); }
+        } catch (e) { UI.toast(UI.terr(e), true); }
       };
-    } catch (e) { UI.toast(e.message, true); }
+    } catch (e) { UI.toast(UI.terr(e), true); }
   }
 
   /* Caregivers could edit the care plan but not their own name or number (NCSS 2.1). */
@@ -109,21 +114,21 @@ const CareView = (() => {
     try {
       const p = await Api.get("/users/me/profile");
       UI.screen(`
-        ${UI.appbar("Your profile", "How the coordinator and your kaki reach you", "#/care/home")}
-        <label class="f-label" for="pname">Your name</label>
+        ${UI.appbar(t("cg.profile"), t("cgp.sub"), "#/care/home")}
+        <label class="f-label" for="pname">${t("cgp.name")}</label>
         <input class="f-input" id="pname" value="${UI.esc(p.name)}" autocomplete="name">
-        <label class="f-label" for="pphone">Mobile number <small>· for visit messages</small></label>
+        <label class="f-label" for="pphone">${t("cgp.phone")} <small>${t("cgp.phone.small")}</small></label>
         <input class="f-input" id="pphone" inputmode="tel" value="${UI.esc(p.phone)}" autocomplete="tel">
-        <p class="f-hint">Signed in as ${UI.esc(UI.contact(p))}. To change that, call the coordinator.</p>
-        <button class="btn" id="saveP">Save profile</button>`);
+        <p class="f-hint">${t("cgp.signedin", { id: UI.esc(UI.contact(p)) })}</p>
+        <button class="btn" id="saveP">${t("cgp.save")}</button>`);
       UI.el("saveP").onclick = async () => {
         try {
           const r = await Api.put("/users/me", { name: UI.el("pname").value.trim(), phone: UI.el("pphone").value.trim() });
           App.user.name = r.name;
-          UI.toast("Profile saved ✓");
-        } catch (e) { UI.toast(e.message, true); }
+          UI.toast(t("cgp.saved"));
+        } catch (e) { UI.toast(UI.terr(e), true); }
       };
-    } catch (e) { UI.toast(e.message, true); }
+    } catch (e) { UI.toast(UI.terr(e), true); }
   }
 
   /* ---- booking flow: service → when → (what happened) → details ----
@@ -132,16 +137,16 @@ const CareView = (() => {
   function book() {
     clearDraft();
     UI.screen(`
-      ${UI.appbar("What do they need?", "Pick a service — timing comes next", "#/care/home")}
-      <span class="stepper">Step 1 of 3</span>
-      ${[["🚶", "Chaperone", "Clinic, market, errands · usually 2–3 hrs"],
-         ["☕", "Companionship", "Conversation, games, walks · 1–3 hrs"],
-         ["🩺", "Wellness check", "Meals, meds, safety drop-in · ~1 hr"],
-         ["🧺", "Household help", "Light chores · 1–2 hrs"]].map(([i, n, d]) =>
-        `<button class="bigcard" onclick="CareView.pickService('${n}')">
-          <span class="bc-ico">${i}</span><div><b>${n}</b><span>${d}</span></div></button>`).join("")}
+      ${UI.appbar(t("book.title"), t("book.sub"), "#/care/home")}
+      <span class="stepper">${t("book.step", { a: 1, b: 3 })}</span>
+      ${[["🚶", "Chaperone", "book.chap.d"],
+         ["☕", "Companionship", "book.comp.d"],
+         ["🩺", "Wellness check", "book.well.d"],
+         ["🧺", "Household help", "book.house.d"]].map(([i, n, d]) =>
+        `<button class="bigcard" data-service="${n}" onclick="CareView.pickService('${n}')">
+          <span class="bc-ico">${i}</span><div><b>${UI.esc(v("service", n))}</b><span>${t(d)}</span></div></button>`).join("")}
       <div class="bigcard locked"><span class="bc-ico">💊</span>
-        <div><b>Medicine administration</b><span>Tier 2 kakis only — ask the coordinator</span></div></div>`);
+        <div><b>${UI.esc(v("service", "Medicine administration"))}</b><span>${t("book.med.d")}</span></div></div>`);
   }
 
   function pickService(s) { bookDraft.service = s; saveDraft(); location.hash = "#/care/book/when"; }
@@ -149,65 +154,69 @@ const CareView = (() => {
   function when() {
     if (!bookDraft.service) return book();
     UI.screen(`
-      ${UI.appbar("When?", bookDraft.service, "#/care/book")}
-      <span class="stepper">Step 2 of 3</span>
+      ${UI.appbar(t("when.title"), v("service", bookDraft.service), "#/care/book")}
+      <span class="stepper">${t("book.step", { a: 2, b: 3 })}</span>
       <button class="tier urgent" onclick="CareView.pickTier('urgent')">
-        <div><b>Urgent — need someone now</b><span>A crisis or something sudden</span></div>
-        <span class="t-eta">within<br>the hour</span></button>
+        <div><b>${t("when.urgent")}</b><span>${t("when.urgent.d")}</span></div>
+        <span class="t-eta">${t("when.urgent.eta")}</span></button>
       <button class="tier" onclick="CareView.pickTier('soon')">
-        <div><b>Soon — something's come up</b><span>Within the next 2 hours</span></div>
-        <span class="t-eta">~2 hrs</span></button>
+        <div><b>${t("when.soon")}</b><span>${t("when.soon.d")}</span></div>
+        <span class="t-eta">${t("when.soon.eta")}</span></button>
       <button class="tier" onclick="CareView.pickTier('planned')">
-        <div><b>Planned — book ahead</b><span>Pick a date and time</span></div>
-        <span class="t-eta">this week<br>or later</span></button>`);
+        <div><b>${t("when.planned")}</b><span>${t("when.planned.d")}</span></div>
+        <span class="t-eta">${t("when.planned.eta")}</span></button>`);
   }
 
-  function pickTier(t) {
-    bookDraft.tier = t; bookDraft.trigger = ""; saveDraft();
-    location.hash = t === "planned" ? "#/care/book/details" : "#/care/book/trigger";
+  function pickTier(tier) {
+    bookDraft.tier = tier; bookDraft.trigger = ""; saveDraft();
+    location.hash = tier === "planned" ? "#/care/book/details" : "#/care/book/trigger";
   }
 
   function triggers() {
     if (!bookDraft.tier) return when();
     UI.screen(`
-      ${UI.appbar("What happened?", "So the right help comes ready", "#/care/book/when")}
-      <span class="stepper">Step 3 of 4 · ${bookDraft.tier}</span>
-      <div class="eyebrow">Most common in Pasir Ris</div>
-      ${[["🧳", "Helper left suddenly", "Bridging care while you find a replacement"],
-         ["🏥", "Spouse hospitalised", "One parent in hospital, the other alone"],
-         ["🆘", "My own emergency", "You're unwell or called away"],
-         ["🛏️", "Discharge, no plan", "Coming home and nobody's ready"],
-         ["📉", "Sudden decline", "A fall, surgery or illness"],
-         ["🕊️", "Loss of a spouse", "Steady presence through hard months"]].map(([i, n, d]) =>
-        `<button class="bigcard" onclick="CareView.pickTrigger('${n}')">
-          <span class="bc-ico">${i}</span><div><b>${n}</b><span>${d}</span></div></button>`).join("")}
+      ${UI.appbar(t("trig.title"), t("trig.sub"), "#/care/book/when")}
+      <span class="stepper">${t("book.step", { a: 3, b: 4 })} · ${v("urgency", bookDraft.tier)}</span>
+      <div class="eyebrow">${t("trig.common")}</div>
+      ${[["🧳", "Helper left suddenly", "trig.helper.d"],
+         ["🏥", "Spouse hospitalised", "trig.spouse.d"],
+         ["🆘", "My own emergency", "trig.own.d"],
+         ["🛏️", "Discharge, no plan", "trig.discharge.d"],
+         ["📉", "Sudden decline", "trig.decline.d"],
+         ["🕊️", "Loss of a spouse", "trig.loss.d"]].map(([i, n, d]) =>
+        `<button class="bigcard" data-trigger="${n}" onclick="CareView.pickTrigger('${n}')">
+          <span class="bc-ico">${i}</span><div><b>${UI.esc(v("trigger", n))}</b><span>${t(d)}</span></div></button>`).join("")}
       <div class="card" style="padding:12px">
-        <label class="f-label" for="otherTxt" style="margin-top:0">Something else? <small>· optional</small></label>
-        <input class="f-input" id="otherTxt" placeholder="A few words, e.g. cataract op" maxlength="80">
-        <button class="btn quiet" style="margin:0" onclick="CareView.pickOther()">Other — tell us</button>
+        <label class="f-label" for="otherTxt" style="margin-top:0">${t("trig.else")} <small>${t("common.optional")}</small></label>
+        <input class="f-input" id="otherTxt" placeholder="${UI.esc(t("trig.else.ph"))}" maxlength="80">
+        <button class="btn quiet" style="margin:0" onclick="CareView.pickOther()">${t("trig.other")}</button>
       </div>
       <button class="li" onclick="location.href='tel:+6560000000'">
         <div class="face gold">📞</div>
-        <div class="body"><b>Not sure — talk to someone</b><span>Call the Pasir Ris ICCP coordinator · 6XXX XXXX</span></div></button>
-      <button class="btn ghost" onclick="CareView.pickTrigger('')">Skip — just need help</button>`);
+        <div class="body"><b>${t("trig.talk")}</b><span>${t("trig.talk.d")}</span></div></button>
+      <button class="btn ghost" onclick="CareView.pickTrigger('')">${t("trig.skip")}</button>`);
   }
 
   function pickOther() {
-    const t = (UI.el("otherTxt").value || "").trim();
-    if (!t) return UI.toast("A few words, so the right help comes", true);
-    pickTrigger("Other: " + t);
+    const txt = (UI.el("otherTxt").value || "").trim();
+    if (!txt) return UI.toast(t("trig.other.empty"), true);
+    pickTrigger("Other: " + txt);
   }
 
-  function pickTrigger(t) { bookDraft.trigger = t; saveDraft(); location.hash = "#/care/book/details"; }
+  function pickTrigger(tr) { bookDraft.trigger = tr; saveDraft(); location.hash = "#/care/book/details"; }
 
   /* Same-day arrival windows, only the ones still ahead of us. At 6pm the
-     2–5pm window must not be offered — it was, on 21 Aug. */
+     2–5pm window must not be offered — it was, on 21 Aug. Values are the
+     English strings the API knows; the chip shows UI.v("window", value). */
   const DAY_WINDOWS = [["Today, 9am–12", 12], ["Today, 2–5pm", 17], ["Today, 6–9pm", 21]];
   function windowsFor(tier, now = new Date()) {
     const first = tier === "urgent" ? "Within the hour" : "Within 2 hours";
     const next = DAY_WINDOWS.find(([, end]) => now.getHours() < end);
     return [first, next ? next[0] : "Tomorrow, 9am–12"];
   }
+
+  /* "Other: cataract op" — the prefix is ours, the rest is the person's. */
+  const triggerLabel = tr => tr && tr.startsWith("Other: ") ? tr : v("trigger", tr);
 
   async function details() {
     if (!bookDraft.tier) return when();
@@ -222,44 +231,44 @@ const CareView = (() => {
     const maxDate = UI.ymdIn(horizon);
     const back = planned ? "#/care/book/when" : "#/care/book/trigger";
     UI.screen(`
-      ${UI.appbar("The details", `${bookDraft.service} · ${UI.TIER_LABEL[bookDraft.tier]}${bookDraft.trigger ? " · " + bookDraft.trigger : ""}`, back)}
-      <span class="stepper">Step ${planned ? "3 of 3" : "4 of 4"}</span>
+      ${UI.appbar(t("det.title"), `${v("service", bookDraft.service)} · ${UI.tierLabel(bookDraft.tier)}${bookDraft.trigger ? " · " + triggerLabel(bookDraft.trigger) : ""}`, back)}
+      <span class="stepper">${planned ? t("book.step", { a: 3, b: 3 }) : t("book.step", { a: 4, b: 4 })}</span>
       ${planned ? `
-        <label class="f-label">Date <small>· required — up to ${horizon} days ahead</small></label>
+        <label class="f-label">${t("det.date")} <small>${t("det.date.small", { n: horizon })}</small></label>
         <input class="f-input" id="date" type="date" min="${today}" max="${maxDate}" value="${today}">
-        <label class="f-label">Time <small>· required — in 30-minute steps</small></label>
+        <label class="f-label">${t("det.time")} <small>${t("det.time.small")}</small></label>
         <div class="row" style="gap:10px;align-items:center">
-          <select class="f-input" id="startT" aria-label="From" style="margin:0">${UI.timeOptions("14:00")}</select>
-          <span>to</span>
-          <select class="f-input" id="endT" aria-label="To" style="margin:0">${UI.timeOptions("16:00")}</select>
+          <select class="f-input" id="startT" aria-label="${UI.esc(t("det.from"))}" style="margin:0">${UI.timeOptions("14:00")}</select>
+          <span>${t("common.to")}</span>
+          <select class="f-input" id="endT" aria-label="${UI.esc(t("det.to"))}" style="margin:0">${UI.timeOptions("16:00")}</select>
         </div>
-        <p class="f-hint" id="hoursHint" style="margin-top:6px">2 hrs — charged by the half hour, minimum 1 hour</p>`
+        <p class="f-hint" id="hoursHint" style="margin-top:6px">${t("det.hours", { h: UI.hrs(2) })}</p>`
       : `
-        <label class="f-label">Arrival window <small>· required</small></label>
-        ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0])}`}
-      <label class="f-label">Languages with them <small>· required — from the care plan; tap to change</small></label>
-      ${UI.chipMulti("langG2", App.config.languages, startLangs)}
+        <label class="f-label">${t("det.window")} <small>${t("common.required")}</small></label>
+        ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0], "window")}`}
+      <label class="f-label">${t("det.langs")} <small>${t("det.langs.small")}</small></label>
+      ${UI.chipMulti("langG2", App.config.languages, startLangs, "language")}
       ${pastKakis.length ? `
-      <label class="f-label">Someone they know <small>· optional — kakis who have visited before</small></label>
+      <label class="f-label">${t("det.known")} <small>${t("det.known.small")}</small></label>
       <div class="chips" id="prefK">
-        <button type="button" class="chip sel" data-v="" onclick="UI.pick('prefK', this)">Anyone</button>
-        ${pastKakis.map(k => `<button type="button" class="chip" data-v="${UI.esc(k.id)}" onclick="UI.pick('prefK', this)">${UI.esc(k.name)} · ${k.times} visit${k.times === 1 ? "" : "s"} together</button>`).join("")}
+        <button type="button" class="chip sel" data-v="" onclick="UI.pick('prefK', this)">${t("det.anyone")}</button>
+        ${pastKakis.map(k => `<button type="button" class="chip" data-v="${UI.esc(k.id)}" onclick="UI.pick('prefK', this)">${UI.esc(k.name)} · ${t("det.together", { n: UI.visitsN(k.times) })}</button>`).join("")}
       </div>` : ""}
-      <label class="f-label">Kaki <small>· optional</small></label>
-      ${UI.chipGroup("genderG", ["No preference", "Female", "Male"], "No preference")}
-      <label class="f-label">Anything the kaki should know? <small>· optional</small></label>
-      <textarea class="f-input" id="notes" placeholder="e.g. Walks with a stick. Helper left suddenly."></textarea>
-      <button class="btn gold" id="submitV">Request this visit</button>`);
+      <label class="f-label">${t("det.kaki")} <small>${t("common.optional")}</small></label>
+      ${UI.chipGroup("genderG", ["No preference", "Female", "Male"], "No preference", "gender")}
+      <label class="f-label">${t("det.notes")} <small>${t("common.optional")}</small></label>
+      <textarea class="f-input" id="notes" placeholder="${UI.esc(t("det.notes.ph"))}"></textarea>
+      <button class="btn gold" id="submitV">${t("det.submit")}</button>`);
     const hint = () => {
       const h = UI.el("hoursHint"); if (!h) return;
       const n = UI.hoursBetween(UI.el("startT").value, UI.el("endT").value);
-      h.textContent = n ? `${n} hr${n === 1 ? "" : "s"} — charged by the half hour, minimum 1 hour` : "The end time must be after the start";
+      h.textContent = n ? t("det.hours", { h: UI.hrs(n) }) : t("det.endafter");
     };
     if (planned) { UI.el("startT").onchange = hint; UI.el("endT").onchange = hint; hint(); }
     const genderPref = () => ({ Female: "female", Male: "male" })[UI.chipValue("genderG")] || "any";
     UI.el("submitV").onclick = async () => {
       try {
-        const v = await Api.post("/visits", planned ? {
+        const vv = await Api.post("/visits", planned ? {
           service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
           date: UI.el("date").value, start_time: UI.el("startT").value, end_time: UI.el("endT").value,
           languages: UI.chipValues("langG2"), notes: UI.el("notes").value, kaki_gender_pref: genderPref(), preferred_kaki_id: UI.chipValue("prefK") || "" } : {
@@ -268,150 +277,148 @@ const CareView = (() => {
           window: UI.chipValue("winG") || "", languages: UI.chipValues("langG2"),
           notes: UI.el("notes").value, kaki_gender_pref: genderPref(), preferred_kaki_id: UI.chipValue("prefK") || "" });
         clearDraft();
-        UI.toast("Request sent — the coordinator is matching a kaki");
-        location.hash = "#/care/visit/" + v.id;
-      } catch (e) { UI.toast(e.message, true); }
+        UI.toast(t("det.sent"));
+        location.hash = "#/care/visit/" + vv.id;
+      } catch (e) { UI.toast(UI.terr(e), true); }
     };
   }
 
   /* What "matching in progress" means in time. The coordinator's targets,
      not a promise — but a blank was worse: caregivers refreshed to find out. */
-  const MATCH_ETA = { urgent: "within the hour", soon: "within 2 hours", planned: "within a day" };
+  const matchEta = tier => ({ urgent: "cv.eta.urgent", soon: "cv.eta.soon", planned: "cv.eta.planned" })[tier] || "cv.eta.soon2";
 
   async function visit(id) {
     UI.spin();
     try {
-      const v = await Api.get("/visits/" + id);
+      const vd = await Api.get("/visits/" + id);
+      const kname = (vd.kaki && vd.kaki.name) || t("common.first");
       const steps = [
-        ["Requested", true, ""],
-        ["Kaki assigned", !!v.kaki, v.kaki ? `${v.kaki.name} — verified by the coordinator` : "The coordinator is matching…"],
-        ["Confirmed", ["accepted", "in_progress", "completed"].includes(v.status),
-          v.on_way_at && v.status === "accepted" ? `${(v.kaki && v.kaki.name) || "Your kaki"} is on the way — since ${UI.hhmm(v.on_way_at)}` : ""],
-        ["Kaki checked at the door", !!v.kaki_verified_at || ["in_progress", "completed"].includes(v.status), v.kaki_verified_at ? "Photo and code matched" : ""],
-        ["Visit", v.status === "completed", v.status === "in_progress" ? "Happening now" : ""],
+        [t("cv.step.requested"), true, ""],
+        [t("cv.step.assigned"), !!vd.kaki, vd.kaki ? t("cv.verified", { name: vd.kaki.name }) : t("cv.matchingdots")],
+        [t("cv.step.confirmed"), ["accepted", "in_progress", "completed"].includes(vd.status),
+          vd.on_way_at && vd.status === "accepted" ? t("cv.onway", { name: kname, t: UI.hhmm(vd.on_way_at) }) : ""],
+        [t("cv.step.door"), !!vd.kaki_verified_at || ["in_progress", "completed"].includes(vd.status), vd.kaki_verified_at ? t("cv.matched") : ""],
+        [t("cv.step.visit"), vd.status === "completed", vd.status === "in_progress" ? t("cv.now") : ""],
       ];
-      const est = v.estimate;
-      const active = ["assigned", "accepted", "in_progress"].includes(v.status);
+      const est = vd.estimate;
+      const active = ["assigned", "accepted", "in_progress"].includes(vd.status);
+      const seniorUp = (vd.senior_name || "").toUpperCase();
       UI.screen(`
-        ${UI.appbar(v.service, `${v.date} · ${v.window || ""}${v.hours ? ` · ${v.hours} hr${v.hours === 1 ? "" : "s"}` : ""} · ${UI.esc(v.senior_name)}`, "#/care/home")}
-        <div class="row" style="flex-wrap:wrap">${UI.statusPill(v.status)}<span class="pill grey">${UI.TIER_LABEL[v.tier] || v.tier}</span>
-        ${v.trigger ? `<span class="pill gold">${UI.esc(v.trigger)}</span>` : ""}
-        <span class="pill green">${UI.esc((v.languages || [v.language]).join(", "))}</span>
-        ${v.kaki_gender_pref && v.kaki_gender_pref !== "any" ? `<span class="pill grey">${v.kaki_gender_pref === "female" ? "Female" : "Male"} kaki requested</span>` : ""}
-        ${v.preferred_kaki ? `<span class="pill grey">You asked for ${UI.esc(v.preferred_kaki.name)}</span>` : ""}</div>
-        ${v.kaki ? `
+        ${UI.appbar(v("service", vd.service), `${vd.date} · ${v("window", vd.window || "")}${vd.hours ? ` · ${UI.hrs(vd.hours)}` : ""} · ${UI.esc(vd.senior_name)}`, "#/care/home")}
+        <div class="row" style="flex-wrap:wrap">${UI.statusPill(vd.status)}<span class="pill grey">${UI.tierLabel(vd.tier)}</span>
+        ${vd.trigger ? `<span class="pill gold">${UI.esc(triggerLabel(vd.trigger))}</span>` : ""}
+        <span class="pill green">${UI.esc((vd.languages || [vd.language]).map(l => v("language", l)).join(", "))}</span>
+        ${vd.kaki_gender_pref && vd.kaki_gender_pref !== "any" ? `<span class="pill grey">${vd.kaki_gender_pref === "female" ? t("cv.female") : t("cv.male")}</span>` : ""}
+        ${vd.preferred_kaki ? `<span class="pill grey">${t("cv.asked", { name: UI.esc(vd.preferred_kaki.name) })}</span>` : ""}</div>
+        ${vd.kaki ? `
           <div class="kakipass">
             <div class="kp-top">
-              <div class="kp-face" style="overflow:hidden">${v.kaki.photo ? `<img src="${UI.esc(v.kaki.photo)}" alt="${UI.esc(v.kaki.name || "Your kaki")}" style="width:100%;height:100%;object-fit:cover">` : UI.initials(v.kaki.name)}</div>
-              <div><h3>${UI.esc(v.kaki.name || "Your kaki")}</h3>
-                <div class="kp-sub">${UI.esc(v.service)} · Pasir Ris</div>
-                <div class="kp-meta"><span>Tier ${v.kaki.tier || 1} · verified</span>
-                ${(v.kaki.languages || []).slice(0, 2).map(l => `<span>Speaks ${UI.esc(l)}</span>`).join("")}</div>
+              <div class="kp-face" style="overflow:hidden">${vd.kaki.photo ? `<img src="${UI.esc(vd.kaki.photo)}" alt="${UI.esc(kname)}" style="width:100%;height:100%;object-fit:cover">` : UI.initials(vd.kaki.name)}</div>
+              <div><h3>${UI.esc(kname)}</h3>
+                <div class="kp-sub">${UI.esc(v("service", vd.service))} · ${t("cv.pr")}</div>
+                <div class="kp-meta"><span>${t("cv.tier", { n: vd.kaki.tier || 1 })}</span>
+                ${(vd.kaki.languages || []).slice(0, 2).map(l => `<span>${t("cv.speaks", { l: UI.esc(v("language", l)) })}</span>`).join("")}</div>
               </div>
             </div>
-            <div class="kp-consist">${v.times_together > 0
-              ? `${UI.esc(v.senior_name)} knows ${UI.esc((v.kaki.name || "them").split(" ")[0])} — <b>${v.times_together} visit${v.times_together === 1 ? "" : "s"} together</b>. No re-introduction needed.`
-              : `A first visit — <b>the coordinator pairs first visits carefully</b>. Show this pass to ${UI.esc(v.senior_name)}.`}</div>
-            <div class="kp-id">KAKI-PR04 · VERIFIED BY THE COORDINATOR · SHOW THIS PASS TO ${UI.esc((v.senior_name || "").toUpperCase())}</div>
+            <div class="kp-consist">${vd.times_together > 0
+              ? t("cv.knows", { senior: UI.esc(vd.senior_name), kaki: UI.esc((vd.kaki.name || "").split(" ")[0] || kname), n: UI.visitsN(vd.times_together) })
+              : t("cv.firstvisit", { senior: UI.esc(vd.senior_name) })}</div>
+            <div class="kp-id">${t("cv.passline", { senior: UI.esc(seniorUp) })}</div>
           </div>` : ""}
         ${active ? `
           <div class="row" style="margin:4px 0 10px">
-            <button class="btn quiet" style="margin:0;min-height:48px" onclick="location.href='tel:+6560000000'">📞 Coordinator</button>
-            ${v.kaki && v.kaki.phone ? `<button class="btn quiet" style="margin:0;min-height:48px" onclick="location.href='tel:${UI.esc(v.kaki.phone)}'">💬 Call ${UI.esc((v.kaki.name || "kaki").split(" ")[0])}</button>` : ""}
+            <button class="btn quiet" style="margin:0;min-height:48px" onclick="location.href='tel:+6560000000'">${t("cv.callcoord")}</button>
+            ${vd.kaki && vd.kaki.phone ? `<button class="btn quiet" style="margin:0;min-height:48px" onclick="location.href='tel:${UI.esc(vd.kaki.phone)}'">${t("cv.callkaki", { name: UI.esc((vd.kaki.name || "Kaki").split(" ")[0]) })}</button>` : ""}
           </div>` : ""}
         <ul class="tl" style="margin-top:8px">
           ${steps.map(([b, done, s], i) => `<li class="${done ? "done" : (i === steps.findIndex(x => !x[1]) ? "now" : "")}">
             <div><b>${b}</b>${s ? `<span>${UI.esc(s)}</span>` : ""}</div></li>`).join("")}
         </ul>
-        ${v.status === "requested" && v.last_cancellation && v.last_cancellation.by === "kaki" ? `
-          <div class="card warn"><p><b>${UI.esc(v.last_cancellation.by_name || "Your kaki")} had to cancel: ${UI.esc(v.last_cancellation.reason)}</b><br>The coordinator is finding someone else.</p></div>` : ""}
-        ${v.status === "requested" ? `
-          <div class="card tint"><h3>Usually matched ${MATCH_ETA[v.tier] || "soon"}</h3>
-          <p>We'll message you the moment a kaki is confirmed — you don't need to keep checking.</p></div>` : ""}
-        ${["assigned", "accepted"].includes(v.status) && !v.kaki_verified_at ? `
-          <div class="card warn"><h3>Check it's them</h3>
-          <p>When ${UI.esc((v.kaki && v.kaki.name) || "your kaki")} arrives, compare the photo above, then ask for the 4-digit code on their screen and enter it here. Your start code appears once it matches.</p>
-          <div class="otp-in">${[0,1,2,3].map(i => `<input id="k${i}" inputmode="numeric" maxlength="1" aria-label="Kaki code digit ${i + 1}">`).join("")}</div>
-          <button class="btn" id="verifyK">Confirm it's them</button></div>` : ""}
-        ${["assigned", "accepted"].includes(v.status) && v.otp_code ? `
-          <div class="card warn"><h3>Start code — read it to your kaki when they arrive</h3>
-          <div class="codebox">${v.otp_code.split("").map(d => `<span>${d}</span>`).join("")}</div>
-          <p>Only you can see this code. Read it to your kaki once you have checked it's them —
-          they type it in to start the visit. That's how we know someone was really let in.</p></div>` : ""}
-        ${est && v.status !== "cancelled" ? `
-          <div class="eyebrow">Estimated cost · pilot</div>
+        ${vd.status === "requested" && vd.last_cancellation && vd.last_cancellation.by === "kaki" ? `
+          <div class="card warn"><p><b>${t("cv.cancelled.by", { name: UI.esc(vd.last_cancellation.by_name || t("common.first")), reason: UI.esc(vd.last_cancellation.reason) })}</b><br>${t("cv.finding")}</p></div>` : ""}
+        ${vd.status === "requested" ? `
+          <div class="card tint"><h3>${t("cv.eta", { eta: t(matchEta(vd.tier)) })}</h3>
+          <p>${t("cv.eta.body")}</p></div>` : ""}
+        ${["assigned", "accepted"].includes(vd.status) && !vd.kaki_verified_at ? `
+          <div class="card warn"><h3>${t("cv.check")}</h3>
+          <p>${t("cv.check.body", { name: UI.esc(kname) })}</p>
+          <div class="otp-in">${[0,1,2,3].map(i => `<input id="k${i}" inputmode="numeric" maxlength="1" aria-label="${UI.esc(t("cv.digit", { n: i + 1 }))}">`).join("")}</div>
+          <button class="btn" id="verifyK">${t("cv.confirm")}</button></div>` : ""}
+        ${["assigned", "accepted"].includes(vd.status) && vd.otp_code ? `
+          <div class="card warn"><h3>${t("cv.startcode")}</h3>
+          <div class="codebox">${vd.otp_code.split("").map(d => `<span>${d}</span>`).join("")}</div>
+          <p>${t("cv.startcode.body")}</p></div>` : ""}
+        ${est && vd.status !== "cancelled" ? `
+          <div class="eyebrow">${t("cv.cost")}</div>
           <div class="stack">
-            <div class="s-row"><span>Visit rate · ${est.hours} hr${est.hours > 1 ? "s" : ""} × $${est.rate}<span class="who">Standard ${UI.esc(v.service.toLowerCase())} rate</span></span><span class="amt">$${est.base.toFixed(2)}</span></div>
-            <div class="s-row minus"><span>Community care subsidy<span class="who">Est. — confirmed by the coordinator</span></span><span class="amt">− $${est.subsidy.toFixed(2)}</span></div>
-            <div class="s-row minus"><span>Foundation top-up<span class="who">Est. · means-tested</span></span><span class="amt">− $${est.foundation.toFixed(2)}</span></div>
-            <div class="s-row total"><span>Family pays (est.)</span><span class="amt">$${est.family_pays.toFixed(2)}</span></div>
+            <div class="s-row"><span>${t("cv.rate", { h: UI.hrs(est.hours), r: est.rate })}<span class="who">${t("cv.rate.who", { s: UI.esc(UI.lang === "zh" ? v("service", vd.service) : vd.service.toLowerCase()) })}</span></span><span class="amt">$${est.base.toFixed(2)}</span></div>
+            <div class="s-row minus"><span>${t("cv.subsidy")}<span class="who">${t("cv.subsidy.who")}</span></span><span class="amt">− $${est.subsidy.toFixed(2)}</span></div>
+            <div class="s-row minus"><span>${t("cv.topup")}<span class="who">${t("cv.topup.who")}</span></span><span class="amt">− $${est.foundation.toFixed(2)}</span></div>
+            <div class="s-row total"><span>${t("cv.pays")}</span><span class="amt">$${est.family_pays.toFixed(2)}</span></div>
           </div>
-          <p style="font-size:.74rem;color:var(--slate);margin:-6px 0 10px">Billed through your ICCP account during the pilot — nothing to pay in the app.</p>
+          <p style="font-size:.74rem;color:var(--slate);margin:-6px 0 10px">${t("cv.billed")}</p>
           ${(App.config.paynow && App.config.paynow.configured) ? `
             <div class="card tint" style="padding:12px">
-              <h3>PayNow</h3>
-              <p>If the coordinator asks you to transfer directly, pay to
+              <h3>${t("cv.paynow")}</h3>
+              <p>${t("cv.paynow.body")}
               <b>${UI.esc(App.config.paynow.value)}</b>
-              (${UI.esc(App.config.paynow.type === "uen" ? "UEN" : "mobile")})${
+              (${UI.esc(App.config.paynow.type === "uen" ? t("cv.paynow.uen") : t("cv.paynow.mobile"))})${
                 App.config.paynow.name ? " · " + UI.esc(App.config.paynow.name) : ""}.</p>
-              <p style="font-size:.72rem;opacity:.85">Always confirm with the coordinator first —
-              during the pilot most visits are billed through ICCP, not paid in the app.</p>
+              <p style="font-size:.72rem;opacity:.85">${t("cv.paynow.note")}</p>
             </div>` : ""}
           ${UI.moneyNote()}` : ""}
-        ${v.status === "completed" && v.report ? `
-          <div class="card"><h3>Visit report</h3>
-            <p>${UI.esc(v.report.text || "")}</p><div class="divider"></div>
-            <div class="row" style="flex-wrap:wrap">${(v.report.chips || []).map(c => `<span class="pill green">${UI.esc(c)}</span>`).join("")}
-            ${v.report.meds_confirmed ? '<span class="pill green">Meds confirmed ✓</span>' : ""}</div></div>
-          <div class="card tint"><h3>Private care note</h3>
-            <p>Goes to the care team — never a public rating.</p>
-            ${UI.chipMulti("noteChips", ["All fine", "Tired after visit", "Refused meds", "Fall concern", "New confusion"], [])}
-            <textarea class="f-input" id="noteTxt" style="margin-top:10px" placeholder="Anything else…"></textarea>
-            <button class="btn quiet" id="sendNote">Send care note</button></div>` : ""}
-        ${["requested", "assigned", "accepted", "in_progress"].includes(v.status) ? `<button class="btn danger" id="cancelV">${v.status === "in_progress" ? "End this visit early" : "Cancel this visit"}</button>` : ""}
+        ${vd.status === "completed" && vd.report ? `
+          <div class="card"><h3>${t("cv.report")}</h3>
+            <p>${UI.esc(vd.report.text || "")}</p><div class="divider"></div>
+            <div class="row" style="flex-wrap:wrap">${(vd.report.chips || []).map(c => `<span class="pill green">${UI.esc(v("report", c))}</span>`).join("")}
+            ${vd.report.meds_confirmed ? `<span class="pill green">${t("cv.meds")}</span>` : ""}</div></div>
+          <div class="card tint"><h3>${t("cv.note")}</h3>
+            <p>${t("cv.note.body")}</p>
+            ${UI.chipMulti("noteChips", ["All fine", "Tired after visit", "Refused meds", "Fall concern", "New confusion"], [], "note")}
+            <textarea class="f-input" id="noteTxt" style="margin-top:10px" placeholder="${UI.esc(t("cv.note.ph"))}"></textarea>
+            <button class="btn quiet" id="sendNote">${t("cv.note.send")}</button></div>` : ""}
+        ${["requested", "assigned", "accepted", "in_progress"].includes(vd.status) ? `<button class="btn danger" id="cancelV">${vd.status === "in_progress" ? t("cv.end") : t("cv.cancel")}</button>` : ""}
       `);
       [0,1,2,3].forEach(i => { const o = UI.el("k" + i); if (o) o.oninput = () => { if (o.value && i < 3) UI.el("k" + (i + 1)).focus(); }; });
       const vk = UI.el("verifyK");
       if (vk) vk.onclick = async () => {
         const code = [0,1,2,3].map(i => UI.el("k" + i).value).join("");
-        try { await Api.post(`/visits/${id}/verify-kaki`, { code }); UI.toast("It's them ✓ — here's your start code"); visit(id); }
-        catch (e) { UI.toast(e.message, true); }
+        try { await Api.post(`/visits/${id}/verify-kaki`, { code }); UI.toast(t("cv.itsthem")); visit(id); }
+        catch (e) { UI.toast(UI.terr(e), true); }
       };
       const sn = UI.el("sendNote");
       if (sn) sn.onclick = async () => {
         try {
           await Api.post(`/visits/${id}/care-note`, { chips: UI.chipValues("noteChips"), text: UI.el("noteTxt").value });
-          UI.toast("Care note sent to the care team ✓"); sn.disabled = true;
-        } catch (e) { UI.toast(e.message, true); }
+          UI.toast(t("cv.note.sent")); sn.disabled = true;
+        } catch (e) { UI.toast(UI.terr(e), true); }
       };
       const cv = UI.el("cancelV");
       if (cv) cv.onclick = async () => {
-        const reason = prompt(v.status === "in_progress"
-          ? "End the visit now? Tell the kaki why (a few words):"
-          : "Cancel this visit? A few words on why helps the coordinator:");
+        const reason = prompt(vd.status === "in_progress" ? t("cv.end.ask") : t("cv.cancel.ask"));
         if (reason === null) return;
-        try { await Api.post(`/visits/${id}/cancel`, { reason: reason.trim() }); UI.toast("Visit cancelled"); location.hash = "#/care/home"; }
-        catch (e) { UI.toast(e.message, true); }
+        try { await Api.post(`/visits/${id}/cancel`, { reason: reason.trim() }); UI.toast(t("cv.cancelled")); location.hash = "#/care/home"; }
+        catch (e) { UI.toast(UI.terr(e), true); }
       };
-    } catch (e) { UI.toast(e.message, true); }
+    } catch (e) { UI.toast(UI.terr(e), true); }
   }
 
   async function visits(seg = "active") {
     UI.spin();
     try {
       const all = await Api.get("/visits");
-      const act = all.filter(v => !["completed", "cancelled"].includes(v.status));
-      const hist = all.filter(v => ["completed", "cancelled"].includes(v.status));
+      const act = all.filter(x => !["completed", "cancelled"].includes(x.status));
+      const hist = all.filter(x => ["completed", "cancelled"].includes(x.status));
       const list = seg === "active" ? act : hist;
       UI.screen(`
-        ${UI.appbar("Visits", "Everything booked for your family")}
+        ${UI.appbar(t("cvs.title"), t("cvs.sub"))}
         <div class="seg">
-          <button class="${seg === "active" ? "on" : ""}" onclick="CareView.visits('active')">Active (${act.length})</button>
-          <button class="${seg === "history" ? "on" : ""}" onclick="CareView.visits('history')">History (${hist.length})</button>
+          <button class="${seg === "active" ? "on" : ""}" onclick="CareView.visits('active')">${t("cvs.active", { n: act.length })}</button>
+          <button class="${seg === "history" ? "on" : ""}" onclick="CareView.visits('history')">${t("cvs.history", { n: hist.length })}</button>
         </div>
         ${list.length ? list.map(vRow).join("")
-          : `<div class="card tint"><p>${seg === "active" ? "Nothing active — book a visit from Home." : "No past visits yet."}</p></div>`}`);
-    } catch (e) { UI.toast(e.message, true); }
+          : `<div class="card tint"><p>${seg === "active" ? t("cvs.none") : t("cvs.nopast")}</p></div>`}`);
+    } catch (e) { UI.toast(UI.terr(e), true); }
   }
 
   return { home, setup, planEdit, profile, book, pickService, when, pickTier, triggers, pickTrigger, pickOther, details, visit, visits, windowsFor };

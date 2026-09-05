@@ -59,4 +59,55 @@ test.describe("language toggle", () => {
   });
 });
 
+test.describe("caregiver screens in 中文", () => {
+  test("a caregiver books a planned visit in Chinese; the API still receives English values", async ({ page, request }) => {
+    const { cg1 } = await seed(request);
+    await useToken(page, cg1.token, "#/care/home");
+    await page.evaluate(() => localStorage.setItem("kakis_lang", "zh"));
+    await page.reload();
+    await expect(page.locator("#screen h1")).toContainText("您好");
+    await expect(page.locator("#tabs")).toContainText("预约");
+    await page.locator("#tabs button", { hasText: "预约" }).click();
+    await expect(page.locator("#screen h1")).toContainText("需要什么帮助");
+    await expect(page.locator("#screen")).toContainText("陪伴");
+    await page.locator(".bigcard[data-service='Companionship']").click();
+    await expect(page.locator("#screen h1")).toContainText("什么时候");
+    await page.getByRole("button", { name: /预约，提前安排/ }).click();
+    await expect(page.locator("#screen h1")).toContainText("详情");
+    await expect(page.locator("#screen")).toContainText("按半小时计费");
+    await expect(page.locator("#langG2 .chip[data-v='Mandarin']")).toHaveText("华语");
+    await page.locator("#date").fill(dateIn(3));
+    await page.getByRole("button", { name: "提交探访申请" }).click();
+    await expect(page.locator("#screen")).toContainText("通常一天内配对成功");
+    await expect(page.locator("#screen")).toContainText("正在找 Kaki");
+    const visits = await api(request, "GET", "/visits", { token: cg1.token });
+    expect(visits.body[0].service).toBe("Companionship");
+    expect(visits.body[0].languages).toContain("Mandarin");
+  });
+
+  test("the door check and start code read in Chinese; a wrong kaki code toasts in Chinese", async ({ page, request }) => {
+    const { admin, cg1, k1 } = await seed(request);
+    const v = await api(request, "POST", "/visits", { token: cg1.token, data: { service: "Companionship", tier: "planned", date: dateIn(2), start_time: "10:00", end_time: "12:00", languages: ["Mandarin"] } });
+    await api(request, "POST", `/admin/visits/${v.body.id}/assign`, { token: admin.token, data: { kaki_id: k1.user.id } });
+    await api(request, "POST", `/visits/${v.body.id}/accept`, { token: k1.token });
+    await useToken(page, cg1.token, `#/care/visit/${v.body.id}`);
+    await page.evaluate(() => localStorage.setItem("kakis_lang", "zh"));
+    await page.reload();
+    await expect(page.locator("#screen")).toContainText("确认是本人");
+    await expect(page.locator("#screen")).toContainText("已确认");
+    await expect(page.locator("#screen")).toContainText("门口已核对 Kaki");
+    for (let i = 0; i < 4; i++) await page.locator(`#k${i}`).fill("0");
+    await page.locator("#verifyK").click();
+    await expect(page.locator("#toast")).toContainText(/验证码不对|开始码/);
+    const kv = await api(request, "GET", `/visits/${v.body.id}`, { token: k1.token });
+    const code = kv.body.kaki_code;
+    for (let i = 0; i < 4; i++) await page.locator(`#k${i}`).fill(code[i]);
+    await page.locator("#verifyK").click();
+    await expect(page.locator("#screen")).toContainText("开始码，Kaki 到达后读给他/她听");
+    await expect(page.locator("#screen")).toContainText("照片和验证码已核对");
+    // nothing English leaked onto the page apart from names and data
+    await expect(page.locator("#screen")).not.toContainText(/Check it's them|Start code|Confirmed|Kaki assigned|Estimated cost/);
+  });
+});
+
 module.exports = { setZh };
