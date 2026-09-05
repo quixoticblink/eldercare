@@ -46,7 +46,12 @@ const App = (() => {
 
   function route() {
     if (!user) return;
-    if (user.status !== "approved") return AuthView.pending(user);
+    // A pending kaki may still add certificates — that is what the coordinator
+    // looks at before approving (v1.6). Everything else waits.
+    if (user.status !== "approved") {
+      if (user.role === "kaki" && location.hash === "#/kaki/profile") return KakiView.profile();
+      return AuthView.pending(user);
+    }
     const h = location.hash;
     // dynamic routes
     let m;
@@ -65,7 +70,10 @@ const App = (() => {
       config = { ...me.config };
       App.user = user; App.config = config;
       UI.el("brandRight").textContent = (user.name || user.email || "").toUpperCase().slice(0, 22) || "PASIR RIS PILOT";
-      if (user.status !== "approved") return AuthView.pending(user);
+      if (user.status !== "approved") {
+        if (user.role === "kaki" && location.hash === "#/kaki/profile") return KakiView.profile();
+        return AuthView.pending(user);
+      }
       if (!location.hash || location.hash === "#/" || !location.hash.startsWith("#/")) location.hash = homeFor(user.role);
       route();
     } catch (e) {

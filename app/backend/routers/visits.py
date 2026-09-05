@@ -3,7 +3,7 @@ import datetime, random, re, zoneinfo
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from .. import assumptions, config, db, security, settings
-from ..services import availability, matching, notify
+from ..services import availability, matching, notify, ratelimit
 
 router = APIRouter(prefix="/visits", tags=["visits"])
 
@@ -340,9 +340,16 @@ def verify_kaki(vid: str, body: KakiCodeIn, user=Depends(security.current_user))
         raise HTTPException(403, "Not your visit")
     if v["status"] not in ("assigned", "accepted") or not v.get("kaki_id"):
         raise HTTPException(400, "No kaki to check yet")
-    if body.code.strip() != (v.get("kaki_code") or ""):
+    code = body.code.strip()
+    if not re.fullmatch(r"\d{4}", code) or not v.get("kaki_code"):
+        raise HTTPException(400, "Enter the 4 digits on your kaki's screen")
+    if ratelimit.exceeded("visit_code", vid):
+        raise HTTPException(429, "Too many tries — call the coordinator on 6XXX XXXX to confirm who is at the door")
+    if code != v["kaki_code"]:
+        ratelimit.record("visit_code", vid)
         db.audit(user["email"] or user["phone"], "kaki_code_wrong", vid)
         raise HTTPException(400, "That code doesn't match — ask your kaki to show it again, or call the coordinator")
+    ratelimit.clear("visit_code", vid)
     if not v.get("kaki_verified_at"):
         db.run("UPDATE visits SET kaki_verified_at = current_timestamp WHERE id = ?", [vid])
         db.audit(user["email"] or user["phone"], "kaki_verified", vid)
@@ -374,8 +381,13 @@ def start(vid: str, body: StartIn, user=Depends(security.current_user)):
     v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
     if not v:
         raise HTTPException(404, "Visit not found")
+    if ratelimit.exceeded("visit_code", vid):
+        raise HTTPException(429, "Too many tries — call the coordinator on 6XXX XXXX")
     if body.otp.strip() != v["otp_code"]:
+        ratelimit.record("visit_code", vid)
+        db.audit(user["email"] or user["phone"], "start_code_wrong", vid)
         raise HTTPException(400, "Wrong start code — ask the family to read it from their visit page")
+    ratelimit.clear("visit_code", vid)
     v = _transition(vid, user, ["kaki"], ["accepted", "assigned"], "in_progress", "started_at")
     kaki, _cg, senior = _parties(v)
     notify.visit_started_contact(v, kaki, senior, db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]]))

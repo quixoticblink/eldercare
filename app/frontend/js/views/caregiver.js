@@ -302,7 +302,7 @@ const CareView = (() => {
         ${v.kaki ? `
           <div class="kakipass">
             <div class="kp-top">
-              <div class="kp-face" style="overflow:hidden">${v.kaki.photo ? `<img src="${v.kaki.photo}" alt="${UI.esc(v.kaki.name || "Your kaki")}" style="width:100%;height:100%;object-fit:cover">` : UI.initials(v.kaki.name)}</div>
+              <div class="kp-face" style="overflow:hidden">${v.kaki.photo ? `<img src="${UI.esc(v.kaki.photo)}" alt="${UI.esc(v.kaki.name || "Your kaki")}" style="width:100%;height:100%;object-fit:cover">` : UI.initials(v.kaki.name)}</div>
               <div><h3>${UI.esc(v.kaki.name || "Your kaki")}</h3>
                 <div class="kp-sub">${UI.esc(v.service)} · Pasir Ris</div>
                 <div class="kp-meta"><span>Tier ${v.kaki.tier || 1} · verified</span>

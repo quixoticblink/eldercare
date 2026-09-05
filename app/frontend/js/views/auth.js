@@ -96,6 +96,8 @@ const AuthView = (() => {
         usually within a day. You can close this page. Once approved you'll be able to
         ${user.role === "kaki" ? "see visits" : "book visits"}.</p>
       </div>
+      ${user.role === "kaki" ? `<button class="btn" onclick="location.hash='#/kaki/profile'">Add your certificates now</button>
+      <p class="f-hint">CPR + AED, mobility training — the coordinator checks these before approving you.</p>` : ""}
       <button class="btn quiet" onclick="App.boot()">Check again</button>
       <button class="btn ghost" onclick="App.logout()">Sign out</button>
       <div class="helpline">Questions? Call <b>Pasir Ris ICCP · 6XXX XXXX</b></div>`);

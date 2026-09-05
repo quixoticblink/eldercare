@@ -119,6 +119,12 @@ def _init(c):
     c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS photo TEXT DEFAULT ''")
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS kaki_code TEXT DEFAULT ''")
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS kaki_verified_at TIMESTAMP")
+    # Visits assigned before v1.6 have no kaki code yet; give them one so the
+    # door check works on the next visit instead of failing on an empty string.
+    for row in c.execute("""SELECT id FROM visits WHERE status IN ('assigned','accepted')
+                            AND (kaki_code IS NULL OR kaki_code = '')""").fetchall():
+        import random as _random
+        c.execute("UPDATE visits SET kaki_code = ? WHERE id = ?", [f"{_random.randint(0, 9999):04d}", row[0]])
     # M-USERS / M-VISITS: "may not want a man to visit". Sorts manual matching,
     # gates auto-match; never filters the coordinator's list.
     c.execute("ALTER TABLE kaki_profiles ADD COLUMN IF NOT EXISTS gender TEXT DEFAULT ''")

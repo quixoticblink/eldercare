@@ -959,8 +959,10 @@ assert c.post(f"/api/visits/{_z}/cancel", json={"reason": "Family asked me to le
 assert db.one("SELECT status, cancelled_by FROM visits WHERE id = ?", [_z]) == {"status": "cancelled", "cancelled_by": "kaki"}
 _q = c.get("/api/admin/quality", headers=ah).json()
 assert any(x["id"] == _z for x in _q["cancellations"]), _q.keys()
-# nobody can cancel a completed visit
-assert c.post(f"/api/visits/{_hid}/cancel", json={"reason": "x"}, headers=ch).status_code == 400   # already cancelled above
+# nobody can cancel a completed or an already-cancelled visit
+assert c.post(f"/api/visits/{_hid}/cancel", json={"reason": "x"}, headers=ch).status_code == 400   # cancelled above
+assert c.post(f"/api/visits/{v16e['id']}/cancel", json={"reason": "x"}, headers=ch).status_code == 400   # completed in B1·11
+assert c.post(f"/api/visits/{v16e['id']}/cancel", json={"reason": "x"}, headers=ah).status_code == 400
 # admin can cancel with a reason
 _w = _booked_and_accepted()
 assert c.post(f"/api/visits/{_w}/cancel", json={"reason": "Coordinator: kaki reassigned"}, headers=ah).status_code == 200
@@ -1001,6 +1003,51 @@ assert all("certificates" in u for u in c.get("/api/admin/pending-users", header
 assert c.delete(f"/api/users/me/certificates/{_cid}", headers=kh_p).status_code == 404
 assert c.delete(f"/api/users/me/certificates/{_cid}", headers=kh).status_code == 200
 assert c.get("/api/users/me/certificates", headers=kh).json() == []
+
+# ---- Bucket 2 review fixes --------------------------------------------------
+# a blank or non-numeric kaki code never verifies; five wrong guesses lock the door check
+_rv = _booked_and_accepted()
+assert c.post(f"/api/visits/{_rv}/verify-kaki", json={"code": "   "}, headers=ch).status_code == 400
+_kc = c.get(f"/api/visits/{_rv}", headers=kh).json()["kaki_code"]
+_wrong = "0000" if _kc != "0000" else "1111"
+for _i in range(5):
+    assert c.post(f"/api/visits/{_rv}/verify-kaki", json={"code": _wrong}, headers=ch).status_code == 400
+assert c.post(f"/api/visits/{_rv}/verify-kaki", json={"code": _kc}, headers=ch).status_code == 429
+_rl.clear("visit_code", _rv)
+assert c.post(f"/api/visits/{_rv}/verify-kaki", json={"code": _kc}, headers=ch).status_code == 200
+_otp_rv = c.get(f"/api/visits/{_rv}", headers=ch).json()["otp_code"]
+for _i in range(5):
+    assert c.post(f"/api/visits/{_rv}/start", json={"otp": "0000" if _otp_rv != "0000" else "1111"}, headers=kh).status_code == 400
+assert c.post(f"/api/visits/{_rv}/start", json={"otp": _otp_rv}, headers=kh).status_code == 429
+_rl.clear("visit_code", _rv)
+assert c.post(f"/api/visits/{_rv}/start", json={"otp": _otp_rv}, headers=kh).status_code == 200
+assert c.post(f"/api/visits/{_rv}/complete", json={"chips": [], "text": "ok"}, headers=kh).status_code == 200
+# an email body never carries raw HTML from a cancellation reason
+_rx = _booked_and_accepted(); _sent.clear()
+assert c.post(f"/api/visits/{_rx}/cancel", json={"reason": "<a href='x'>click</a>"}, headers=kh).status_code == 200
+_body = " ".join(m[3] for m in _sent if m[0] == "email" and m[1] == "priya@example.com")
+assert "&lt;a" in _body and "<a href" not in _body, _body
+# a suspended kaki cannot upload; a kaki has at most 10 certificates
+_ph_sus = c.post(f"/api/admin/users/{kk_p['id']}/suspend", headers=ah); assert _ph_sus.status_code == 200
+assert c.put("/api/users/me/photo", json={"data_url": _png}, headers=kh_p).status_code == 403
+assert c.post("/api/users/me/certificates", json={"name": "x", "file_name": "x.pdf", "data_url": _pdf}, headers=kh_p).status_code == 403
+for _i in range(10):
+    assert c.post("/api/users/me/certificates", json={"name": f"c{_i}", "file_name": "c.pdf", "data_url": _pdf}, headers=kh).status_code == 200
+assert c.post("/api/users/me/certificates", json={"name": "one too many", "file_name": "c.pdf", "data_url": _pdf}, headers=kh).status_code == 400
+# an "extra slot" exception must contain the visit, not merely touch it
+assert c.put("/api/users/me/availability", json={"weekly": {"Mon": {"from": "09:00", "to": "12:00"}}}, headers=kh).status_code == 200
+assert c.post("/api/users/me/availability/exceptions", json={"date": "2026-08-18", "half_day": "morning", "available": True}, headers=kh).status_code == 200
+assert availmod.check(kk["id"], "2026-08-18", "09:00–11:00")["state"] == "available"
+assert availmod.check(kk["id"], "2026-08-18", "12:30–14:30")["state"] == "unavailable"
+db.run("UPDATE kaki_profiles SET weekly_slots = ? WHERE user_id = ?", ['{"Tue": {"from": "09:00", "to": "12:00"}, "Sat": {"from": "08:00", "to": "18:00"}}', kk["id"]])
+# cross-ownership: a caregiver cannot cancel or verify someone else's visit
+ch2, cg2 = login("hong@example.com", role="caregiver", name="Hong Hang")
+assert c.post(f"/api/admin/users/{cg2['id']}/approve", json={"role": "caregiver"}, headers=ah).status_code == 200
+ch2, cg2 = login("hong@example.com")
+_ry = _booked_and_accepted()
+assert c.post(f"/api/visits/{_ry}/cancel", json={"reason": "not mine"}, headers=ch2).status_code == 403
+assert c.post(f"/api/visits/{_ry}/verify-kaki", json={"code": "1234"}, headers=ch2).status_code == 403
+assert c.post(f"/api/visits/{_ry}/cancel", json={"reason": "done"}, headers=ch).status_code == 200
 
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string

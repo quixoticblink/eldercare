@@ -173,8 +173,8 @@ const KakiView = (() => {
       const [p, certs] = await Promise.all([Api.get("/users/me/profile"), Api.get("/users/me/certificates")]);
       const k = p.kaki || { services: [], languages: [] };
       UI.screen(`
-        ${UI.appbar("My profile", "The coordinator matches you by this")}
-        <div class="li"><div class="face" style="width:52px;height:52px;overflow:hidden">${p.photo ? `<img src="${p.photo}" alt="Your photo" style="width:100%;height:100%;object-fit:cover">` : UI.initials(p.name)}</div>
+        ${UI.appbar("My profile", p.status === "approved" ? "The coordinator matches you by this" : "Waiting for approval — add your certificates", p.status === "approved" ? undefined : "#/")}
+        <div class="li"><div class="face" style="width:52px;height:52px;overflow:hidden">${p.photo ? `<img src="${UI.esc(p.photo)}" alt="Your photo" style="width:100%;height:100%;object-fit:cover">` : UI.initials(p.name)}</div>
           <div class="body"><b>${UI.esc(p.name || UI.contact(p))}</b><span>Tier ${k.tier || 1} · Good standing · ${UI.esc(UI.contact(p))}</span></div>
           <div class="end"><label class="chip" for="photoIn" style="cursor:pointer">${p.photo ? "Change photo" : "Add a photo"}</label>
             <input type="file" id="photoIn" accept="image/*" capture="user" style="display:none"></div></div>

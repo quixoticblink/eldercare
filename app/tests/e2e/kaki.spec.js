@@ -1,6 +1,6 @@
 // Kaki-side screens. Feature tasks append tests here.
 const { test, expect } = require("@playwright/test");
-const { seed, useToken, api, dateIn, TINY_PNG } = require("./helpers");
+const { seed, useToken, api, dateIn, TINY_PNG, signIn, uniq } = require("./helpers");
 
 test.describe("kaki home copy (Bucket 1 · 6)", () => {
   test("the kaki is told the app need not stay open", async ({ page, request }) => {
@@ -108,9 +108,13 @@ test.describe("cancel after accepting (Bucket 2 · 6)", () => {
 });
 
 test.describe("certificates (Bucket 2 · 7)", () => {
-  test("a kaki uploads a certificate and the coordinator sees it at approval", async ({ page, request }) => {
+  test("a pending kaki uploads a certificate and the coordinator sees it on the approval card", async ({ page, request }) => {
     const s = await seed(request);
-    await useToken(page, s.k3.token, "#/kaki/profile");
+    const kakiId = uniq("newkaki");
+    await signIn(page, kakiId, { role: "kaki", name: "Lim Ah Seng" });
+    await expect(page.getByRole("heading", { name: "Nothing to do right now" })).toBeVisible();
+    await page.getByRole("button", { name: "Add your certificates now" }).click();
+    await expect(page.getByText("Waiting for approval — add your certificates")).toBeVisible();
     await page.locator("#certName").fill("CPR + AED");
     await page.locator("#certIssuer").fill("St. Luke's Hospital");
     await page.locator("#certFile").setInputFiles({ name: "cpr.png", mimeType: "image/png",
@@ -118,11 +122,13 @@ test.describe("certificates (Bucket 2 · 7)", () => {
     await page.getByRole("button", { name: "Add certificate" }).click();
     await expect(page.getByText("Certificate added")).toBeVisible();
     await expect(page.locator(".cert-row", { hasText: "CPR + AED" })).toContainText("St. Luke's Hospital");
+
+    const me = (await api(request, "GET", "/auth/me", { token: await page.evaluate(() => localStorage.getItem("kakis_token")) })).body.user;
     await useToken(page, s.admin.token, "#/admin/approvals");
-    const row = page.locator(".li", { has: page.locator(`[data-uid="${s.k3.user.id}"]`) });
-    await expect(row).toContainText("1 certificate");
-    await row.getByRole("button", { name: "Certificates" }).click();
-    await expect(page.locator(".cert-row", { hasText: "CPR + AED" })).toBeVisible();
+    const card = page.locator(".card.warn", { has: page.locator(`[data-uid="${me.id}"]`) });
+    await expect(card).toContainText("1 certificate");
+    await card.getByRole("button", { name: "Certificates" }).click();
+    await expect(card.locator(".cert-row", { hasText: "CPR + AED" })).toBeVisible();
   });
 });
 

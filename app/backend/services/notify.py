@@ -9,8 +9,13 @@ that triggered it — an assignment that happened is still an assignment, and th
 coordinator can always phone. Every attempt is written to audit_log so a missed
 message can be traced afterwards.
 """
+import html as _html
 from .. import assumptions, db
 from . import emailer, sms
+
+def _e(x) -> str:
+    """Anything user-typed that ends up in an email body."""
+    return _html.escape(str(x or ""), quote=True)
 
 def channel_for(user: dict) -> str | None:
     """'sms' | 'email' | None — prefer a verified channel over an unverified one."""
@@ -119,8 +124,8 @@ def visit_declined(visit: dict, kaki: dict, caregiver: dict, senior_name: str = 
 def visit_cancelled(visit: dict, by_role: str, kaki: dict, caregiver: dict,
                     senior_name: str = "", reason: str = "") -> dict:
     """Tell the side that did not cancel."""
-    who = senior_name or "the senior"
-    why = f" Reason: {reason}" if reason else ""
+    who = _e(senior_name or "the senior")
+    why = f" Reason: {_e(reason)}" if reason else ""
     if by_role == "caregiver":
         return notify(
             kaki,
@@ -136,7 +141,7 @@ def visit_cancelled(visit: dict, by_role: str, kaki: dict, caregiver: dict,
         notify(kaki, subject=f"Cancelled by the coordinator: {visit.get('service', 'visit')} for {who}",
                sms_text=f"Kakis: the coordinator cancelled the {(visit.get('service') or 'visit').lower()} for {who}, {_when(visit)}.{why} No need to travel.")
         return cg_res
-    name = (kaki or {}).get("name") or "Your kaki"
+    name = _e((kaki or {}).get("name") or "Your kaki")
     return notify(
         caregiver,
         subject=f"{name} had to cancel: {visit.get('service', 'your visit')}",

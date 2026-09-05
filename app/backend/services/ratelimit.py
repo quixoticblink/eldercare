@@ -42,6 +42,9 @@ LIMITS = {
     "request_code_identifier": (_int("RATE_LIMIT_CODE_PER_IDENTIFIER", 5), WINDOW_MIN),
     "request_code_ip":         (_int("RATE_LIMIT_CODE_PER_IP", 200), WINDOW_MIN),
     "verify_failure":          (_int("RATE_LIMIT_VERIFY_FAILURES", 5), WINDOW_MIN),
+    # v1.6: the two 4-digit door codes (kaki code, start code) — 10,000 guesses
+    # is an afternoon for a script. Keyed per visit.
+    "visit_code":              (_int("RATE_LIMIT_VISIT_CODE", 5), WINDOW_MIN),
 }
 
 def _cutoff(minutes: int):

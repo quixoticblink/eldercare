@@ -206,10 +206,18 @@ def check(user_id: str, date_str: str, window: str) -> dict:
             covers = rng[0] < hi and rng[1] > lo
         else:
             covers = half is None or e["half_day"] == half
-        if covers:
-            if not e["available"]:
-                return {"state": "unavailable", "why": e.get("note") or f"marked off on {iso}"}
-            return {"state": "available", "why": f"extra slot on {iso}"}
+        if covers and not e["available"]:
+            return {"state": "unavailable", "why": e.get("note") or f"marked off on {iso}"}
+        if e["available"]:
+            # An extra slot must actually contain the visit; a partial overlap
+            # falls through to the weekly pattern.
+            if e["half_day"] == "all":
+                return {"state": "available", "why": f"extra slot on {iso}"}
+            lo, hi = hw.get(e["half_day"], (0, 0))
+            if rng is None and (half is None or e["half_day"] == half):
+                return {"state": "available", "why": f"extra slot on {iso}"}
+            if rng and lo <= rng[0] and rng[1] <= hi:
+                return {"state": "available", "why": f"extra slot on {iso}"}
 
     day = hours.get(day_name)
     if not day:

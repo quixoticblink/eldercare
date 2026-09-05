@@ -149,7 +149,7 @@ const AdminView = (() => {
                 const pref = v.kaki_gender_pref && v.kaki_gender_pref !== "any" ? v.kaki_gender_pref : null;
                 const meta = [
                   k.preferred ? "requested by the family" : null,
-                  pref ? (k.gender_ok ? `${k.gender} · as requested` : `${k.gender || "gender not stated"} · does not match the family's preference`) : null,
+                  pref ? (k.gender_ok ? `${UI.esc(k.gender)} · as requested` : `${UI.esc(k.gender || "gender not stated")} · does not match the family's preference`) : null,
                   history ? `${history}× with this senior` : null,
                   langOk ? `speaks ${UI.esc((v.languages || [v.language]).join("/"))}` : `no ${UI.esc((v.languages || [v.language]).join("/"))} on profile`,
                   svcOk ? null : "service not on profile",

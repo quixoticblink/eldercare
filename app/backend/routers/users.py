@@ -78,8 +78,12 @@ def put_photo(body: PhotoIn, user=Depends(security.current_user)):
     and capped, because the frontend resizes to 320px before sending."""
     import base64, re
     security.require_role(user, "kaki")
+    if user.get("status") == "suspended":
+        raise HTTPException(403, "Account suspended — call the coordinator")
     data = (body.data_url or "").strip()
     if data:
+        if len(data) > PHOTO_MAX_BYTES * 4 // 3 + 64:      # refuse before decoding
+            raise HTTPException(413, "Photo too large — the app should resize it first")
         m = re.match(r"^data:(image/(?:jpeg|png));base64,([A-Za-z0-9+/=]+)$", data)
         if not m or m.group(1) not in PHOTO_TYPES:
             raise HTTPException(400, "Photos must be JPEG or PNG")
@@ -111,6 +115,7 @@ def get_me_profile(user=Depends(security.current_user)):
 # the file only on an explicit fetch.
 
 CERT_MAX_BYTES = 1024 * 1024
+CERT_MAX_PER_KAKI = 10
 CERT_TYPES = ("application/pdf", "image/jpeg", "image/png")
 
 class CertificateIn(BaseModel):
@@ -137,10 +142,17 @@ def my_certificates(user=Depends(security.current_user)):
 def add_certificate(body: CertificateIn, user=Depends(security.current_user)):
     import base64, re
     security.require_role(user, "kaki")
+    if user.get("status") == "suspended":
+        raise HTTPException(403, "Account suspended — call the coordinator")
     name = (body.name or "").strip()
     if not name:
         raise HTTPException(400, "Name the certificate, e.g. CPR + AED")
-    m = re.match(r"^data:([a-z]+/[a-z0-9.+-]+);base64,([A-Za-z0-9+/=]+)$", (body.data_url or "").strip())
+    if db.q("SELECT count(*) c FROM kaki_certificates WHERE user_id = ?", [user["id"]])[0]["c"] >= CERT_MAX_PER_KAKI:
+        raise HTTPException(400, f"Up to {CERT_MAX_PER_KAKI} certificates — remove one first")
+    data = (body.data_url or "").strip()
+    if len(data) > CERT_MAX_BYTES * 4 // 3 + 64:           # refuse before decoding
+        raise HTTPException(413, "File too large — 1 MB at most; a photo of the certificate is fine")
+    m = re.match(r"^data:([a-z]+/[a-z0-9.+-]+);base64,([A-Za-z0-9+/=]+)$", data)
     if not m or m.group(1) not in CERT_TYPES:
         raise HTTPException(400, "Certificates must be a PDF, JPEG or PNG")
     try:
