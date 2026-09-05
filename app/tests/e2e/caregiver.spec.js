@@ -175,6 +175,33 @@ test.describe("gender preference (Bucket 2 · 3)", () => {
   });
 });
 
+test.describe("same kaki again (Bucket 2 · 4)", () => {
+  test("after a completed visit the family can ask for that kaki again", async ({ page, request }) => {
+    const s = await seed(request);
+    // One completed visit with Bee Lian, through the API.
+    const v = await api(request, "POST", "/visits", { token: s.cg1.token, data: {
+      service: "Companionship", tier: "planned", date: dateIn(3), start_time: "09:00", end_time: "11:00", language: "English" } });
+    await api(request, "POST", `/admin/visits/${v.body.id}/assign`, { token: s.admin.token, data: { kaki_id: s.k1.user.id } });
+    await api(request, "POST", `/visits/${v.body.id}/accept`, { token: s.k1.token });
+    const kc = (await api(request, "GET", `/visits/${v.body.id}`, { token: s.k1.token })).body.kaki_code;
+    const otp = (await api(request, "POST", `/visits/${v.body.id}/verify-kaki`, { token: s.cg1.token, data: { code: kc } })).body.otp_code;
+    await api(request, "POST", `/visits/${v.body.id}/start`, { token: s.k1.token, data: { otp } });
+    await api(request, "POST", `/visits/${v.body.id}/complete`, { token: s.k1.token, data: { chips: [], text: "fine" } });
+
+    await useToken(page, s.cg1.token, "#/care/book");
+    await page.getByRole("button", { name: /Companionship/ }).click();
+    await page.getByRole("button", { name: /Planned/ }).click();
+    await page.locator("#date").fill(dateIn(12));
+    await page.locator("#prefK").getByRole("button", { name: /Tan Bee Lian · 1 visit together/ }).click();
+    await page.getByRole("button", { name: "Request this visit" }).click();
+    await expect(page).toHaveURL(/#\/care\/visit\//);
+    await expect(page.getByText("You asked for Tan Bee Lian")).toBeVisible();
+    await useToken(page, s.admin.token, "#/admin/requests");
+    const card = page.locator(".card", { hasText: "Mr Nathan" }).filter({ hasText: "asked for Tan Bee Lian" }).first();
+    await expect(card.locator(".pick-row", { has: page.locator(`input[value="${s.k1.user.id}"]`) })).toContainText("requested by the family");
+  });
+});
+
 test.describe("caregiver", () => {
   test("home renders for an approved caregiver", async ({ page, request }) => {
     const s = await seed(request);

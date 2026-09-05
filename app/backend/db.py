@@ -123,6 +123,8 @@ def _init(c):
     # gates auto-match; never filters the coordinator's list.
     c.execute("ALTER TABLE kaki_profiles ADD COLUMN IF NOT EXISTS gender TEXT DEFAULT ''")
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS kaki_gender_pref TEXT DEFAULT 'any'")
+    # M-VISITS: "the same person again" — consistency is the product.
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS preferred_kaki_id TEXT DEFAULT ''")
 
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for

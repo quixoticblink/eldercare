@@ -213,8 +213,9 @@ const CareView = (() => {
     if (!bookDraft.tier) return when();
     const planned = bookDraft.tier === "planned";
     // Start from the care plan's languages — NCSS: "why type it again?"
-    let planLangs = [];
+    let planLangs = [], pastKakis = [];
     try { const hh = await Api.get("/care/household"); planLangs = (hh.plan && hh.plan.languages) || []; } catch (e) {}
+    try { pastKakis = await Api.get("/visits/past-kakis"); } catch (e) {}
     const startLangs = planLangs.length ? planLangs : ["English"];
     const today = UI.ymd();
     const horizon = App.config.max_advance_days || 30;
@@ -238,6 +239,12 @@ const CareView = (() => {
         ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0])}`}
       <label class="f-label">Languages with them <small>· required — from the care plan; tap to change</small></label>
       ${UI.chipMulti("langG2", App.config.languages, startLangs)}
+      ${pastKakis.length ? `
+      <label class="f-label">Someone they know <small>· optional — kakis who have visited before</small></label>
+      <div class="chips" id="prefK">
+        <button type="button" class="chip sel" data-v="" onclick="UI.pick('prefK', this)">Anyone</button>
+        ${pastKakis.map(k => `<button type="button" class="chip" data-v="${UI.esc(k.id)}" onclick="UI.pick('prefK', this)">${UI.esc(k.name)} · ${k.times} visit${k.times === 1 ? "" : "s"} together</button>`).join("")}
+      </div>` : ""}
       <label class="f-label">Kaki <small>· optional</small></label>
       ${UI.chipGroup("genderG", ["No preference", "Female", "Male"], "No preference")}
       <label class="f-label">Anything the kaki should know? <small>· optional</small></label>
@@ -255,11 +262,11 @@ const CareView = (() => {
         const v = await Api.post("/visits", planned ? {
           service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
           date: UI.el("date").value, start_time: UI.el("startT").value, end_time: UI.el("endT").value,
-          languages: UI.chipValues("langG2"), notes: UI.el("notes").value, kaki_gender_pref: genderPref() } : {
+          languages: UI.chipValues("langG2"), notes: UI.el("notes").value, kaki_gender_pref: genderPref(), preferred_kaki_id: UI.chipValue("prefK") || "" } : {
           service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
           date: (UI.chipValue("winG") || "").startsWith("Tomorrow") ? "tomorrow" : "today",
           window: UI.chipValue("winG") || "", languages: UI.chipValues("langG2"),
-          notes: UI.el("notes").value, kaki_gender_pref: genderPref() });
+          notes: UI.el("notes").value, kaki_gender_pref: genderPref(), preferred_kaki_id: UI.chipValue("prefK") || "" });
         clearDraft();
         UI.toast("Request sent — the coordinator is matching a kaki");
         location.hash = "#/care/visit/" + v.id;
@@ -290,7 +297,8 @@ const CareView = (() => {
         <div class="row" style="flex-wrap:wrap">${UI.statusPill(v.status)}<span class="pill grey">${UI.TIER_LABEL[v.tier] || v.tier}</span>
         ${v.trigger ? `<span class="pill gold">${UI.esc(v.trigger)}</span>` : ""}
         <span class="pill green">${UI.esc((v.languages || [v.language]).join(", "))}</span>
-        ${v.kaki_gender_pref && v.kaki_gender_pref !== "any" ? `<span class="pill grey">${v.kaki_gender_pref === "female" ? "Female" : "Male"} kaki requested</span>` : ""}</div>
+        ${v.kaki_gender_pref && v.kaki_gender_pref !== "any" ? `<span class="pill grey">${v.kaki_gender_pref === "female" ? "Female" : "Male"} kaki requested</span>` : ""}
+        ${v.preferred_kaki ? `<span class="pill grey">You asked for ${UI.esc(v.preferred_kaki.name)}</span>` : ""}</div>
         ${v.kaki ? `
           <div class="kakipass">
             <div class="kp-top">

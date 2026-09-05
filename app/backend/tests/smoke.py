@@ -870,6 +870,29 @@ assert _matching.best_available(db.one("SELECT * FROM visits WHERE id = ?", [_vg
 for _x in (_vg, _vg2, _vg3):
     assert c.post(f"/api/visits/{_x['id']}/cancel", headers=ch).status_code == 200
 
+# [B2·4] "ask for the same person again" — 21 Aug. Homage calls it continuity.
+# Priya's household has completed visits with Bee Lian by now.
+_past = c.get("/api/visits/past-kakis", headers=ch)
+assert _past.status_code == 200, _past.text
+_pk = next((k for k in _past.json() if k["id"] == kk["id"]), None)
+assert _pk and _pk["times"] >= 1 and _pk["name"] == "Tan Bee Lian" and "photo" in _pk, _past.json()
+assert c.get("/api/visits/past-kakis", headers=kh).status_code == 403
+_r = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                 "start_time": "09:30", "end_time": "11:30", "language": "English",
+                                 "preferred_kaki_id": kk["id"]}, headers=ch)
+assert _r.status_code == 200 and _r.json()["preferred_kaki"]["name"] == "Tan Bee Lian", _r.text
+_vp = _r.json()
+# a kaki you have never had cannot be "requested again"
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                   "start_time": "09:30", "end_time": "11:30", "language": "English",
+                                   "preferred_kaki_id": "nobody"}, headers=ch).status_code == 400
+_roster = c.get(f"/api/admin/kakis?visit_id={_vp['id']}", headers=ah).json()
+assert _roster[0]["id"] == kk["id"] and _roster[0]["preferred"] is True, _roster[0]
+assert _matching.rank(db.one("SELECT * FROM visits WHERE id = ?", [_vp["id"]]))[0]["id"] == kk["id"]
+# auto-match honours it when the preferred kaki is available (Tue 09:00–12:00: yes)
+assert _matching.best_available(db.one("SELECT * FROM visits WHERE id = ?", [_vp["id"]]))["id"] == kk["id"]
+assert c.post(f"/api/visits/{_vp['id']}/cancel", headers=ch).status_code == 200
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

@@ -34,9 +34,12 @@ def score(kaki: dict, visit: dict) -> dict:
     gender = p.get("gender") or ""
     gender_ok = pref == "any" or gender == pref
 
+    preferred = bool(visit.get("preferred_kaki_id")) and visit["preferred_kaki_id"] == uid
+
     total = 0
     total += {"available": 100, "unknown": 0, "unavailable": -1000}[fit["state"]]
     total += 0 if pref == "any" else (15 if gender_ok else -40)
+    total += 50 if preferred else 0        # the family asked for this person
     total += min(history, 5) * 20          # continuity matters most after availability
     wanted = db.uj(visit.get("languages")) or ([visit["language"]] if visit.get("language") else [])
     language_ok = any(l in languages for l in wanted)
@@ -44,7 +47,7 @@ def score(kaki: dict, visit: dict) -> dict:
     total += 10 if visit.get("service") in services else 0
     total -= active * 5                    # spread the load
     return {"total": total, "fit": fit, "history": history, "active": active,
-            "gender_ok": gender_ok, "gender": gender,
+            "gender_ok": gender_ok, "gender": gender, "preferred": preferred,
             "language_ok": language_ok,
             "service_ok": visit.get("service") in services}
 

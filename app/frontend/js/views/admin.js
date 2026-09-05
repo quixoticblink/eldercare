@@ -105,7 +105,8 @@ const AdminView = (() => {
             <div class="row" style="flex-wrap:wrap"><h3 class="grow">${UI.esc(v.service)} · ${UI.esc(v.senior_name)}</h3>
               <span class="pill ${v.tier === "urgent" ? "clay" : v.tier === "soon" ? "gold" : "grey"}">${UI.esc(v.tier)}</span>
               ${v.trigger ? `<span class="pill gold">${UI.esc(v.trigger)}</span>` : ""}
-              ${v.kaki_gender_pref && v.kaki_gender_pref !== "any" ? `<span class="pill grey">${UI.esc(v.kaki_gender_pref)} kaki requested</span>` : ""}</div>
+              ${v.kaki_gender_pref && v.kaki_gender_pref !== "any" ? `<span class="pill grey">${UI.esc(v.kaki_gender_pref)} kaki requested</span>` : ""}
+              ${v.preferred_kaki ? `<span class="pill gold">asked for ${UI.esc(v.preferred_kaki.name)}</span>` : ""}</div>
             <p>${UI.esc(v.date)} ${UI.esc(v.window || "")} · ${UI.esc((v.languages || [v.language]).join(", "))} · by ${UI.esc(v.caregiver?.name || UI.contact(v.caregiver))}</p>
             ${v.notes ? `<p style="margin-top:6px"><b>Note:</b> ${UI.esc(v.notes)}</p>` : ""}
             <div class="divider"></div>
@@ -118,6 +119,7 @@ const AdminView = (() => {
                 const fit = k.fit || { state: "unknown", why: "" };
                 const pref = v.kaki_gender_pref && v.kaki_gender_pref !== "any" ? v.kaki_gender_pref : null;
                 const meta = [
+                  k.preferred ? "requested by the family" : null,
                   pref ? (k.gender_ok ? `${k.gender} · as requested` : `${k.gender || "gender not stated"} · does not match the family's preference`) : null,
                   history ? `${history}× with this senior` : null,
                   langOk ? `speaks ${UI.esc((v.languages || [v.language]).join("/"))}` : `no ${UI.esc((v.languages || [v.language]).join("/"))} on profile`,

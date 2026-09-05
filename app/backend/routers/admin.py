@@ -99,6 +99,7 @@ def kakis(visit_id: str | None = None, user=Depends(security.current_user)):
         r["services"] = db.uj(p.get("services"))
         r["languages"] = db.uj(p.get("languages"))
         r["gender"] = p.get("gender") or ""
+        r["preferred"] = bool(visit) and (visit.get("preferred_kaki_id") or "") == r["id"]
         _pref = (visit or {}).get("kaki_gender_pref") or "any"
         r["gender_ok"] = _pref == "any" or r["gender"] == _pref
         r["active"] = db.q("SELECT count(*) c FROM visits WHERE kaki_id = ? AND status IN ('assigned','accepted','in_progress')", [r["id"]])[0]["c"]
@@ -115,7 +116,8 @@ def kakis(visit_id: str | None = None, user=Depends(security.current_user)):
 
     if visit:
         order = {"available": 0, "unknown": 1, "unavailable": 2}
-        rows.sort(key=lambda r: (order.get(r["fit"]["state"], 3),
+        rows.sort(key=lambda r: (0 if r["preferred"] else 1,
+                                 order.get(r["fit"]["state"], 3),
                                  0 if r["gender_ok"] else 1,
                                  -r["done_with"].get(visit["household_id"], 0),
                                  r["active"], (r["name"] or "").lower()))

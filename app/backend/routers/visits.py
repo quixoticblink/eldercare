@@ -19,6 +19,7 @@ class VisitIn(BaseModel):
     notes: str | None = ""
     trigger: str | None = Field(default="", max_length=120)   # urgent/soon path: what happened
     kaki_gender_pref: str | None = "any"   # any | female | male
+    preferred_kaki_id: str | None = ""     # a kaki this household has had before
 
 class StartIn(BaseModel):
     otp: str
@@ -157,8 +158,10 @@ def _enrich(v: dict) -> dict:
     if plan:
         plan["languages"] = db.uj(plan.get("languages"))
     langs = db.uj(v.get("languages")) or ([v["language"]] if v.get("language") else [])
+    preferred = (db.one("SELECT id, name FROM users WHERE id = ?", [v["preferred_kaki_id"]])
+                 if v.get("preferred_kaki_id") else None)
     return {**v, "window": v.get("time_window"), "trigger": v.get("crisis_trigger") or "",
-            "languages": langs,
+            "languages": langs, "preferred_kaki": preferred,
             "senior_name": h.get("senior_name"), "senior_age": h.get("senior_age"),
             "address": h.get("address"), "kaki": kaki, "caregiver": cg,
             "times_together": times_together, "estimate": _estimate(v.get("service"), v.get("hours")),
@@ -202,14 +205,17 @@ def create(body: VisitIn, user=Depends(security.current_user)):
     h = db.one("SELECT * FROM households WHERE caregiver_id = ?", [user["id"]])
     if not h:
         raise HTTPException(400, "Set up your household and care plan first")
+    preferred = (body.preferred_kaki_id or "").strip()
+    if preferred and preferred not in {k["id"] for k in _past_kakis(h["id"])}:
+        raise HTTPException(400, "You can only ask again for a kaki who has visited before")
     vid = db.new_id()
     otp = f"{random.randint(0, 9999):04d}"
     db.run("""INSERT INTO visits(id, household_id, caregiver_id, service, tier, date, time_window, language, languages, notes, otp_code, crisis_trigger,
-                                 start_time, end_time, hours, kaki_gender_pref)
-              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                                 start_time, end_time, hours, kaki_gender_pref, preferred_kaki_id)
+              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
            [vid, h["id"], user["id"], body.service, body.tier, body.date, window,
             language, db.j(langs), body.notes or "", otp, body.trigger or "",
-            start_time, end_time, hours, gender_pref])
+            start_time, end_time, hours, gender_pref, preferred])
     db.audit(user["email"] or user["phone"], "visit_requested", f"{vid} {body.service} {body.tier}")
 
     # Auto-matching, when the coordinator has switched it on. It only ever picks
@@ -233,6 +239,23 @@ def list_visits(user=Depends(security.current_user)):
     else:  # admin
         rows = db.q("SELECT * FROM visits ORDER BY created_at DESC")
     return [_out(v, user) for v in rows]
+
+def _past_kakis(household_id: str) -> list[dict]:
+    """Kakis who have completed a visit for this household, most visits first."""
+    rows = db.q("""SELECT u.id, u.name, u.photo, count(*) AS times
+                   FROM visits v JOIN users u ON u.id = v.kaki_id
+                   WHERE v.household_id = ? AND v.status = 'completed'
+                     AND u.role = 'kaki' AND u.status = 'approved'
+                   GROUP BY u.id, u.name, u.photo ORDER BY times DESC, u.name""", [household_id])
+    return [{"id": r["id"], "name": r["name"], "photo": r.get("photo") or "", "times": r["times"]} for r in rows]
+
+@router.get("/past-kakis")
+def past_kakis(user=Depends(security.current_user)):
+    """For the booking form: 'someone they know'. Caregiver only."""
+    security.approved_user(user)
+    security.require_role(user, "caregiver")
+    h = db.one("SELECT id FROM households WHERE caregiver_id = ?", [user["id"]])
+    return _past_kakis(h["id"]) if h else []
 
 @router.get("/{vid}")
 def get_visit(vid: str, user=Depends(security.current_user)):
