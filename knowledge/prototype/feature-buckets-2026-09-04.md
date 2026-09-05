@@ -29,6 +29,10 @@ the same hourly rate, prorated to the half hour; and identity runs both ways —
 shows a **photo and a 4-digit kaki code** to the caregiver, then the caregiver's code is
 entered to start the visit. Both halves, not one or the other.
 
+**Status 2026-09-05:** Buckets 1 and 2 are live as v1.6. Bucket 2 item 1 shipped with
+30-minute input steps (not 15); item 5 keeps mobility and the emergency contact visible
+to a household-help kaki and hides age, medications and notes.
+
 ## Bucket 1 — days each, mostly one module, no or trivial schema change
 
 In this order.

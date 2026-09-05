@@ -247,10 +247,24 @@
         </div>
       </div>
 
+      <div class="entry">
+        <div class="date">September 5, 2026 · Build</div>
+        <h3>The August feedback, built in</h3>
+        <p>Eighteen of the seventy recommendations, chosen for how often they were repeated and for what the app could absorb without a rewrite, shipped as v1.6 — one commit each, each behind an end-to-end test that drives the real screens. The one that changes what happens at the door: the kaki now shows a photo and a code of their own, the family enters it, and only then does their start code appear. NCSS wanted proof of identity; we had proof of admission; now it is both. Also: exact times charged by the half hour, languages pre-filled from the care plan, a female-or-male preference and &ldquo;the same kaki again&rdquo;, cancellation with reasons on both sides, certificates the coordinator reads before approving, and the small things that stopped eight people on 21 August — no placeholder number, a waiting screen that says there is nothing to do, no 2–5pm offered at six in the evening.</p>
+        <p>Two review passes found what the tests could not: the kaki had been receiving the start code in the API all along (the screen never showed it), and every wall-clock rule was running on a UTC server. Both fixed, both now tested. What is still deliberately not built: Mandarin, the subsidy rule, dual-role accounts.</p>
+        <div class="arc">
+          <span class="step">two registers, one list</span>
+          <span class="step">18 features, 18 commits</span>
+          <span class="step">24 end-to-end specs</span>
+          <span class="step">the door, both ways</span>
+          <span class="step final">v1.6 live</span>
+        </div>
+      </div>
+
       <div class="entry future">
         <div class="date">September 2026 · Round 2</div>
         <h3>Same seniors, changed app</h3>
-        <p>The two registers — NCSS&rsquo;s thirty items and the seniors&rsquo; forty — worked into the app module by module, then put back in front of the same group to validate the changes rather than discover new ones. Round 1 ran planned bookings; round 2 has to run the crisis triggers.</p>
+        <p>v1.6 back in front of the same group, to validate the changes rather than discover new ones. Round 1 ran planned bookings; round 2 has to run the crisis triggers.</p>
       </div>
 
       <div class="entry future">
@@ -583,14 +597,14 @@
   <div class="narrow">
     <p class="eyebrow">The Build</p>
     <h2 id="showcase-h">The app is live. The deck is a draft.</h2>
-    <p class="lede">What started as eighteen clickable screens now runs at a real address, with real sign-in codes going to real phones.</p>
+    <p class="lede">What started as eighteen clickable screens now runs at a real address, with real sign-in codes going to real phones — and, since 5 September, with the August feedback built in.</p>
     <p>The working name is <em>Kakis</em> — Singlish for the trusted companions you can call on — and it is provisional until the team votes. It walks all three sides of the loop: a caregiver activating respite, planned or urgent; a respite giver training through Vanguard&rsquo;s real certification modules; and an ops console where one coordinator handles exceptions instead of rosters. Every screen traces back to the evidence.</p>
   </div>
 
   <div class="narrow">
     <h3 class="sub-h">Three journeys, as they actually work</h3>
     <p><strong>The caregiver</strong> sets up a household and a care plan once — medications, mobility, languages, emergency contacts. Booking is service, then urgency, then <em>what happened</em>: urgent and soon bookings ask for the trigger, which is what turns a booking into a story the coordinator can prioritise. When the kaki arrives, the caregiver&rsquo;s screen shows a four-digit start code to read aloud. Afterwards: a report, and a private note the care team sees but the kaki does not.</p>
-    <p><strong>The kaki</strong> declares when they can work as a Monday-to-Sunday grid of half-days, plus dated exceptions — because most respite givers are employed elsewhere and &ldquo;Tuesdays and Saturday mornings, except I&rsquo;m away next week&rdquo; is the shape of a real life. They accept an assigned visit or pass it straight back, start it by entering the family&rsquo;s code, and finish with a short report. They never see that code in their own app. That single asymmetry is what turns &ldquo;the app says a visit happened&rdquo; into &ldquo;someone was at the door and the family let them in.&rdquo;</p>
+    <p><strong>The kaki</strong> declares when they can work as hours per day, plus dated exceptions — because most respite givers are employed elsewhere and &ldquo;Tuesday and Saturday mornings, except I&rsquo;m away next week&rdquo; is the shape of a real life. They carry a photo and their certificates. They accept an assigned visit or pass it straight back, tap <em>I&rsquo;m on my way</em>, and at the door show their photo and a four-digit code of their own; the family enters it, and only then reads them the start code that begins the visit. The kaki never sees the family&rsquo;s code and the family never sees the kaki&rsquo;s. Two codes, two directions: &ldquo;the app says a visit happened&rdquo; becomes &ldquo;the right person was at the door and the family let them in.&rdquo;</p>
     <p><strong>The coordinator</strong> approves people and matches visits, urgent first. Each candidate carries an availability badge for that exact date and half-day, history with this senior, language and service match, and current workload — sorted best-first but never filtered, because an urgent case may still justify phoning someone nominally off. Approval and matching can both be automated; all three switches default to off, because each one removes a human from a decision about who enters a vulnerable person&rsquo;s home.</p>
     <p>Money is deliberately honest. Every rate, hour and subsidy percentage sits in one file with its source stated, most of it still marked <em>placeholder</em> — the community care subsidy and foundation top-up are illustrative, not confirmed. Every screen showing a dollar figure says so.</p>
   </div>
@@ -875,7 +889,7 @@
     <div>
       <h4>Eldercare Sprint</h4>
       <p>A six-month leadership sprint working out how caregivers of the relatively healthy elderly in Singapore can activate trusted respite when a need arises — planned or urgent. Started May 19, 2026. Five people. Public journey. Anchored on Vanguard&rsquo;s Pasir Ris pilot from July 8 onward.</p>
-      <p class="colophon">Updated 2026-09-04 · Singapore</p>
+      <p class="colophon">Updated 2026-09-05 · Singapore</p>
     </div>
     <div>
       <h4>Find your way</h4>

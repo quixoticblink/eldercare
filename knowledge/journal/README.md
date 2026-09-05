@@ -1,7 +1,7 @@
 ---
 title: Journal — the running log
 status: live
-last_updated: 2026-09-04
+last_updated: 2026-09-05
 ---
 
 The most boring folder in the wiki and the most important one. This is where the arc of the sprint gets recorded, one working session at a time. Six months from now, the rubric line *"evidence of learning, adaptation & resilience over 6 months"* is scored from here.
@@ -33,3 +33,4 @@ Retros go in the same folder with the suffix `-retro.md` (e.g., `2026-06-15-retr
 - [[2026-08-03-himmat-review]] — same day, the opposite advice: real app in real hands early, demand is the constraint, don't narrow.
 - [[2026-08-18-ncss-app-review]] — NCSS desk-reviews the live app role by role. Thirty items; one reverses the start-code direction. Register in [[../prototype/ncss-app-review-2026-08-18]].
 - [[2026-08-21-tabletop-vanguard-ncss]] — Table Top Exercise, round 1. Eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard and NCSS facilitating. Concept held; onboarding didn't. Full recommendation register in [[../prototype/tabletop-2026-08-21-feedback]].
+- [[2026-09-05-v1.6-build]] — v1.6 built and shipped: eighteen features from Buckets 1 and 2, each behind a Playwright test; what the reviews caught that the tests didn't.

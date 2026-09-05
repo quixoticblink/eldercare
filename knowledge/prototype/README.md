@@ -11,6 +11,11 @@ Woke up on 2026-07-11, ahead of the 2026-08-20 SGLN prototype milestone. Working
 database that persists. The HTML prototype below stays as the design record; the app is
 now the thing people actually touch.
 
+**Update 2026-09-05: v1.6 is live.** Buckets 1 and 2 of [[feature-buckets-2026-09-04]]
+shipped to singaporekakis.com — eighteen features, each behind a Playwright test and a
+smoke assertion. The plan that was executed is [[plans/v1.6-buckets-1-2]]; what went
+wrong on the way is in [[kakis-app]].
+
 **Update 2026-09-04: the app has been in seniors' hands.** Table Top Exercise, round 1, ran on
 2026-08-21 — eight seniors, own phones, Care Corner AAC Toa Payoh 261A, Vanguard and NCSS facilitating. The
 session record is [[../journal/2026-08-21-tabletop-vanguard-ncss]]; every recommendation,

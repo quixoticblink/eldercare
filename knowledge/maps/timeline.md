@@ -1,7 +1,7 @@
 ---
 title: "Timeline — the sprint's chronological arc"
 status: live
-last_updated: 2026-09-04
+last_updated: 2026-09-05
 covers: 2026-05-19 to 2026-09-XX (Demo Day)
 ---
 
@@ -103,6 +103,10 @@ Eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard an
 Optional exhibition at Suntec — potential venue if prototype is demo-ready four weeks early.
 
 ## September — Demo Day
+
+### 2026-09-05 · Kakis v1.6 · [[../journal/2026-09-05-v1.6-build]]
+
+Buckets 1 and 2 of the August feedback built and shipped: the door check both ways, exact times, preferences, cancellation lifecycle, certificates, and the onboarding fixes. 24 Playwright specs, 368 smoke assertions.
 
 ### 2026-09-XX · SGLN Demo Day
 

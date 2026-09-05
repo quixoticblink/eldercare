@@ -1,7 +1,7 @@
 ---
 title: "Kakis — the working app"
 status: live
-last_updated: 2026-09-04
+last_updated: 2026-09-05
 url: https://singaporekakis.com
 ---
 
@@ -25,28 +25,35 @@ Postgres) is written down in [[kakis-build-plan]] and deliberately not taken yet
 Three roles share one app:
 
 - **Caregiver** — set up the household and care plan, book a visit (service → urgency
-  → trigger → details), read the start code to the kaki, receive the report.
-- **Kaki** — declare availability as a weekly half-day grid plus dated exceptions,
-  accept or pass back an assigned visit, start it with the family's 4-digit code,
-  finish with a report.
-- **Coordinator** — approve people, match visits, and now optionally automate both.
+  → trigger → details, with exact times for planned visits), check the kaki's photo
+  and code at the door, then read the start code to the kaki, receive the report.
+- **Kaki** — declare working hours per day plus dated exceptions, upload a photo and
+  certificates, accept or pass back an assigned visit, say when they're on the way, show
+  their code at the door, start with the family's 4-digit code, finish with a report.
+- **Coordinator** — approve people (with their certificates), match visits, and
+  optionally automate both.
 
 Full feature reference and user guide: [[app/SPEC|app/SPEC.md]] section 9.
 
 ## The design decisions worth remembering
 
-**The start code is one-way.** The caregiver's screen shows a 4-digit code; the kaki
-enters it. The kaki never sees it in their own app. That single asymmetry is what
-converts "the app says a visit happened" into "someone was physically at the door and
-the family let them in."
+**The start code is one-way — and since v1.6 the door check runs both ways.** The
+caregiver's screen shows a 4-digit code; the kaki enters it. The kaki never sees it in
+their own app. That single asymmetry is what converts "the app says a visit happened"
+into "someone was physically at the door and the family let them in." NCSS pointed out
+on Aug 18 that this proves admission, not identity, so v1.6 added the other half: the
+kaki shows a photo and a code of their own, the caregiver enters it, and only then does
+the caregiver's start code appear. Two codes, two directions, one door.
 
 **No public ratings, anywhere.** Concerns from either side go privately to the care
 team. This is MOH guidance rather than our preference, but it also removes the
 mechanism by which gig platforms make vulnerable workers performatively cheerful.
 
 **Availability sorts, it doesn't filter.** The matching screen ranks kakis
-available → unknown → unavailable for that exact date and half-day, but shows all of
-them. An urgent case may still justify phoning someone who is nominally off. A kaki who
+available → unknown → unavailable for that exact date and time, but shows all of
+them. (v1.6 adds two more sort keys ahead of it — a kaki the family asked for by name,
+and a match to a stated gender preference — and auto-match will never assign against
+either.) An urgent case may still justify phoning someone who is nominally off. A kaki who
 has never set availability reads *unknown*, never *unavailable* — otherwise silence
 would quietly remove them from work.
 
@@ -90,14 +97,34 @@ The pattern across all three: **the system said it succeeded.** Acceptance is no
 delivery, an assignment is not the right assignment, and a clean first boot is not a
 working service.
 
+Two more from the v1.6 round, both caught by a reviewer rather than a test, which is
+its own lesson.
+
+**The kaki was getting the start code after all.** The rule "the kaki never sees the
+start code" was enforced in exactly one place — the single-visit GET — and nowhere
+else. The list endpoint, and the responses to the kaki's own accept, start and complete,
+all carried `otp_code` in the JSON. The UI never rendered it, so eight seniors and two
+partner reviews never noticed; anyone with the browser's network tab would have. v1.6
+added a new endpoint with the same leak and the reviewer traced every return. Fixed
+with one function every visit response passes through. A hard rule that lives in one
+code path isn't a rule, it's a coincidence.
+
+**Wall-clock rules on a UTC box.** The pilot VM runs UTC. "That window has passed",
+"bookings open 30 days ahead", "on the way since 18:07" — all Singapore rules, all
+computed from the server clock, all eight hours out. The smoke suite pins the clock, so
+it could not see it; the frontend computed "today" with `toISOString()`, which is
+yesterday until 8am here, so it agreed with the server for the wrong reason. Fixed by
+naming the zone in config and in the service environment, and by never using a UTC date
+function in the frontend again.
+
 ## Where it stands
 
 Live, hardened, and audited against ISO/IEC 5055 — see
-[[app/deploy/SECURITY-AUDIT|SECURITY-AUDIT.md]]. Rate limiting on sign-in, health
-data off world-readable permissions, security headers, pinned dependencies. 156
-automated assertions covering the full lifecycle — a figure the test now derives
-from its own source, after the hand-maintained version of it drifted to six
-different numbers across five documents.
+[[app/deploy/SECURITY-AUDIT|SECURITY-AUDIT.md]]. Rate limiting on sign-in and on both
+door codes, health data off world-readable permissions, security headers, pinned
+dependencies. 368 smoke assertions and 24 Playwright end-to-end specs covering the full
+lifecycle — the smoke figure derives from its own source, after the hand-maintained
+version drifted to six different numbers across five documents.
 
 Fit for a **supervised tabletop**, which is exactly what [[../journal/2026-08-03-ncss-vanguard|NCSS and Vanguard]]
 asked for on Aug 3. Not fit for unsupervised public launch: backups have never been
@@ -123,8 +150,28 @@ The full register, mapped to modules, is [[tabletop-2026-08-21-feedback]]. Note 
 session did not test: the six crisis triggers. It ran planned bookings. What gets built
 next, and in what order, is [[feature-buckets-2026-09-04]].
 
+**v1.6 shipped on 2026-09-05** — Buckets 1 and 2 of that file, eighteen features, live.
+The ones that change what a senior sees at the door: the kaki now carries a photo and a
+4-digit code of their own; the family enters it and only then gets their start code to
+read back. Both halves of the identity argument from Aug 18 and Aug 21, in one flow.
+Exact start and end times in half-hour steps, charged by the half hour with a one-hour
+minimum. Languages pre-filled from the care plan, Cantonese added. A female-or-male
+preference and "the same kaki again", both sorting the coordinator's roster and both
+respected by auto-match. Cancellation after accept and mid-visit, either side, with the
+reason recorded and the other side told. Certificates uploaded by the kaki and read by
+the coordinator before approval. And the small things that stopped eight people on
+Aug 21: no placeholder number in the sign-in box, a waiting screen that says there is
+nothing to do, required fields marked, a refresh that keeps your place, and no
+"2–5pm" offered at six in the evening.
+
+Every feature has a Playwright test (24 specs, `app/tests/e2e/`) and a smoke assertion
+(156 → 368), one commit each, and two review passes whose findings are in the change
+log. The build plan, task by task, is [[plans/v1.6-buckets-1-2]]. Still not built, by
+decision: Mandarin UI, subsidy rules, dual-role accounts, live updates — Bucket 3.
+
 *Connects to:* [[README]] · [[kakis-build-plan]] · [[kakis-prototype-spec]] ·
 [[tabletop-2026-08-21-feedback]] · [[ncss-app-review-2026-08-18]] · [[../journal/2026-08-03-ncss-vanguard]] ·
 [[../journal/2026-08-21-tabletop-vanguard-ncss]] · [[../reframing/hmw-current]]
 
 *2026-09-04: added the Aug 18 NCSS review and the Aug 21 Table Top Exercise outcome to "Where it stands"; linked the recommendation register.*
+*2026-09-05: v1.6 shipped — Buckets 1 and 2; two new entries under "what went wrong" (the start-code leak, the UTC box).*
