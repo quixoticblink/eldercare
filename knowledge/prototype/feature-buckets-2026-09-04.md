@@ -1,7 +1,7 @@
 ---
 title: "Feature buckets after the August feedback round — 2026-09-04"
 status: solid
-last_updated: 2026-09-04
+last_updated: 2026-09-05
 based_on: [prototype/tabletop-2026-08-21-feedback, prototype/ncss-app-review-2026-08-18]
 ---
 
