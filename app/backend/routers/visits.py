@@ -3,7 +3,7 @@ import datetime, random, re, zoneinfo
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from .. import assumptions, config, db, security, settings
-from ..services import matching, notify
+from ..services import availability, matching, notify
 
 router = APIRouter(prefix="/visits", tags=["visits"])
 
@@ -11,7 +11,9 @@ class VisitIn(BaseModel):
     service: str
     tier: str
     date: str          # "2026-07-22" or "today"
-    window: str        # "14:00–17:00" / "within the hour"
+    window: str | None = ""   # "Afternoon 2–5" / "within the hour"; derived from the times when given
+    start_time: str | None = None   # "09:30" — v1.6 exact times, 30-minute steps
+    end_time: str | None = None
     language: str | None = None        # legacy single value
     languages: list[str] | None = None # v1.6: several; first one becomes `language`
     notes: str | None = ""
@@ -58,17 +60,45 @@ def _window_has_passed(date: str, window: str) -> bool:
     now = _now()
     if (date or "").strip().lower() not in ("today", now.date().isoformat()):
         return False
-    end = window_end_hour(window)
-    return end is not None and now.hour >= end
+    w = (window or "").lower()
+    if "within" in w:
+        return False                       # relative to now, by definition
+    rng = availability.window_range(window)
+    if rng is None:
+        end = window_end_hour(window)
+        return end is not None and now.hour >= end
+    return now.hour * 60 + now.minute >= rng[1]
 
-def _estimate(service: str) -> dict | None:
+def _hours_for(start_time: str | None, end_time: str | None, service: str) -> tuple[float, str, str, str]:
+    """→ (hours, window, start, end). Exact times are validated on the half
+    hour; duration rounds UP to assumptions.rounding_hours with a floor of
+    assumptions.min_visit_hours. Without times, the service default applies."""
+    meta = assumptions.service(service) or {}
+    default = float(meta.get("hours", assumptions.default_hours()))
+    if not start_time and not end_time:
+        return default, "", "", ""
+    a, b = availability.parse_hhmm(start_time or ""), availability.parse_hhmm(end_time or "")
+    if a is None or b is None:
+        raise HTTPException(400, "Times look like 09:30 — pick both a start and an end")
+    if not (availability.on_the_half_hour(a) and availability.on_the_half_hour(b)):
+        raise HTTPException(400, "Times go in 30-minute steps, e.g. 09:30 or 10:00")
+    if b <= a:
+        raise HTTPException(400, "The end time must be after the start")
+    step = assumptions.rounding_hours() or 0.5
+    raw = (b - a) / 60
+    hours = max(assumptions.min_visit_hours(), (int(raw / step) + (1 if raw % step else 0)) * step)
+    start, end = availability.fmt_hhmm(a), availability.fmt_hhmm(b)
+    return float(hours), f"{start}–{end}", start, end
+
+def _estimate(service: str, hours: float | None = None) -> dict | None:
     """Pilot price stack. Every number comes from assumptions.json — see that
     file for the source behind each figure. Presentational only; billing runs
-    through the Vanguard / ICCP account during the pilot."""
+    through the Vanguard / ICCP account during the pilot. `hours` is the
+    visit's own (prorated) duration when it has exact times."""
     m = assumptions.service(service)
     if not m:
         return None
-    hours = m.get("hours", assumptions.default_hours())
+    hours = float(hours) if hours else float(m.get("hours", assumptions.default_hours()))
     rate = m.get("family_rate_per_hour", 0)
     base = hours * rate
     subsidy = round(base * assumptions.subsidy_pct("community_care_fund_pct"))
@@ -121,7 +151,8 @@ def _enrich(v: dict) -> dict:
             "languages": langs,
             "senior_name": h.get("senior_name"), "senior_age": h.get("senior_age"),
             "address": h.get("address"), "kaki": kaki, "caregiver": cg,
-            "times_together": times_together, "estimate": _estimate(v.get("service")),
+            "times_together": times_together, "estimate": _estimate(v.get("service"), v.get("hours")),
+            "hours": v.get("hours") or (assumptions.service(v.get("service")) or {}).get("hours"),
             "report": report, "care_plan": plan}
 
 @router.post("")
@@ -132,7 +163,11 @@ def create(body: VisitIn, user=Depends(security.current_user)):
         raise HTTPException(400, "That service isn't bookable yet")
     if body.tier not in config.TIERS:
         raise HTTPException(400, "Pick an urgency")
-    if _window_has_passed(body.date, body.window):
+    hours, exact_window, start_time, end_time = _hours_for(body.start_time, body.end_time, body.service)
+    window = exact_window or (body.window or "")
+    if not window:
+        raise HTTPException(400, "Pick a time")
+    if _window_has_passed(body.date, window):
         raise HTTPException(400, "That window has passed — pick a later one")
     horizon = int(settings.get("max_advance_days") or 30)
     m = re.match(r"^(\d{4})-(\d{2})-(\d{2})$", (body.date or "").strip())
@@ -156,10 +191,12 @@ def create(body: VisitIn, user=Depends(security.current_user)):
         raise HTTPException(400, "Set up your household and care plan first")
     vid = db.new_id()
     otp = f"{random.randint(0, 9999):04d}"
-    db.run("""INSERT INTO visits(id, household_id, caregiver_id, service, tier, date, time_window, language, languages, notes, otp_code, crisis_trigger)
-              VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
-           [vid, h["id"], user["id"], body.service, body.tier, body.date, body.window,
-            language, db.j(langs), body.notes or "", otp, body.trigger or ""])
+    db.run("""INSERT INTO visits(id, household_id, caregiver_id, service, tier, date, time_window, language, languages, notes, otp_code, crisis_trigger,
+                                 start_time, end_time, hours)
+              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+           [vid, h["id"], user["id"], body.service, body.tier, body.date, window,
+            language, db.j(langs), body.notes or "", otp, body.trigger or "",
+            start_time, end_time, hours])
     db.audit(user["email"] or user["phone"], "visit_requested", f"{vid} {body.service} {body.tier}")
 
     # Auto-matching, when the coordinator has switched it on. It only ever picks

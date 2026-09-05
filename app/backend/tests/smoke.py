@@ -738,6 +738,58 @@ assert c.post(f"/api/visits/{v16f['id']}/start", json={"otp": c.get(f"/api/visit
 assert not [m for m in _sent if m[1] == "+6591112222"]
 assert c.post(f"/api/visits/{v16f['id']}/complete", json={"chips": [], "text": "ok"}, headers=kh).status_code == 200
 
+# ---- Bucket 2 --------------------------------------------------------------
+# [B2·1] exact start and end in 30-minute steps; hours prorated to the half
+# hour at the same rate, minimum 1 hour; kaki availability by day and hours.
+_svc = c.get("/api/admin/assumptions", headers=ah).json()["services"]["Companionship"]   # rates were edited above
+_r = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                 "start_time": "09:30", "end_time": "11:30", "language": "English"}, headers=ch)
+assert _r.status_code == 200, _r.text
+_v = _r.json()
+assert _v["hours"] == 2.0 and _v["window"] == "09:30–11:30", _v
+assert _v["estimate"]["hours"] == 2.0 and _v["estimate"]["base"] == 2.0 * _svc["family_rate_per_hour"], _v["estimate"]
+assert _v["estimate"]["kaki_fee"] == 2.0 * _svc["kaki_rate_per_hour"]
+_r = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                 "start_time": "10:00", "end_time": "10:30", "language": "English"}, headers=ch)
+assert _r.status_code == 200 and _r.json()["hours"] == 1.0, _r.text   # half an hour is charged as the 1-hour minimum
+_r = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                 "start_time": "10:00", "end_time": "12:30", "language": "English"}, headers=ch)
+assert _r.status_code == 200 and _r.json()["hours"] == 2.5, _r.text
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                   "start_time": "11:00", "end_time": "10:00", "language": "English"}, headers=ch).status_code == 400
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                   "start_time": "10:10", "end_time": "12:00", "language": "English"}, headers=ch).status_code == 400
+# without times, the service default still applies
+_r = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                 "window": "Morning 9–12", "language": "English"}, headers=ch).json()
+assert _r["hours"] == _svc["hours"], _r
+# a same-day exact window that has ended is refused (the after-5pm rule, now to the minute)
+_visits._now = lambda: _dt.datetime(2026, 7, 25, 11, 40)
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-07-25",
+                                   "start_time": "09:30", "end_time": "11:30", "language": "English"}, headers=ch).status_code == 400
+_visits._now = lambda: _PINNED_NOW
+
+# kaki availability by hours; the half-day API still works and the two agree
+_r = c.put("/api/users/me/availability",
+           json={"weekly": {"Tue": {"from": "09:00", "to": "12:00"}, "Sat": {"from": "08:00", "to": "18:00"}}}, headers=kh)
+assert _r.status_code == 200, _r.text
+assert _r.json()["weekly_hours"]["Tue"] == {"from": "09:00", "to": "12:00"}, _r.json()
+assert _r.json()["weekly"]["Tue"] == ["morning"] and sorted(_r.json()["weekly"]["Sat"]) == ["afternoon", "morning"]
+assert _r.json()["weekly_hours"]["Wed"] is None
+assert c.put("/api/users/me/availability", json={"weekly": {"Tue": {"from": "09:10", "to": "12:00"}}}, headers=kh).status_code == 400
+assert c.put("/api/users/me/availability", json={"weekly": {"Tue": {"from": "12:00", "to": "09:00"}}}, headers=kh).status_code == 400
+# 2026-08-18 is a Tuesday
+assert availmod.check(kk["id"], "2026-08-18", "09:30–11:30")["state"] == "available"
+_fit = availmod.check(kk["id"], "2026-08-18", "11:30–13:30")
+assert _fit["state"] == "unavailable" and "09:00" in _fit["why"], _fit
+assert availmod.check(kk["id"], "2026-08-18", "Morning 9–12")["state"] == "available"     # legacy windows still map
+assert availmod.check(kk["id"], "2026-08-19", "09:30–11:30")["state"] == "unavailable"     # Wednesday: nothing set
+# legacy half-day storage still reads as hours
+db.run("UPDATE kaki_profiles SET weekly_slots = ? WHERE user_id = ?", ['{"Thu": ["afternoon"]}', kk["id"]])
+assert availmod.weekly_hours(kk["id"])["Thu"] == {"from": "13:00", "to": "18:00"}, availmod.weekly_hours(kk["id"])
+assert availmod.check(kk["id"], "2026-08-20", "14:00–16:00")["state"] == "available"
+db.run("UPDATE kaki_profiles SET weekly_slots = ? WHERE user_id = ?", ['{"Tue": {"from": "09:00", "to": "12:00"}, "Sat": {"from": "08:00", "to": "18:00"}}', kk["id"]])
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

@@ -78,6 +78,23 @@ const UI = (() => {
   }
   function ymdIn(days) { const d = new Date(); d.setDate(d.getDate() + days); return ymd(d); }
 
+  /* <option>s for a time <select>, 30-minute steps. */
+  function timeOptions(selected, from = 7 * 60, to = 21 * 60) {
+    const out = [];
+    for (let m = from; m <= to; m += 30) {
+      const v = String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+      out.push(`<option value="${v}"${v === selected ? " selected" : ""}>${v}</option>`);
+    }
+    return out.join("");
+  }
+  const minutesOf = hhmm => { const [h, m] = (hhmm || "0:0").split(":").map(Number); return h * 60 + m; };
+  /* Same rule as the server: round UP to the half hour, floor 1 hour. */
+  function hoursBetween(a, b) {
+    const raw = (minutesOf(b) - minutesOf(a)) / 60;
+    if (!(raw > 0)) return 0;
+    return Math.max(1, Math.ceil(raw * 2) / 2);
+  }
+
   /* "HH:MM" in the phone's local time from a server timestamp; "" if unparseable. */
   function hhmm(ts) {
     if (!ts) return "";
@@ -89,5 +106,6 @@ const UI = (() => {
   const TIER_LABEL = { urgent: "Urgent · within the hour", soon: "Soon · within 2 hours", planned: "Planned" };
 
   return { el, esc, toast, screen, spin, appbar, chipGroup, pick, chipValue,
-           chipMulti, chipValues, statusPill, initials, contact, moneyNote, hhmm, ymd, ymdIn, TIER_LABEL };
+           chipMulti, chipValues, statusPill, initials, contact, moneyNote, hhmm, ymd, ymdIn,
+           timeOptions, hoursBetween, TIER_LABEL };
 })();

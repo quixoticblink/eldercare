@@ -10,9 +10,8 @@
     "Anything with source 'PLACEHOLDER' has not been confirmed with Vanguard or",
     "MOH and should be treated as a guess."
   ],
-  "version": "2026-07-31",
+  "version": "2026-09-05",
   "currency": "SGD",
-
   "services": {
     "Chaperone": {
       "hours": 3,
@@ -43,7 +42,6 @@
       "note": "Light housekeeping, laundry, simple meal prep."
     }
   },
-
   "subsidies": {
     "community_care_fund_pct": {
       "value": 0.54,
@@ -56,7 +54,6 @@
       "note": "Represents a charitable top-up covering part of the remainder. Not yet committed by any funder."
     }
   },
-
   "kaki_payment": {
     "transport_allowance_per_visit": {
       "value": 3.2,
@@ -69,7 +66,6 @@
       "note": "Cashless to PayNow."
     }
   },
-
   "time": {
     "hours_are_estimates": {
       "value": true,
@@ -91,9 +87,18 @@
       "afternoon": "13:00–18:00",
       "source": "Design decision",
       "note": "Availability is captured in half-days, not exact hours, to keep it realistic for part-time kakis."
+    },
+    "min_visit_hours": {
+      "value": 1,
+      "source": "Decision 2026-09-04 after the Table Top Exercise: 1-hour blocks, not a 2-hour minimum",
+      "note": "Any exact-time booking shorter than this is charged as this."
+    },
+    "rounding_hours": {
+      "value": 0.5,
+      "source": "Decision 2026-09-04: prorated to the half hour at the same hourly rate",
+      "note": "Duration rounds UP to the nearest half hour."
     }
   },
-
   "disclaimer": {
     "short": "For illustration only",
     "long": "Figures are pilot estimates for illustration only. Actual costs, subsidies and payouts are determined by the Vanguard / ICCP account and the applicable means test."

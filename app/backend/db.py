@@ -108,6 +108,11 @@ def _init(c):
     c.execute("ALTER TABLE care_plans ADD COLUMN IF NOT EXISTS contact_name TEXT DEFAULT ''")
     c.execute("ALTER TABLE care_plans ADD COLUMN IF NOT EXISTS contact_relationship TEXT DEFAULT ''")
     c.execute("ALTER TABLE care_plans ADD COLUMN IF NOT EXISTS contact_phone TEXT DEFAULT ''")
+    # M-VISITS: exact times in 30-minute steps; hours prorated to the half hour.
+    # time_window keeps a "HH:MM–HH:MM" copy so older screens and the matcher read it.
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS start_time TEXT DEFAULT ''")
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS end_time TEXT DEFAULT ''")
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS hours DOUBLE")
 
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for

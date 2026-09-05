@@ -74,7 +74,8 @@ test.describe("languages (Bucket 1 · 8)", () => {
     await group.getByRole("button", { name: "Cantonese" }).click();
     await expect(group.getByRole("button", { name: "Mandarin" })).toHaveClass(/sel/);   // multi-select keeps the others
     await page.locator("#date").fill(dateIn(7));
-    await page.getByRole("button", { name: "Morning 9–12" }).click();
+    await page.locator("#startT").selectOption("09:00");
+    await page.locator("#endT").selectOption("12:00");
     await page.getByRole("button", { name: "Request this visit" }).click();
     await expect(page).toHaveURL(/#\/care\/visit\//);
     await expect(page.locator(".appbar, .row").first()).toBeVisible();
@@ -128,6 +129,23 @@ test.describe("'Other' trigger and booking horizon (Bucket 1 · 10)", () => {
     const max = await page.locator("#date").getAttribute("max");
     expect(max).toBe(dateIn(30));
     await expect(page.getByText("up to 30 days ahead")).toBeVisible();
+  });
+});
+
+test.describe("exact times (Bucket 2 · 1)", () => {
+  test("a planned booking takes a start and end time and shows prorated hours", async ({ page, request }) => {
+    const s = await seed(request);
+    await useToken(page, s.cg1.token, "#/care/book");
+    await page.getByRole("button", { name: /Companionship/ }).click();
+    await page.getByRole("button", { name: /Planned/ }).click();
+    await page.locator("#date").fill(dateIn(9));
+    await page.locator("#startT").selectOption("09:30");
+    await page.locator("#endT").selectOption("11:30");
+    await expect(page.getByText("2 hrs")).toBeVisible();
+    await page.getByRole("button", { name: "Request this visit" }).click();
+    await expect(page).toHaveURL(/#\/care\/visit\//);
+    await expect(page.locator(".appbar")).toContainText("09:30–11:30");
+    await expect(page.getByText("2 hrs ×")).toBeVisible();
   });
 });
 

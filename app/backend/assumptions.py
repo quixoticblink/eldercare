@@ -59,6 +59,12 @@ def transport_allowance() -> float:
 def default_hours() -> int:
     return int(_v(load().get("time", {}).get("default_hours_when_service_unknown"), 2) or 2)
 
+def min_visit_hours() -> float:
+    return float(_v(load().get("time", {}).get("min_visit_hours"), 1) or 1)
+
+def rounding_hours() -> float:
+    return float(_v(load().get("time", {}).get("rounding_hours"), 0.5) or 0.5)
+
 def half_day_windows() -> dict:
     w = load().get("time", {}).get("half_day_windows", {})
     return {"morning": w.get("morning", "08:00–13:00"), "afternoon": w.get("afternoon", "13:00–18:00")}

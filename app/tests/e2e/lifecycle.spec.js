@@ -32,12 +32,14 @@ test("caregiver books, kaki serves, report comes back", async ({ page, request }
   await page.getByRole("button", { name: /Companionship/ }).click();
   await page.getByRole("button", { name: /Planned/ }).click();
   await page.locator("#date").fill(dateIn(1));
-  await page.getByRole("button", { name: "Afternoon 2–5" }).click();
+  await page.locator("#startT").selectOption("14:00");
+  await page.locator("#endT").selectOption("16:00");
   await page.locator("#notes").fill("Likes rummy-o.");
   await page.getByRole("button", { name: "Request this visit" }).click();
   await expect(page).toHaveURL(/#\/care\/visit\//);
   const visitId = page.url().split("/visit/")[1];
   await expect(page.getByText("Finding a kaki")).toBeVisible();
+  await expect(page.locator(".appbar")).toContainText("14:00–16:00 · 2 hrs");
 
   // Coordinator assigns Bee Lian.
   const asg = await api(request, "POST", `/admin/visits/${visitId}/assign`, { token: s.admin.token, data: { kaki_id: s.k1.user.id } });

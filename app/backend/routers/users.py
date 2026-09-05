@@ -15,8 +15,9 @@ class ProfileIn(BaseModel):
     area: str | None = None
 
 class WeeklyIn(BaseModel):
-    # {"Mon": ["morning"], "Sat": ["morning", "afternoon"]}
-    weekly: dict[str, list[str]]
+    # v1.6: {"Mon": {"from": "09:00", "to": "13:00"}, "Sat": {"from": "08:00", "to": "18:00"}}
+    # v1.3 (still accepted): {"Mon": ["morning"], "Sat": ["morning", "afternoon"]}
+    weekly: dict[str, dict[str, str] | list[str] | None]
     note: str | None = None
 
 class ExceptionIn(BaseModel):
@@ -87,12 +88,22 @@ def put_availability(body: WeeklyIn, user=Depends(security.current_user)):
     rather than stored, so a typo can never make someone silently unbookable."""
     _kaki(user)
     clean = {}
-    for day, slots in (body.weekly or {}).items():
-        if day not in config.WEEKDAYS:
+    for day, value in (body.weekly or {}).items():
+        if day not in config.WEEKDAYS or value is None:
             continue
-        picked = [s for s in (slots or []) if s in config.HALF_DAYS]
-        if picked:
-            clean[day] = picked
+        if isinstance(value, dict):
+            a, b = availability.parse_hhmm(value.get("from", "")), availability.parse_hhmm(value.get("to", ""))
+            if a is None or b is None:
+                raise HTTPException(400, f"{day}: times look like 09:00")
+            if not (availability.on_the_half_hour(a) and availability.on_the_half_hour(b)):
+                raise HTTPException(400, f"{day}: times go in 30-minute steps")
+            if b <= a:
+                raise HTTPException(400, f"{day}: the end must be after the start")
+            clean[day] = {"from": availability.fmt_hhmm(a), "to": availability.fmt_hhmm(b)}
+        else:
+            picked = [s for s in (value or []) if s in config.HALF_DAYS]
+            if picked:
+                clean[day] = picked
     db.run("UPDATE kaki_profiles SET weekly_slots = ? WHERE user_id = ?",
            [json.dumps(clean), user["id"]])
     if body.note is not None:

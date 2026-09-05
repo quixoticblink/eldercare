@@ -38,6 +38,24 @@ test.describe("start-code copy for the kaki (Bucket 1 · 9)", () => {
   });
 });
 
+test.describe("availability by hours (Bucket 2 · 1)", () => {
+  test("a kaki sets working hours per day instead of a grid", async ({ page, request }) => {
+    const s = await seed(request);
+    await useToken(page, s.k3.token, "#/kaki/availability");
+    await expect(page.locator(".avail-grid")).toHaveCount(0);
+    await page.locator("#day-Tue").check();
+    await page.locator("#from-Tue").selectOption("09:00");
+    await page.locator("#to-Tue").selectOption("13:00");
+    await page.getByRole("button", { name: "Save my week" }).click();
+    await expect(page.getByText("Availability saved")).toBeVisible();
+    await page.reload();
+    await expect(page.locator("#day-Tue")).toBeChecked();
+    await expect(page.locator("#from-Tue")).toHaveValue("09:00");
+    await expect(page.locator("#to-Tue")).toHaveValue("13:00");
+    await expect(page.locator("#day-Wed")).not.toBeChecked();
+  });
+});
+
 test.describe("kaki", () => {
   test("home and profile render for an approved kaki", async ({ page, request }) => {
     const s = await seed(request);

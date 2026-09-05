@@ -39,7 +39,7 @@ const KakiView = (() => {
       const v = await Api.get("/visits/" + id);
       const plan = v.care_plan || {};
       UI.screen(`
-        ${UI.appbar(v.service, `${v.date} · ${v.window || ""} · ${UI.esc(v.senior_name)}`, "#/kaki/home")}
+        ${UI.appbar(v.service, `${v.date} · ${v.window || ""}${v.hours ? ` · ${v.hours} hr${v.hours === 1 ? "" : "s"}` : ""} · ${UI.esc(v.senior_name)}`, "#/kaki/home")}
         <div class="row">${UI.statusPill(v.status)}<span class="pill grey">${UI.TIER_LABEL[v.tier] || v.tier}</span>
         <span class="pill green">${UI.esc((v.languages || [v.language]).join(", "))}</span></div>
         <div class="card" style="margin-top:12px">
@@ -166,8 +166,8 @@ const KakiView = (() => {
         <button class="li" onclick="location.hash='#/kaki/availability'">
           <div class="face">◷</div><div class="body"><b>When I can work</b>
           <span>${(k.availability && k.availability.any_set)
-            ? Object.entries(k.availability.weekly).filter(([, s]) => s.length)
-                .map(([d, s]) => d + " " + s.map(x => x[0].toUpperCase()).join("")).join(" · ")
+            ? Object.entries(k.availability.weekly_hours || {}).filter(([, r]) => r)
+                .map(([d, r]) => `${d} ${r.from}–${r.to}`).join(" · ")
             : "Not set yet — the coordinator can't tell when you're free"}</span></div>
           <div class="end"><span class="pill ${(k.availability && k.availability.any_set) ? "green" : "gold"}">
             ${(k.availability && k.availability.any_set) ? "Set" : "Add"}</span></div></button>
@@ -196,26 +196,23 @@ const KakiView = (() => {
     try {
       const a = await Api.get("/users/me/availability");
       const days = App.config.weekdays || ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-      const halves = App.config.half_days || ["morning", "afternoon"];
-      const win = a.half_day_windows || {};
-      const on = (d, h) => ((a.weekly || {})[d] || []).includes(h);
+      const hrs = a.weekly_hours || {};
 
       UI.screen(`
         ${UI.appbar("When I can work", "The coordinator matches visits to this", "#/kaki/profile")}
-        <div class="card tint"><p>Tick the half-days you're usually free. You don't have to be
+        <div class="card tint"><p>Tick the days you're usually free and the hours. You don't have to be
         available every week — mark days off below when something comes up.</p></div>
 
         <div class="eyebrow">My normal week</div>
-        <div class="avail-grid">
-          <span></span>
-          <span class="hdr">Morning<br><small>${UI.esc(win.morning || "")}</small></span>
-          <span class="hdr">Afternoon<br><small>${UI.esc(win.afternoon || "")}</small></span>
-          ${days.map(d => `
-            <span class="day">${UI.esc(d)}</span>
-            ${halves.map(h => `<div class="slot${on(d, h) ? " sel" : ""}" data-d="${d}" data-h="${h}"
-              onclick="this.classList.toggle('sel')">${on(d, h) ? "✓" : ""}</div>`).join("")}
-          `).join("")}
-        </div>
+        ${days.map(d => {
+          const on = !!hrs[d];
+          return `<div class="li avail-day" style="align-items:center">
+            <input type="checkbox" id="day-${d}" ${on ? "checked" : ""} aria-label="${d}" style="width:22px;height:22px;accent-color:var(--pandan)">
+            <label for="day-${d}" style="width:42px;font-weight:600">${UI.esc(d)}</label>
+            <select class="f-input" id="from-${d}" aria-label="${d} from" style="margin:0" ${on ? "" : "disabled"}>${UI.timeOptions(on ? hrs[d].from : "09:00")}</select>
+            <span style="padding:0 4px">to</span>
+            <select class="f-input" id="to-${d}" aria-label="${d} to" style="margin:0" ${on ? "" : "disabled"}>${UI.timeOptions(on ? hrs[d].to : "13:00")}</select>
+          </div>`; }).join("")}
         <label class="f-label" for="availNote">Anything the coordinator should know</label>
         <input class="f-input" id="availNote" value="${UI.esc(a.note || "")}"
           placeholder="e.g. I can do urgent visits at short notice on weekends">
@@ -243,10 +240,15 @@ const KakiView = (() => {
           <button class="btn quiet" id="addEx">Add this date</button>
         </div>`);
 
+      days.forEach(d => {
+        const cb = UI.el("day-" + d);
+        cb.onchange = () => { UI.el("from-" + d).disabled = !cb.checked; UI.el("to-" + d).disabled = !cb.checked; };
+      });
+
       UI.el("saveAvail").onclick = async () => {
         const weekly = {};
-        document.querySelectorAll(".avail-grid .slot.sel").forEach(s => {
-          (weekly[s.dataset.d] = weekly[s.dataset.d] || []).push(s.dataset.h);
+        days.forEach(d => {
+          if (UI.el("day-" + d).checked) weekly[d] = { from: UI.el("from-" + d).value, to: UI.el("to-" + d).value };
         });
         try {
           await Api.put("/users/me/availability", { weekly, note: UI.el("availNote").value.trim() });

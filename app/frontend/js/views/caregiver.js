@@ -226,8 +226,13 @@ const CareView = (() => {
       ${planned ? `
         <label class="f-label">Date <small>· required — up to ${horizon} days ahead</small></label>
         <input class="f-input" id="date" type="date" min="${today}" max="${maxDate}" value="${today}">
-        <label class="f-label">Time window <small>· required</small></label>
-        ${UI.chipGroup("winG", ["Morning 9–12", "Afternoon 2–5", "Evening 5–8"], "Afternoon 2–5")}`
+        <label class="f-label">Time <small>· required — in 30-minute steps</small></label>
+        <div class="row" style="gap:10px;align-items:center">
+          <select class="f-input" id="startT" aria-label="From" style="margin:0">${UI.timeOptions("14:00")}</select>
+          <span>to</span>
+          <select class="f-input" id="endT" aria-label="To" style="margin:0">${UI.timeOptions("16:00")}</select>
+        </div>
+        <p class="f-hint" id="hoursHint" style="margin-top:6px">2 hrs — charged by the half hour, minimum 1 hour</p>`
       : `
         <label class="f-label">Arrival window <small>· required</small></label>
         ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0])}`}
@@ -236,11 +241,20 @@ const CareView = (() => {
       <label class="f-label">Anything the kaki should know? <small>· optional</small></label>
       <textarea class="f-input" id="notes" placeholder="e.g. Walks with a stick. Helper left suddenly."></textarea>
       <button class="btn gold" id="submitV">Request this visit</button>`);
+    const hint = () => {
+      const h = UI.el("hoursHint"); if (!h) return;
+      const n = UI.hoursBetween(UI.el("startT").value, UI.el("endT").value);
+      h.textContent = n ? `${n} hr${n === 1 ? "" : "s"} — charged by the half hour, minimum 1 hour` : "The end time must be after the start";
+    };
+    if (planned) { UI.el("startT").onchange = hint; UI.el("endT").onchange = hint; hint(); }
     UI.el("submitV").onclick = async () => {
       try {
-        const v = await Api.post("/visits", {
+        const v = await Api.post("/visits", planned ? {
           service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
-          date: planned ? UI.el("date").value : ((UI.chipValue("winG") || "").startsWith("Tomorrow") ? "tomorrow" : "today"),
+          date: UI.el("date").value, start_time: UI.el("startT").value, end_time: UI.el("endT").value,
+          languages: UI.chipValues("langG2"), notes: UI.el("notes").value } : {
+          service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
+          date: (UI.chipValue("winG") || "").startsWith("Tomorrow") ? "tomorrow" : "today",
           window: UI.chipValue("winG") || "", languages: UI.chipValues("langG2"),
           notes: UI.el("notes").value });
         clearDraft();
@@ -268,7 +282,7 @@ const CareView = (() => {
       const est = v.estimate;
       const active = ["assigned", "accepted", "in_progress"].includes(v.status);
       UI.screen(`
-        ${UI.appbar(v.service, `${v.date} · ${v.window || ""} · ${UI.esc(v.senior_name)}`, "#/care/home")}
+        ${UI.appbar(v.service, `${v.date} · ${v.window || ""}${v.hours ? ` · ${v.hours} hr${v.hours === 1 ? "" : "s"}` : ""} · ${UI.esc(v.senior_name)}`, "#/care/home")}
         <div class="row" style="flex-wrap:wrap">${UI.statusPill(v.status)}<span class="pill grey">${UI.TIER_LABEL[v.tier] || v.tier}</span>
         ${v.trigger ? `<span class="pill gold">${UI.esc(v.trigger)}</span>` : ""}
         <span class="pill green">${UI.esc((v.languages || [v.language]).join(", "))}</span></div>
