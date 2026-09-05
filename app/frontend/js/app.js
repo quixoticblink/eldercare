@@ -54,13 +54,14 @@ const App = (() => {
   function applyLang() {
     const btn = UI.el("langBtn");
     const isAdmin = user && user.role === "admin";
-    if (isAdmin) { UI.setLang("en", false); btn.hidden = true; return; }   // not persisted: a shared phone keeps its choice
-    btn.hidden = false;
+    if (isAdmin) UI.setLang("en", false);   // not persisted: a shared phone keeps its choice
+    btn.hidden = !!isAdmin;
     btn.textContent = UI.t("lang.switch");
     btn.setAttribute("aria-label", UI.t("lang.switch.aria"));
     UI.el("umSignout").textContent = UI.t("menu.signout");
+    if (!Api.getToken()) UI.el("umWho").textContent = UI.t("menu.notsigned");
     UI.el("helpBtn").setAttribute("aria-label", UI.t("help.btn"));
-    HelpView.relabel();
+    HelpView.relabel();   // English again for the coordinator, whatever the phone was set to
   }
   function initLang() {
     UI.setLang(UI.storedLang() || "en", false);

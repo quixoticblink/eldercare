@@ -48,7 +48,7 @@ const KakiView = (() => {
         <div class="card" style="margin-top:12px">
           <h3>${UI.esc(x.senior_name)}${x.senior_age ? ", " + x.senior_age : ""}${x.times_together ? t("kv.together", { n: x.times_together }) : t("kv.first")}</h3>
           <p>${UI.esc(x.address || t("cv.pr"))}</p>
-          ${x.trigger ? `<p style="margin-top:4px"><b>${t("kv.why")}</b> ${UI.esc(x.trigger.startsWith("Other: ") ? x.trigger : v("trigger", x.trigger))}</p>` : ""}
+          ${x.trigger ? `<p style="margin-top:4px"><b>${t("kv.reason")}</b> ${UI.esc(x.trigger.startsWith("Other: ") ? x.trigger : v("trigger", x.trigger))}</p>` : ""}
           ${x.notes ? `<div class="divider"></div><p><b>${t("kv.family")}</b> ${UI.esc(x.notes)}</p>` : ""}
           ${x.estimate ? `<div class="divider"></div><div class="row"><span class="pill gold">${t("kv.receive", { n: (x.estimate.kaki_fee + x.estimate.transport).toFixed(2) })}</span><span class="pill green">${t("kv.cashless")}</span></div>${UI.moneyNote()}` : ""}
         </div>
