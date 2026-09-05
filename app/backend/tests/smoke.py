@@ -1074,10 +1074,38 @@ _bad = c.post(f"/api/visits/{_rz}/verify-kaki", json={"code": "0000" if c.get(f"
 assert _bad.status_code == 400 and _bad.json()["error"] == "kaki_code_wrong", _bad.text
 _rl.clear("visit_code", _rz)
 assert c.post(f"/api/visits/{_rz}/cancel", json={"reason": "done"}, headers=ch).status_code == 200
+# notifications follow the recipient's language: a zh kaki gets Chinese, the
+# en caregiver on the same visit gets English, and the audit log stays English
+assert c.put("/api/users/me", json={"lang": "zh"}, headers=kh).status_code == 200
+_vz = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                  "start_time": "09:00", "end_time": "11:00", "languages": ["Mandarin"]}, headers=ch).json()
+_sent.clear()
+assert c.post(f"/api/admin/visits/{_vz['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+_kz = " ".join(_texts_to("beelian@example.com")); _cz = " ".join(_texts_to("priya@example.com"))
+assert "探访" in _kz and "2026-08-18" in _kz and "Companionship" in _kz and "2 小时" in _kz, _kz
+assert "Open the app" not in _kz, _kz
+assert "matched" in _cz.lower() and not any("一" <= ch_ <= "鿿" for ch_ in _cz), _cz
+_aud = db.q("SELECT detail FROM audit_log WHERE action = 'notified' ORDER BY ts DESC LIMIT 2")
+assert _aud and all(not any("一" <= ch_ <= "鿿" for ch_ in (r["detail"] or "")) for r in _aud), _aud
+_sent.clear()
+assert c.post(f"/api/visits/{_vz['id']}/accept", headers=kh).status_code == 200
+assert any("confirmed" in t.lower() for t in _texts_to("priya@example.com")), _sent
+_sent.clear()
+assert c.post(f"/api/visits/{_vz['id']}/cancel", json={"reason": "plans changed"}, headers=ch).status_code == 200
+_kz = " ".join(_texts_to("beelian@example.com"))
+assert "取消" in _kz and "plans changed" in _kz, _kz          # reason is the caregiver's words, untranslated
+assert c.put("/api/users/me", json={"lang": "en"}, headers=kh).status_code == 200
+# the help bot answers in the language of the question
+_zq = c.post("/api/chat", json={"message": "什么是开始码？"}, headers=ch).json()["reply"]
+assert "开始码" in _zq and "start code" not in _zq.lower(), _zq
+_zq = c.post("/api/chat", json={"message": "怎样登录？"}).json()["reply"]          # signed out: the guide
+assert "验证码" in _zq, _zq
+_eq = c.post("/api/chat", json={"message": "what is the start code?"}, headers=ch).json()["reply"]
+assert not any("一" <= ch_ <= "鿿" for ch_ in _eq), _eq
 
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.
 _n = sum(1 for _line in open(os.path.abspath(__file__), encoding="utf-8")
          if _line.lstrip().startswith("assert "))
-print(f"ALL SMOKE TESTS PASSED ✓  (v1.6 — {_n} assertions)")
+print(f"ALL SMOKE TESTS PASSED ✓  (v1.7 — {_n} assertions)")

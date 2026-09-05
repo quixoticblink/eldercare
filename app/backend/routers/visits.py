@@ -390,8 +390,8 @@ def start(vid: str, body: StartIn, user=Depends(security.current_user)):
         raise KakisError(400, "Wrong start code — ask the family to read it from their visit page", "start_code_wrong")
     ratelimit.clear("visit_code", vid)
     v = _transition(vid, user, ["kaki"], ["accepted", "assigned"], "in_progress", "started_at")
-    kaki, _cg, senior = _parties(v)
-    notify.visit_started_contact(v, kaki, senior, db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]]))
+    kaki, cg, senior = _parties(v)
+    notify.visit_started_contact(v, kaki, senior, db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]]), cg)
     return _out(v, user)
 
 @router.post("/{vid}/complete")
@@ -401,8 +401,8 @@ def complete(vid: str, body: ReportIn, user=Depends(security.current_user)):
     db.run("DELETE FROM visit_reports WHERE visit_id = ?", [vid])
     db.run("INSERT INTO visit_reports(visit_id, chips, text, meds_confirmed) VALUES (?,?,?,?)",
            [vid, db.j(body.chips), body.text, body.meds_confirmed])
-    kaki, _cg, senior = _parties(v)
-    notify.visit_finished_contact(v, kaki, senior, db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]]))
+    kaki, cg, senior = _parties(v)
+    notify.visit_finished_contact(v, kaki, senior, db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]]), cg)
     return _out(db.one("SELECT * FROM visits WHERE id = ?", [vid]), user)
 
 @router.post("/{vid}/cancel")

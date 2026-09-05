@@ -22,6 +22,42 @@ HELP_GUIDE = {
     "notification": "You don't need to keep the app open. We send you an SMS or email message when a visit is assigned, confirmed, or changes.",
 }
 
+# v1.7: the same guide in Simplified Chinese, keyed by the words a Singapore
+# senior would type. Matched only when the question itself is in Chinese.
+HELP_GUIDE_ZH = {
+    "登录": "输入您的电邮地址或手机号码，然后输入我们发给您的 6 位数验证码。不需要密码。登录过的用户只需要输入验证码。新账户需要等协调员审批。",
+    "验证码": "登录时的 6 位数验证码会发到您的电邮或手机。如果没收到，请再发送一次，或致电协调员 6XXX XXXX。",
+    "审批": "第一次登录后，Kakis 协调员会审核并批准您的账户，通常一天内完成。在那之前您会看到等待页面。",
+    "预约": "照顾者：首页 → 预约探访 → 选服务 → 选时间（紧急 / 尽快 / 预约）→ 填详情 → 提交。协调员会配对 Kaki，您可以在“探访”里看到。",
+    "紧急": "紧急是指一小时内就需要人，例如帮佣突然离开。协调员会优先处理这些申请。",
+    "开始码": "照顾者：Kaki 到达时，先在“确认是本人”输入他/她屏幕上的 4 位数 Kaki 验证码，您的开始码就会出现在探访页面。把开始码读给 Kaki，探访就开始。",
+    "kaki 验证码": "Kaki：您的探访页面有一个给家属的 4 位数验证码。到门口时连同您的照片一起出示，家属输入后会把开始码读给您。",
+    "照片": "Kaki：在“我的资料”添加照片。家属会在探访页面看到，这样在门口就知道是您。",
+    "证书": "Kaki：在“我的资料”添加证书（CPR + AED、行动辅助培训等），PDF 或照片都可以。协调员审批前会查看。",
+    "报告": "Kaki：结束探访后，勾选适用的项目并写一段简短备注。照顾者会在探访页面看到报告。",
+    "照护计划": "照顾者：首页 → 照护计划。请保持药物、行动能力和语言的资料更新，每位 Kaki 探访前都会看。",
+    "取消": "打开探访，点“取消”。请至少提前 2 小时取消，以免 Kaki 已经在路上。",
+    "付款": "试点期间应用内不需要付款，费用通过 Vanguard / ICCP 账户结算。",
+    "报酬": "Kaki：“成果”页面显示小时数和金额。试点期间报酬每周通过 Vanguard 发放。",
+    "联系": "有困难？请致电巴西立 ICCP 协调员 6XXX XXXX。",
+    "开着": "不需要一直开着应用。安排了探访、确认了或有任何变动，我们都会发短信或电邮给您，收到再打开应用就可以。",
+    "通知": "不需要一直开着应用。安排了探访、确认了或有任何变动，我们都会发短信或电邮给您。",
+}
+_ZH_FALLBACK = ("我可以帮您解答：登录、审批、预约探访、开始码、报告、照护计划、取消和报酬。"
+                "请试试这些词，或致电巴西立 ICCP 协调员 6XXX XXXX。")
+
+def is_zh(text: str) -> bool:
+    """True when the question is (mostly) written in Chinese characters."""
+    han = sum(1 for ch in (text or "") if "\u4e00" <= ch <= "\u9fff")
+    return han >= 2 and han * 3 >= len((text or "").strip())
+
+def _guide_zh(message: str) -> str:
+    m = (message or "").lower()
+    for key, answer in HELP_GUIDE_ZH.items():
+        if key in m:
+            return answer
+    return _ZH_FALLBACK
+
 SYSTEM_PROMPT = """You are the in-app helper for Kakis, a Singapore pilot app where family
 caregivers book trusted respite visits for elderly parents, trained "kakis" (respite givers)
 serve those visits, and a coordinator approves users and matches visits manually.
@@ -33,7 +69,8 @@ Answer briefly (2-4 sentences), warmly, in plain language. App facts:
 - Kakis: profile photo, gender, certificates (PDF or photo) that the coordinator checks before approving; working hours per day; see assigned visits, accept, tap "I'm on my way", start with the family's start code, end with a short report. Household-help visits show the kaki only what the task needs (no medications or age). Impact tab shows hours/earnings; weekly payout via Vanguard.
 - You don't need to keep the app open: SMS or email arrives when anything changes.
 - No payments in-app during the pilot (billed via ICCP account). No public ratings of kakis (MOH rule) - concerns go privately to the care team.
-- Coordinator phone: 6XXX XXXX. If you don't know, say so and point to the coordinator."""
+- Coordinator phone: 6XXX XXXX. If you don't know, say so and point to the coordinator.
+- Answer in the language the question was asked in: English for English, Simplified Chinese (as spoken in Singapore, plain and short) for Chinese. Keep "Kaki" as Kaki; start code = 开始码; kaki code = Kaki 验证码; caregiver = 照顾者; coordinator = 协调员; visit = 探访."""
 
 def _recent(history: list) -> list:
     return [{"role": m.get("role", "user"), "content": m.get("content", "")}
@@ -70,6 +107,8 @@ def _openai(message: str, history: list) -> str | None:
 def guide_reply(message: str) -> str:
     """Keyword guide only — no provider call. Used for signed-out visitors, who
     are most often asking how to sign in."""
+    if is_zh(message):
+        return _guide_zh(message)
     m = (message or "").lower()
     if any(w in m for w in ("sign in", "signin", "log in", "login", "code", "otp")):
         return HELP_GUIDE["sign in"]
@@ -92,7 +131,9 @@ def reply(message: str, history: list) -> str:
                 return out
         except Exception:
             pass
-    # keyword fallback
+    # keyword fallback, in the language of the question
+    if is_zh(message):
+        return _guide_zh(message)
     m = message.lower()
     for key, answer in HELP_GUIDE.items():
         if key in m:
