@@ -89,4 +89,5 @@ LOCKED_SERVICES = ["Medicine administration"]  # Tier 2 — visible, not bookabl
 TIERS = ["urgent", "soon", "planned"]
 LANGUAGES = ["English", "Mandarin", "Cantonese", "Hokkien", "Malay", "Tamil"]
 GENDERS = ["female", "male"]                 # on the kaki profile; "" = not stated
+APP_LANGS = ["en", "zh"]                     # v1.7: UI + notification languages (users.lang)
 GENDER_PREFS = ["any", "female", "male"]     # on a visit request

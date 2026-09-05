@@ -1,7 +1,7 @@
 /* M-HELP · floating help button, guide chips, chatbot. */
 const HelpView = (() => {
   let history = [];
-  const QUICK = ["How do I book a visit?", "What's the start code?", "When am I approved?", "How do payouts work?"];
+  const QUICK = ["help.q1", "help.q2", "help.q3", "help.q4"];
 
   function init() {
     const panel = UI.el("helpPanel");
@@ -10,12 +10,31 @@ const HelpView = (() => {
     panel.onclick = e => { if (e.target === panel) panel.classList.remove("open"); };
     UI.el("chatSend").onclick = send;
     UI.el("chatInput").onkeydown = e => { if (e.key === "Enter") send(); };
-    if (!history.length) addMsg("bot", "Hello! I'm the Kakis helper. Ask me anything about booking, visits, the start code, or approvals.");
+    relabel();
+  }
+
+  /* v1.7: the panel's fixed copy follows the language switch. The greeting is
+     re-drawn only while the conversation is still empty — a real exchange is
+     never rewritten under the person. */
+  function relabel() {
+    UI.el("helpTitle").textContent = UI.t("help.title");
+    UI.el("helpSub").textContent = UI.t("help.sub");
+    UI.el("helpClose").textContent = UI.t("help.close");
+    UI.el("chatInput").placeholder = UI.t("help.placeholder");
+    UI.el("chatSend").textContent = UI.t("help.send");
+    UI.el("helpPanel").setAttribute("aria-label", UI.t("help.btn"));
+    if (history.length <= 1) {
+      history = []; UI.el("chatLog").innerHTML = "";
+      addMsg("bot", UI.t("help.greeting"));
+    }
+    if (UI.el("helpPanel").classList.contains("open")) renderQuick();
   }
 
   function renderQuick() {
-    UI.el("helpQuick").innerHTML = QUICK.map(q =>
-      `<button class="chip" onclick="HelpView.ask('${q.replace(/'/g, "\\'")}')">${q}</button>`).join("");
+    UI.el("helpQuick").innerHTML = QUICK.map(id => {
+      const q = UI.t(id);
+      return `<button class="chip" onclick="HelpView.ask('${q.replace(/'/g, "\\'")}')">${UI.esc(q)}</button>`;
+    }).join("");
   }
 
   function addMsg(role, text) {
@@ -40,9 +59,9 @@ const HelpView = (() => {
       const r = await Api.post("/chat", { message: msg, history: history.slice(0, -1) });
       addMsg("bot", r.reply);
     } catch (e) {
-      addMsg("bot", "I couldn't reach the helper just now — try again, or call the coordinator at 6XXX XXXX.");
+      addMsg("bot", UI.t("help.offline"));
     }
   }
 
-  return { init, ask };
+  return { init, ask, relabel };
 })();

@@ -9,6 +9,7 @@ import datetime
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from .. import config, db, security
+from ..errors import KakisError
 from ..services import emailer, ratelimit, sms
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -30,6 +31,7 @@ def _public(user: dict) -> dict:
     out = {k: user.get(k) for k in ("id", "email", "name", "phone", "role", "status")}
     out["email_verified"] = bool(user.get("email_verified"))
     out["phone_verified"] = bool(user.get("phone_verified"))
+    out["lang"] = user.get("lang") or ""          # v1.7: '' until they choose
     return out
 
 def _identifier(body) -> tuple[str, str]:
@@ -64,12 +66,12 @@ def request_code(body: IdentifierIn, request: Request = None):
     # run up the Twilio bill and hammer someone's phone at the same time.
     ip = ratelimit.client_ip(request)
     if ratelimit.exceeded("request_code_identifier", value):
-        raise HTTPException(429, f"Too many codes requested. Try again in "
-                                 f"{ratelimit.retry_after('request_code_identifier', value)} minutes, "
-                                 f"or call the coordinator on 6XXX XXXX.")
+        raise KakisError(429, f"Too many codes requested. Try again in "
+                              f"{ratelimit.retry_after('request_code_identifier', value)} minutes, "
+                              f"or call the coordinator on 6XXX XXXX.", "too_many_tries")
     if ip and ratelimit.exceeded("request_code_ip", ip):
-        raise HTTPException(429, "Too many sign-in attempts from this connection. "
-                                 "Please wait a few minutes and try again.")
+        raise KakisError(429, "Too many sign-in attempts from this connection. "
+                              "Please wait a few minutes and try again.", "too_many_tries")
     ratelimit.record("request_code_identifier", value)
     if ip:
         ratelimit.record("request_code_ip", ip)
@@ -110,17 +112,17 @@ def verify(body: VerifyIn):
     # A 6-digit code is only strong if guesses are limited. Without this an
     # attacker can walk the whole keyspace inside the 10-minute window.
     if ratelimit.exceeded("verify_failure", value):
-        raise HTTPException(429, f"Too many incorrect codes. Locked for "
-                                 f"{ratelimit.retry_after('verify_failure', value)} minutes — "
-                                 f"request a new code after that, or call the coordinator.")
+        raise KakisError(429, f"Too many incorrect codes. Locked for "
+                              f"{ratelimit.retry_after('verify_failure', value)} minutes — "
+                              f"request a new code after that, or call the coordinator.", "too_many_tries")
 
     row = db.one("SELECT * FROM otp_codes WHERE identifier = ? AND code = ?", [value, body.code.strip()])
     if not row:
         ratelimit.record("verify_failure", value)
         db.audit(value, "login_failed", "wrong code")
-        raise HTTPException(400, "Wrong code — check and try again")
+        raise KakisError(400, "Wrong code — check and try again", "code_wrong")
     if row["expires"] < db.now():
-        raise HTTPException(400, "Code expired — request a new one")
+        raise KakisError(400, "Code expired — request a new one", "code_expired")
     db.run("DELETE FROM otp_codes WHERE identifier = ?", [value])
     # A genuine sign-in clears the counters, so an honest user who fumbled a few
     # digits is not left locked out.

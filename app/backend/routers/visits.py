@@ -2,6 +2,7 @@
 import datetime, random, re, zoneinfo
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+from ..errors import KakisError
 from .. import assumptions, config, db, security, settings
 from ..services import availability, matching, notify, ratelimit
 
@@ -206,7 +207,7 @@ def create(body: VisitIn, user=Depends(security.current_user)):
     if not window:
         raise HTTPException(400, "Pick a time")
     if _window_has_passed(body.date, window):
-        raise HTTPException(400, "That window has passed — pick a later one")
+        raise KakisError(400, "That window has passed — pick a later one", "window_passed")
     horizon = int(settings.get("max_advance_days") or 30)
     m = re.match(r"^(\d{4})-(\d{2})-(\d{2})$", (body.date or "").strip())
     if m:
@@ -215,9 +216,9 @@ def create(body: VisitIn, user=Depends(security.current_user)):
         except ValueError:
             raise HTTPException(400, "Use a real date")
         if d < _now().date():
-            raise HTTPException(400, "That date has passed")
+            raise KakisError(400, "That date has passed", "date_passed")
         if (d - _now().date()).days > horizon:
-            raise HTTPException(400, f"Bookings open up to {horizon} days ahead — pick an earlier date")
+            raise KakisError(400, f"Bookings open up to {horizon} days ahead — pick an earlier date", "date_too_far")
     langs = [l for l in (body.languages or []) if l in config.LANGUAGES]
     if not langs and body.language:
         langs = [body.language]
@@ -342,13 +343,13 @@ def verify_kaki(vid: str, body: KakiCodeIn, user=Depends(security.current_user))
         raise HTTPException(400, "No kaki to check yet")
     code = body.code.strip()
     if not re.fullmatch(r"\d{4}", code) or not v.get("kaki_code"):
-        raise HTTPException(400, "Enter the 4 digits on your kaki's screen")
+        raise KakisError(400, "Enter the 4 digits on your kaki's screen", "kaki_code_wrong")
     if ratelimit.exceeded("visit_code", vid):
-        raise HTTPException(429, "Too many tries — call the coordinator on 6XXX XXXX to confirm who is at the door")
+        raise KakisError(429, "Too many tries — call the coordinator on 6XXX XXXX to confirm who is at the door", "too_many_tries")
     if code != v["kaki_code"]:
         ratelimit.record("visit_code", vid)
         db.audit(user["email"] or user["phone"], "kaki_code_wrong", vid)
-        raise HTTPException(400, "That code doesn't match — ask your kaki to show it again, or call the coordinator")
+        raise KakisError(400, "That code doesn't match — ask your kaki to show it again, or call the coordinator", "kaki_code_wrong")
     ratelimit.clear("visit_code", vid)
     if not v.get("kaki_verified_at"):
         db.run("UPDATE visits SET kaki_verified_at = current_timestamp WHERE id = ?", [vid])
@@ -382,11 +383,11 @@ def start(vid: str, body: StartIn, user=Depends(security.current_user)):
     if not v:
         raise HTTPException(404, "Visit not found")
     if ratelimit.exceeded("visit_code", vid):
-        raise HTTPException(429, "Too many tries — call the coordinator on 6XXX XXXX")
+        raise KakisError(429, "Too many tries — call the coordinator on 6XXX XXXX", "too_many_tries")
     if body.otp.strip() != v["otp_code"]:
         ratelimit.record("visit_code", vid)
         db.audit(user["email"] or user["phone"], "start_code_wrong", vid)
-        raise HTTPException(400, "Wrong start code — ask the family to read it from their visit page")
+        raise KakisError(400, "Wrong start code — ask the family to read it from their visit page", "start_code_wrong")
     ratelimit.clear("visit_code", vid)
     v = _transition(vid, user, ["kaki"], ["accepted", "assigned"], "in_progress", "started_at")
     kaki, _cg, senior = _parties(v)

@@ -16,13 +16,17 @@ const Api = (() => {
         method, headers, body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch (e) {
-      throw new Error("Can't reach Kakis — check your connection");
+      throw new Error(UI.t("common.noconnection"));
     }
     let data = {};
     try { data = await res.json(); } catch (e) {}
     if (!res.ok) {
       if (res.status === 401) { setToken(null); }
-      throw new Error(data.detail || "Something went wrong");
+      // v1.7: `detail` is English; `error` is a stable code that UI.terr()
+      // turns into the person's language. Views toast UI.terr(e).
+      const err = new Error(typeof data.detail === "string" && data.detail ? data.detail : UI.t("common.wrong"));
+      if (data.error) err.code = data.error;
+      throw err;
     }
     return data;
   }

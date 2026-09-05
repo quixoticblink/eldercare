@@ -187,6 +187,13 @@ nav.tabs button.on{color:var(--pandan-deep);background:var(--mint)}
 .brandbar #brandRight{cursor:pointer;border:0;background:transparent;font:inherit;color:inherit;
   display:flex;align-items:center;gap:6px;min-height:36px}
 .brandbar #brandRight:hover{color:var(--pandan-deep)}
+/* v1.7 language toggle: sits between the wordmark and the user menu, big
+   enough for a thumb, plain enough not to compete with the screen. */
+.brandbar .right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.brandbar .langbtn{cursor:pointer;min-height:36px;padding:4px 12px;border-radius:999px;
+  border:1.5px solid var(--pandan);background:transparent;color:var(--pandan-deep);
+  font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:.85rem}
+.brandbar .langbtn:hover{background:var(--mint-soft)}
 
 /* toast */
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:var(--ink);color:#fff;

@@ -1049,6 +1049,32 @@ assert c.post(f"/api/visits/{_ry}/cancel", json={"reason": "not mine"}, headers=
 assert c.post(f"/api/visits/{_ry}/verify-kaki", json={"code": "1234"}, headers=ch2).status_code == 403
 assert c.post(f"/api/visits/{_ry}/cancel", json={"reason": "done"}, headers=ch).status_code == 200
 
+# ---- v1.7: language ----------------------------------------------------------
+# users.lang round-trips; only en and zh are accepted; /auth/me carries it so a
+# second phone follows the person, not the browser.
+assert c.get("/api/users/me/profile", headers=kh).json().get("lang", "") in ("", "en")
+assert c.put("/api/users/me", json={"lang": "zh"}, headers=kh).status_code == 200
+assert c.get("/api/users/me/profile", headers=kh).json()["lang"] == "zh"
+assert c.get("/api/auth/me", headers=kh).json()["user"]["lang"] == "zh"
+assert c.put("/api/users/me", json={"lang": "fr"}, headers=kh).status_code == 400
+assert c.put("/api/users/me", json={"lang": "en"}, headers=kh).status_code == 200
+assert c.get("/api/users/me/profile", headers=kh).json()["lang"] == "en"
+# senior-facing errors carry a stable code next to the English detail; the
+# frontend maps the code, the coordinator and the logs still read the sentence
+_req = request_code("beelian@example.com")
+_bad = c.post("/api/auth/verify", json={"identifier": "beelian@example.com", "code": "000000"})
+assert _bad.status_code == 400 and _bad.json()["error"] == "code_wrong" and "Wrong code" in _bad.json()["detail"], _bad.text
+_rl.clear("verify_failure", "beelian@example.com")
+kh, kk = login("beelian@example.com")
+_rz = _booked_and_accepted()
+_bad = c.post(f"/api/visits/{_rz}/start", json={"otp": "abcd"}, headers=kh)   # never a real code
+assert _bad.status_code == 400 and _bad.json()["error"] == "start_code_wrong", _bad.text
+_rl.clear("visit_code", _rz)
+_bad = c.post(f"/api/visits/{_rz}/verify-kaki", json={"code": "0000" if c.get(f"/api/visits/{_rz}", headers=kh).json()["kaki_code"] != "0000" else "1111"}, headers=ch)
+assert _bad.status_code == 400 and _bad.json()["error"] == "kaki_code_wrong", _bad.text
+_rl.clear("visit_code", _rz)
+assert c.post(f"/api/visits/{_rz}/cancel", json={"reason": "done"}, headers=ch).status_code == 200
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

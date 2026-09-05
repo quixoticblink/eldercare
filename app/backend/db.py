@@ -146,6 +146,10 @@ def _init(c):
       uploaded_at TIMESTAMP DEFAULT current_timestamp);
     """)
 
+    # v1.7 M-USERS: the language a person chose in the app ('' | 'en' | 'zh').
+    # Read by notifications so a message follows the person, not the browser.
+    c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS lang TEXT DEFAULT ''")
+
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for
     # ADD COLUMN ... DEFAULT after an unclean shutdown (e.g. systemctl restart

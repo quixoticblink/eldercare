@@ -14,6 +14,7 @@ class ProfileIn(BaseModel):
     languages: list[str] | None = None
     area: str | None = None
     gender: str | None = None        # kaki only: female | male | "" (not stated)
+    lang: str | None = None          # v1.7: en | zh — the app language they chose
 
 class PhotoIn(BaseModel):
     data_url: str = ""     # "data:image/jpeg;base64,..." or "" to remove
@@ -55,6 +56,11 @@ def update_me(body: ProfileIn, user=Depends(security.current_user)):
             # A new number has not been proved yet; it is proved the first time
             # a sign-in code is used on it (M-AUTH).
             db.run("UPDATE users SET phone = ?, phone_verified = FALSE WHERE id = ?", [phone, user["id"]])
+    if body.lang is not None:
+        lang = body.lang.strip().lower()
+        if lang not in config.APP_LANGS:
+            raise HTTPException(400, "Language must be en or zh")
+        db.run("UPDATE users SET lang = ? WHERE id = ?", [lang, user["id"]])
     if user["role"] == "kaki":
         if not db.one("SELECT 1 FROM kaki_profiles WHERE user_id = ?", [user["id"]]):
             db.run("INSERT INTO kaki_profiles(user_id) VALUES (?)", [user["id"]])
@@ -101,6 +107,7 @@ def put_photo(body: PhotoIn, user=Depends(security.current_user)):
 def get_me_profile(user=Depends(security.current_user)):
     out = {k: user.get(k) for k in ("id", "email", "name", "phone", "role", "status")}
     out["photo"] = user.get("photo") or ""
+    out["lang"] = user.get("lang") or ""
     if user["role"] == "kaki":
         p = db.one("SELECT * FROM kaki_profiles WHERE user_id = ?", [user["id"]]) or {}
         out["kaki"] = {"services": db.uj(p.get("services")), "languages": db.uj(p.get("languages")),

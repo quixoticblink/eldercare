@@ -7,6 +7,7 @@ normalised pair (channel, value) so the rest of the app never has to guess.
 import base64, hashlib, hmac, json, re, time, random
 from fastapi import Header, HTTPException
 from . import config, db
+from .errors import KakisError
 
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -69,7 +70,7 @@ def current_user(authorization: str = Header(default="")):
         raise HTTPException(401, "Not signed in")
     uid = parse_token(authorization[7:])
     if not uid:
-        raise HTTPException(401, "Session expired — sign in again")
+        raise KakisError(401, "Session expired — sign in again", "session_expired")
     user = db.one("SELECT * FROM users WHERE id = ?", [uid])
     if not user:
         raise HTTPException(401, "Account not found")
@@ -79,7 +80,7 @@ def approved_user(user=None):
     if user is None:
         raise HTTPException(401, "Not signed in")
     if user["status"] != "approved":
-        raise HTTPException(403, "Account awaiting approval")
+        raise KakisError(403, "Account awaiting approval", "not_approved")
     return user
 
 def require_role(user, *roles):

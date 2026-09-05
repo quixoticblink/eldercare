@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from . import config, db
+from . import config, db, errors
 from .routers import auth, users, care, visits, admin, chat
 
 # The interactive docs publish the entire API surface — every endpoint, every
@@ -23,6 +23,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+errors.install(app)   # v1.7: {"detail": English, "error": stable code}
 
 for r in (auth.router, users.router, care.router, visits.router, admin.router, chat.router):
     app.include_router(r, prefix="/api")
