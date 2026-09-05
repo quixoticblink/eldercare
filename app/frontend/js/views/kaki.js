@@ -55,7 +55,8 @@ const KakiView = (() => {
              ${plan.mobility ? "🚶 " + UI.esc(plan.mobility) + "<br>" : ""}
              ${(plan.languages || []).length ? "🗣 " + plan.languages.map(UI.esc).join(", ") + "<br>" : ""}
              ${plan.notes ? "📝 " + UI.esc(plan.notes) : ""}</p>
-          ${plan.contacts ? `<div class="divider"></div><p><b>Emergency:</b> ${UI.esc(plan.contacts)}</p>` : ""}
+          ${plan.contact_name || plan.contact_phone ? `<div class="divider"></div><p><b>Emergency:</b> ${UI.esc(plan.contact_name || "")}${plan.contact_relationship ? " (" + UI.esc(plan.contact_relationship) + ")" : ""} · ${UI.esc(plan.contact_phone || "")}<br><small>They're messaged when you start and finish.</small></p>` : ""}
+          ${plan.contacts ? `<div class="divider"></div><p><b>Other contacts:</b> ${UI.esc(plan.contacts)}</p>` : ""}
         </div>
         ${v.status === "assigned" ? `
           <button class="btn gold" id="acceptV">Accept this visit</button>

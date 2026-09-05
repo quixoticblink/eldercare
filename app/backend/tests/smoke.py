@@ -701,6 +701,32 @@ assert _r.status_code == 200 and _r.json()["trigger"] == "Other: cataract op", _
 assert c.post(f"/api/visits/{_r.json()['id']}/cancel", headers=ch).status_code == 200
 assert c.put("/api/admin/settings", json={"max_advance_days": 30}, headers=ah).json()["max_advance_days"] == 30
 
+# [B1·11] the emergency contact hears when a visit starts and ends
+# (facilitators' feedback, 21 Aug). Priya's plan has Ravi on +6591112222 from B1·9.
+v16e = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-15",
+                                   "window": "Morning 9–12", "language": "English"}, headers=ch).json()
+assert c.post(f"/api/admin/visits/{v16e['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+assert c.post(f"/api/visits/{v16e['id']}/accept", headers=kh).status_code == 200
+_otp16 = c.get(f"/api/visits/{v16e['id']}", headers=ch).json()["otp_code"]
+_sent.clear()
+assert c.post(f"/api/visits/{v16e['id']}/start", json={"otp": _otp16}, headers=kh).status_code == 200
+_ravi = [m for m in _sent if m[1] == "+6591112222"]
+assert _ravi and "started" in _ravi[0][3].lower() and "Tan Bee Lian" in _ravi[0][3], _sent
+_sent.clear()
+assert c.post(f"/api/visits/{v16e['id']}/complete", json={"chips": ["Went well"], "text": "ok"}, headers=kh).status_code == 200
+_ravi = [m for m in _sent if m[1] == "+6591112222"]
+assert _ravi and "finished" in _ravi[0][3].lower(), _sent
+# no contact on file → nothing sent, nothing breaks
+assert c.put("/api/care/plan", json={"meds": "Metformin 2pm", "mobility": "Bedridden", "languages": ["Tamil"]}, headers=ch).status_code == 200
+v16f = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-15",
+                                   "window": "Morning 9–12", "language": "English"}, headers=ch).json()
+assert c.post(f"/api/admin/visits/{v16f['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+assert c.post(f"/api/visits/{v16f['id']}/accept", headers=kh).status_code == 200
+_sent.clear()
+assert c.post(f"/api/visits/{v16f['id']}/start", json={"otp": c.get(f"/api/visits/{v16f['id']}", headers=ch).json()["otp_code"]}, headers=kh).status_code == 200
+assert not [m for m in _sent if m[1] == "+6591112222"]
+assert c.post(f"/api/visits/{v16f['id']}/complete", json={"chips": [], "text": "ok"}, headers=kh).status_code == 200
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

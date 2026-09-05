@@ -146,3 +146,38 @@ def visit_on_the_way(visit: dict, kaki: dict, caregiver: dict, senior_name: str 
         email_html=(f"<p><b>{name}</b> is on the way to {who} now.</p>"
                     f"<p>Have the 4-digit start code ready on your visit page.</p>"),
     )
+
+# ---- the emergency contact (v1.6) -------------------------------------------
+# Not a user: a name and a number on the care plan. SMS only; never raises.
+
+def contact_sms(phone: str, text: str, actor: str = "care-plan-contact") -> bool:
+    phone = (phone or "").strip()
+    if not phone:
+        return False
+    try:
+        sent = bool(sms.send_sms(phone, text))
+    except Exception as e:
+        print(f"[kakis] contact sms to {phone} failed: {e}")
+        sent = False
+    try:
+        db.audit(actor, "contact_notified" if sent else "contact_notify_failed", phone)
+    except Exception:
+        pass
+    return sent
+
+def visit_started_contact(visit: dict, kaki: dict, senior_name: str, plan: dict) -> bool:
+    if not plan or not plan.get("contact_phone"):
+        return False
+    name = (kaki or {}).get("name") or "A Kakis helper"
+    who = senior_name or "your family member"
+    return contact_sms(plan["contact_phone"],
+                       f"Kakis: {name} has started a {(visit.get('service') or 'visit').lower()} with {who}. "
+                       f"You'll get another message when it finishes.")
+
+def visit_finished_contact(visit: dict, kaki: dict, senior_name: str, plan: dict) -> bool:
+    if not plan or not plan.get("contact_phone"):
+        return False
+    name = (kaki or {}).get("name") or "The Kakis helper"
+    who = senior_name or "your family member"
+    return contact_sms(plan["contact_phone"],
+                       f"Kakis: {name} has finished the visit with {who}. The family can read the report in the app.")

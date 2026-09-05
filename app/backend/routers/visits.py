@@ -246,7 +246,10 @@ def start(vid: str, body: StartIn, user=Depends(security.current_user)):
         raise HTTPException(404, "Visit not found")
     if body.otp.strip() != v["otp_code"]:
         raise HTTPException(400, "Wrong start code — ask the family to read it from their visit page")
-    return _enrich(_transition(vid, user, ["kaki"], ["accepted", "assigned"], "in_progress", "started_at"))
+    v = _transition(vid, user, ["kaki"], ["accepted", "assigned"], "in_progress", "started_at")
+    kaki, _cg, senior = _parties(v)
+    notify.visit_started_contact(v, kaki, senior, db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]]))
+    return _enrich(v)
 
 @router.post("/{vid}/complete")
 def complete(vid: str, body: ReportIn, user=Depends(security.current_user)):
@@ -255,6 +258,8 @@ def complete(vid: str, body: ReportIn, user=Depends(security.current_user)):
     db.run("DELETE FROM visit_reports WHERE visit_id = ?", [vid])
     db.run("INSERT INTO visit_reports(visit_id, chips, text, meds_confirmed) VALUES (?,?,?,?)",
            [vid, db.j(body.chips), body.text, body.meds_confirmed])
+    kaki, _cg, senior = _parties(v)
+    notify.visit_finished_contact(v, kaki, senior, db.one("SELECT * FROM care_plans WHERE household_id = ?", [v["household_id"]]))
     return _enrich(db.one("SELECT * FROM visits WHERE id = ?", [vid]))
 
 @router.post("/{vid}/cancel")
