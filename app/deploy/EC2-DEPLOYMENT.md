@@ -331,6 +331,14 @@ ssh -i ~/Documents/Claude/Keypairs/eldercare.pem ec2-user@3.1.33.212 \
   'sudo chown -R kakis:kakis /home/kakis/eldercare && sudo systemctl restart kakis'
 ```
 
+**Learned on the v1.6 deploy (2026-09-05):**
+
+- Back up the database first, from where `.env` says it is (`DB_PATH=/home/kakis/kakis.duckdb`, not inside `app/`): `sudo -u kakis cp /home/kakis/kakis.duckdb /home/kakis/kakis.duckdb.bak-$(date +%Y%m%d-%H%M%S)` and the `.wal` alongside it. You cannot open the live file read-only while the service runs; open the backup instead.
+- `rsync` overwrites `assumptions.json`. The coordinator can edit rates from the admin panel, which writes that file on the box. Check `audit_log` for `rates_changed` before deploying, or exclude the file when they have.
+- The box runs UTC. `TZ=Asia/Singapore` is set in `.env` via `set-secret.sh` (the unit file in `deploy/` also carries it for a fresh install). Every wall-clock rule in the app is a Singapore rule.
+- `index.html` versions its script and stylesheet URLs (`?v=1.6`). Bump that with every frontend release — phones cache the JS, and a v1.5 caregiver page against a v1.6 backend would never show a start code.
+- Restart at least twice and read `journalctl` both times (the second-boot rule).
+
 Handy one-liners:
 
 ```bash
