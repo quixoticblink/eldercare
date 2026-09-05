@@ -1,7 +1,7 @@
 ---
 title: "Purpose & Importance of the Eldercare Sprint"
 status: solid
-last_updated: 2026-09-04
+last_updated: 2026-09-05
 ---
 
 # Purpose & Importance of the Eldercare Sprint
@@ -104,7 +104,7 @@ Each joined the sprint with family experience of eldercare—caregiving decision
 
 This section is a snapshot; the living record is at [[maps/timeline]] and updates every week.
 
-As of 4 September 2026 (roughly fifteen weeks in):
+As of 5 September 2026 (roughly fifteen weeks in):
 
 - **Round 1 field interviews** (six conversations) completed and synthesized ([[evidence/interview-round-1-findings]]).
 - **HMW has gone through five iterations.** Now at *"How might we enable caregivers of the relatively healthy elderly in Singapore to activate trusted respite when a need arises — planned or urgent — layered onto Vanguard's Pasir Ris ICCP pilot as our first operational proof"* ([[reframing/hmw-2026-07-11-broader-need]]). The Jul 8 iteration had narrowed this to crisis-only; we caught that as too tight three days later.
@@ -112,6 +112,7 @@ As of 4 September 2026 (roughly fifteen weeks in):
 - **Strategy activated.** Marketplace 2×2 framework, respite marketplace concept, consistency-as-design-constraint all written up in [[strategy/README|strategy/]].
 - **The prototype became a running app.** [[prototype/kakis-app]] — live at **https://singaporekakis.com**, three roles, real sign-in codes to real phones, audited against ISO/IEC 5055. `prototype/` and `pitch/` are both awake.
 - **The pilot became a tabletop, and the tabletop happened.** On 3 August Vanguard countered our live-pilot ask with a supervised tabletop exercise ([[journal/2026-08-03-ncss-vanguard]]); no operational pilot inside the Demo Day window, scope narrows to chaperoning. On 18 August NCSS desk-reviewed the app role by role ([[journal/2026-08-18-ncss-app-review]]), and on 21 August eight seniors ran it on their own phones at Care Corner's Toa Payoh 261A AAC with Vanguard and NCSS facilitating ([[journal/2026-08-21-tabletop-vanguard-ncss]]). The concept held; the onboarding around it did not. Two recommendation registers, mapped to app modules: [[prototype/ncss-app-review-2026-08-18]] and [[prototype/tabletop-2026-08-21-feedback]].
+- **The feedback is built in.** v1.6 shipped on 5 September — eighteen features from Buckets 1 and 2 of [[prototype/feature-buckets-2026-09-04]], each behind an end-to-end test: the door check both ways (kaki photo and code, then the family's start code), exact times charged by the half hour, gender and same-kaki preferences, cancellation with reasons, certificates read at approval, and the onboarding fixes. What shipped and what waits is [[prototype/roadmap]]; the build is [[journal/2026-09-05-v1.6-build]].
 
 Key early findings that still hold:
 
@@ -147,3 +148,4 @@ If it works, the artefacts here become a model for how to approach hard social p
 *2026-08-09: re-cut the "Where we are now" snapshot, which had been stuck at mid-July and was still quoting the superseded crisis-only HMW as current. Marked the May 19 question explicitly as the north star rather than the working HMW. Added the running app, the Aug 3 tabletop counter-proposal, the supply-constraint finding, and the three-unreconciled-framings problem.*
 
 *2026-09-04: snapshot re-cut to 4 September. Added the 18 Aug NCSS review, the 21 Aug Table Top Exercise, and the two findings that came out of them (the wall before the product; the start-code direction).*
+*2026-09-05: snapshot bumped for v1.6; roadmap linked.*
