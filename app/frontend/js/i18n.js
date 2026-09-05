@@ -138,7 +138,7 @@ const I18N = (() => {
     "k.none.body": "The coordinator matches visits to you based on your services and languages. Keep your profile current — and you'll hear as soon as a family needs you.",
     "k.noopen": "You don't need to keep the app open — we message you when a visit is assigned or anything changes.",
     "k.impact": "Your impact", "k.impact.line": "{v} · {h} · ~${e} earned", "k.impact.go": "Impact →", "k.visited": "you've visited {n}×",
-    "kv.first": "— first visit", "kv.together": "— you've visited {n}×", "kv.why": "Why:", "kv.family": "From the family:",
+    "kv.first": " — first visit", "kv.together": " — you've visited {n}×", "kv.why": "Why:", "kv.family": "From the family:",
     "kv.receive": "You receive ~${n}", "kv.cashless": "Cashless · weekly via Vanguard",
     "kv.need": "What you need for this visit", "kv.plan": "Care plan — read before you go",
     "kv.minimised": "Care plan not shared for household visits — the family will tell you what they'd like done. Ask them or the coordinator if you need more.",
