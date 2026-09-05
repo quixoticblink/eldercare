@@ -122,6 +122,17 @@ def create(body: VisitIn, user=Depends(security.current_user)):
         raise HTTPException(400, "Pick an urgency")
     if _window_has_passed(body.date, body.window):
         raise HTTPException(400, "That window has passed — pick a later one")
+    horizon = int(settings.get("max_advance_days") or 30)
+    m = re.match(r"^(\d{4})-(\d{2})-(\d{2})$", (body.date or "").strip())
+    if m:
+        try:
+            d = datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            raise HTTPException(400, "Use a real date")
+        if d < _now().date():
+            raise HTTPException(400, "That date has passed")
+        if (d - _now().date()).days > horizon:
+            raise HTTPException(400, f"Bookings open up to {horizon} days ahead — pick an earlier date")
     langs = [l for l in (body.languages or []) if l in config.LANGUAGES]
     if not langs and body.language:
         langs = [body.language]

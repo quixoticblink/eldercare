@@ -181,10 +181,21 @@ const CareView = (() => {
          ["🕊️", "Loss of a spouse", "Steady presence through hard months"]].map(([i, n, d]) =>
         `<button class="bigcard" onclick="CareView.pickTrigger('${n}')">
           <span class="bc-ico">${i}</span><div><b>${n}</b><span>${d}</span></div></button>`).join("")}
+      <div class="card" style="padding:12px">
+        <label class="f-label" for="otherTxt" style="margin-top:0">Something else? <small>· optional</small></label>
+        <input class="f-input" id="otherTxt" placeholder="A few words, e.g. cataract op" maxlength="80">
+        <button class="btn quiet" style="margin:0" onclick="CareView.pickOther()">Other — tell us</button>
+      </div>
       <button class="li" onclick="location.href='tel:+6560000000'">
         <div class="face gold">📞</div>
         <div class="body"><b>Not sure — talk to someone</b><span>Call the Pasir Ris ICCP coordinator · 6XXX XXXX</span></div></button>
       <button class="btn ghost" onclick="CareView.pickTrigger('')">Skip — just need help</button>`);
+  }
+
+  function pickOther() {
+    const t = (UI.el("otherTxt").value || "").trim();
+    if (!t) return UI.toast("A few words, so the right help comes", true);
+    pickTrigger("Other: " + t);
   }
 
   function pickTrigger(t) { bookDraft.trigger = t; saveDraft(); location.hash = "#/care/book/details"; }
@@ -206,13 +217,15 @@ const CareView = (() => {
     try { const hh = await Api.get("/care/household"); planLangs = (hh.plan && hh.plan.languages) || []; } catch (e) {}
     const startLangs = planLangs.length ? planLangs : ["English"];
     const today = new Date().toISOString().slice(0, 10);
+    const horizon = App.config.max_advance_days || 30;
+    const maxDate = new Date(Date.now() + horizon * 86400000).toISOString().slice(0, 10);
     const back = planned ? "#/care/book/when" : "#/care/book/trigger";
     UI.screen(`
       ${UI.appbar("The details", `${bookDraft.service} · ${UI.TIER_LABEL[bookDraft.tier]}${bookDraft.trigger ? " · " + bookDraft.trigger : ""}`, back)}
       <span class="stepper">Step ${planned ? "3 of 3" : "4 of 4"}</span>
       ${planned ? `
-        <label class="f-label">Date <small>· required</small></label>
-        <input class="f-input" id="date" type="date" min="${today}" value="${today}">
+        <label class="f-label">Date <small>· required — up to ${horizon} days ahead</small></label>
+        <input class="f-input" id="date" type="date" min="${today}" max="${maxDate}" value="${today}">
         <label class="f-label">Time window <small>· required</small></label>
         ${UI.chipGroup("winG", ["Morning 9–12", "Afternoon 2–5", "Evening 5–8"], "Afternoon 2–5")}`
       : `
@@ -357,5 +370,5 @@ const CareView = (() => {
     } catch (e) { UI.toast(e.message, true); }
   }
 
-  return { home, setup, planEdit, profile, book, pickService, when, pickTier, triggers, pickTrigger, details, visit, visits, windowsFor };
+  return { home, setup, planEdit, profile, book, pickService, when, pickTier, triggers, pickTrigger, pickOther, details, visit, visits, windowsFor };
 })();

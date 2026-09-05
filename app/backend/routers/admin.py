@@ -19,6 +19,7 @@ class SettingsIn(BaseModel):
     paynow_type: str | None = None
     paynow_value: str | None = None
     paynow_name: str | None = None
+    max_advance_days: int | None = None
 
 class ServiceRatesIn(BaseModel):
     # {"Chaperone": {"hours": 3, "family_rate_per_hour": 28, "kaki_rate_per_hour": 12}}
@@ -152,6 +153,8 @@ def put_settings(body: SettingsIn, user=Depends(security.current_user)):
     payload = {k: v for k, v in body.model_dump().items() if v is not None}
     if "paynow_type" in payload and payload["paynow_type"] not in ("uen", "mobile"):
         raise HTTPException(400, "paynow_type must be 'uen' or 'mobile'")
+    if "max_advance_days" in payload and not (1 <= int(payload["max_advance_days"]) <= 365):
+        raise HTTPException(400, "max_advance_days must be between 1 and 365")
     return settings.set_many(payload, user["email"] or user["phone"])
 
 @router.put("/assumptions/services")

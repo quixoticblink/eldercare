@@ -1,6 +1,6 @@
 // Kaki-side screens. Feature tasks append tests here.
 const { test, expect } = require("@playwright/test");
-const { seed, useToken, api } = require("./helpers");
+const { seed, useToken, api, dateIn } = require("./helpers");
 
 test.describe("kaki home copy (Bucket 1 · 6)", () => {
   test("the kaki is told the app need not stay open", async ({ page, request }) => {
@@ -15,7 +15,7 @@ test.describe("on the way (Bucket 1 · 7)", () => {
   test("the kaki taps I'm on my way and the caregiver sees it", async ({ page, request }) => {
     const s = await seed(request);
     const v = await api(request, "POST", "/visits", { token: s.cg1.token, data: {
-      service: "Companionship", tier: "planned", date: "2026-12-04", window: "Morning 9–12", language: "English" } });
+      service: "Companionship", tier: "planned", date: dateIn(6), window: "Morning 9–12", language: "English" } });
     await api(request, "POST", `/admin/visits/${v.body.id}/assign`, { token: s.admin.token, data: { kaki_id: s.k1.user.id } });
     await api(request, "POST", `/visits/${v.body.id}/accept`, { token: s.k1.token });
     await useToken(page, s.k1.token, `#/kaki/visit/${v.body.id}`);
@@ -30,7 +30,7 @@ test.describe("start-code copy for the kaki (Bucket 1 · 9)", () => {
   test("the start card says the kaki never sees the code", async ({ page, request }) => {
     const s = await seed(request);
     const v = await api(request, "POST", "/visits", { token: s.cg2.token, data: {
-      service: "Chaperone", tier: "planned", date: "2026-12-06", window: "Morning 9–12", language: "English" } });
+      service: "Chaperone", tier: "planned", date: dateIn(8), window: "Morning 9–12", language: "English" } });
     await api(request, "POST", `/admin/visits/${v.body.id}/assign`, { token: s.admin.token, data: { kaki_id: s.k2.user.id } });
     await api(request, "POST", `/visits/${v.body.id}/accept`, { token: s.k2.token });
     await useToken(page, s.k2.token, `#/kaki/visit/${v.body.id}`);

@@ -214,4 +214,5 @@ def me(user=Depends(security.current_user)):
         "weekdays": config.WEEKDAYS, "half_days": config.HALF_DAYS,
         "half_day_windows": assumptions.half_day_windows(),
         "money_disclaimer": assumptions.disclaimer(),
+        "max_advance_days": settings.get("max_advance_days"),
         "paynow": settings.paynow()}}

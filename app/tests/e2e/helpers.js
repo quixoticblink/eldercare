@@ -93,4 +93,10 @@ async function useToken(page, token, hash = "") {
   await page.waitForFunction(() => typeof App !== "undefined" && App.user && App.user.id);
 }
 
-module.exports = { uniq, api, apiLogin, signIn, approve, seed, useToken };
+/** YYYY-MM-DD, n days from today in local time. Bookings open only 30 days ahead. */
+function dateIn(n) {
+  const d = new Date(); d.setDate(d.getDate() + n);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+module.exports = { uniq, api, apiLogin, signIn, approve, seed, useToken, dateIn };

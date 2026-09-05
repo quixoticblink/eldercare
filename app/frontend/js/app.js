@@ -62,7 +62,7 @@ const App = (() => {
     try {
       const me = await Api.get("/auth/me");
       user = me.user;
-      config = { services: me.config.services, languages: me.config.languages, tiers: me.config.tiers };
+      config = { ...me.config };
       App.user = user; App.config = config;
       UI.el("brandRight").textContent = (user.name || user.email || "").toUpperCase().slice(0, 22) || "PASIR RIS PILOT";
       if (user.status !== "approved") return AuthView.pending(user);

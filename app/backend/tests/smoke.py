@@ -22,6 +22,15 @@ from backend import config, db
 from backend.services import ratelimit as _rl
 c = TestClient(app)
 
+# v1.6 added a booking horizon (max_advance_days, default 30) and a past-date
+# check. The fixtures below use fixed dates in early August 2026 so the weekday
+# assertions stay readable; pin "now" to a Saturday just before them so those
+# dates are neither past nor beyond the horizon, whatever day the suite runs.
+from backend.routers import visits as _visits
+import datetime as _dt
+_PINNED_NOW = _dt.datetime(2026, 7, 25, 10, 0)     # Saturday
+_visits._now = lambda: _PINNED_NOW
+
 # Every request in this suite comes from the same TestClient address, so the
 # per-IP cap would throttle the suite itself. Reset that one counter between
 # calls; the per-identifier cap and the IP cap are both still asserted
@@ -552,13 +561,9 @@ assert c.post("/api/chat", json={"message": "how do I book?"}, headers=ch).json(
 
 # ---- v1.6 · Buckets 1 and 2 after the August feedback round ----------------
 # Each block below is one feature from knowledge/prototype/feature-buckets-2026-09-04.md.
-from backend.routers import visits as _visits
-import datetime as _dt
-
 # [B1·4] a same-day window that has already passed is refused, whatever the tier.
 # Seniors saw "Today, 2–5pm" offered for an urgent visit at 6pm on 21 Aug.
-_real_now = _visits._now
-_visits._now = lambda: _dt.datetime(2026, 9, 10, 18, 30)
+_visits._now = lambda: _dt.datetime(2026, 7, 25, 18, 30)
 late = c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today",
                                    "window": "Today, 2–5pm", "language": "English"}, headers=ch)
 assert late.status_code == 400 and "passed" in late.json()["detail"], late.text
@@ -569,9 +574,9 @@ assert ok_win.status_code == 200, ok_win.text
 assert c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today",
                                    "window": "Within the hour", "language": "English"}, headers=ch).status_code == 200
 # a window on a future date is never "passed"
-assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-01",
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-10",
                                    "window": "Afternoon 2–5", "language": "English"}, headers=ch).status_code == 200
-_visits._now = _real_now
+_visits._now = lambda: _PINNED_NOW
 
 # [B1·5] the caregiver hears when the kaki confirms, passes back, or cancels.
 # On 21 Aug caregivers refreshed the page to find out. Record every outbound
@@ -585,7 +590,7 @@ _sms.send_sms = lambda to, text: (_sent.append(("sms", to, "", text)) or True)
 def _texts_to(identifier):
     return [m[2] + " " + m[3] for m in _sent if m[1] == identifier]
 
-v16 = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-02",
+v16 = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-11",
                                   "window": "Afternoon 2–5", "language": "English"}, headers=ch).json()
 _sent.clear()
 assert c.post(f"/api/admin/visits/{v16['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
@@ -607,14 +612,14 @@ assert not _texts_to("priya@example.com"), _sent
 
 # [B1·6] the kaki's assignment message says the hours and what the task is.
 # "when kaki receive a request, they should know the hours as well" — 21 Aug.
-v16b = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-03",
+v16b = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-12",
                                    "window": "Morning 9–12", "language": "English"}, headers=ch).json()
 _sent.clear()
 assert c.post(f"/api/admin/visits/{v16b['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
 _kaki_msgs = _texts_to("beelian@example.com")
 assert _kaki_msgs, _sent
 _m = " ".join(_kaki_msgs)
-assert "Companionship" in _m and "2026-12-03" in _m, _m
+assert "Companionship" in _m and "2026-08-12" in _m, _m
 assert "2 hr" in _m, "hours missing from the kaki's message: " + _m
 assert "Conversation" in _m, "task description missing from the kaki's message: " + _m
 assert c.post(f"/api/visits/{v16b['id']}/cancel", headers=ch).status_code == 200
@@ -624,7 +629,7 @@ assert "open" in _g["reply"].lower() and "message" in _g["reply"].lower(), _g
 
 # [B1·7] "I'm on my way" — the cheapest possible ETA. Asked for by all three
 # 21 Aug sources and by NCSS.
-v16c = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-04",
+v16c = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-13",
                                    "window": "Morning 9–12", "language": "English"}, headers=ch).json()
 assert c.post(f"/api/admin/visits/{v16c['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
 # not before accepting
@@ -644,7 +649,7 @@ assert c.post(f"/api/visits/{v16c['id']}/cancel", headers=ch).status_code == 200
 # starts from (asked for on 21 Aug and by NCSS on 18 Aug).
 assert "Cantonese" in config.LANGUAGES
 assert "Cantonese" in c.get("/api/auth/me", headers=ch).json()["config"]["languages"]
-v16d = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-05",
+v16d = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-14",
                                    "window": "Morning 9–12", "languages": ["Cantonese", "Mandarin"]}, headers=ch)
 assert v16d.status_code == 200, v16d.text
 v16d = v16d.json()
@@ -657,7 +662,7 @@ assert _me["language_ok"] is True, _me
 from backend.services import matching as _matching
 assert _matching.score({"id": kk["id"]}, db.one("SELECT * FROM visits WHERE id = ?", [v16d["id"]]))["language_ok"]
 # the legacy single 'language' field still works on its own
-assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-12-05",
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-14",
                                    "window": "Morning 9–12", "language": "Hokkien"}, headers=ch).json()["languages"] == ["Hokkien"]
 assert c.post(f"/api/visits/{v16d['id']}/cancel", headers=ch).status_code == 200
 
@@ -678,6 +683,23 @@ assert c.get("/api/auth/me", headers=ch).json()["user"]["name"] == "Priya Nathan
 assert _prof.json()["phone"] == "+6593334444", _prof.json()
 # a number that belongs to someone else is refused (the kaki's number was set in v1.2 tests)
 assert c.put("/api/users/me", json={"phone": "9123 4567"}, headers=ch).status_code == 400
+
+# [B1·10] "Other — tell us" on the trigger step (NCSS 2.20) and a horizon on
+# how far ahead a planned visit can be booked (NCSS 2.15), as a setting.
+assert c.get("/api/admin/settings", headers=ah).json()["max_advance_days"] == 30
+assert c.get("/api/auth/me", headers=ch).json()["config"]["max_advance_days"] == 30
+assert c.put("/api/admin/settings", json={"max_advance_days": 7}, headers=ah).json()["max_advance_days"] == 7
+assert c.put("/api/admin/settings", json={"max_advance_days": 0}, headers=ah).status_code == 400
+_far = (_PINNED_NOW.date() + _dt.timedelta(days=10)).isoformat()
+_near = (_PINNED_NOW.date() + _dt.timedelta(days=5)).isoformat()
+_r = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": _far,
+                                 "window": "Morning 9–12", "language": "English"}, headers=ch)
+assert _r.status_code == 400 and "7 days" in _r.json()["detail"], _r.text
+_r = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": _near,
+                                 "window": "Morning 9–12", "language": "English", "trigger": "Other: cataract op"}, headers=ch)
+assert _r.status_code == 200 and _r.json()["trigger"] == "Other: cataract op", _r.text
+assert c.post(f"/api/visits/{_r.json()['id']}/cancel", headers=ch).status_code == 200
+assert c.put("/api/admin/settings", json={"max_advance_days": 30}, headers=ah).json()["max_advance_days"] == 30
 
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string

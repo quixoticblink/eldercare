@@ -18,7 +18,12 @@ DEFAULTS = {
     "paynow_type":            "uen",     # uen | mobile
     "paynow_value":           "",
     "paynow_name":            "",
+    # How far ahead a planned visit may be booked. Supply is the binding
+    # constraint (Aug 3); a horizon keeps the coordinator's week plannable.
+    "max_advance_days":       30,
 }
+
+INT_KEYS = {"max_advance_days"}
 
 BOOL_KEYS = {"auto_approve_kaki", "auto_approve_caregiver", "auto_match"}
 
@@ -41,7 +46,12 @@ def set_many(values: dict, actor: str = "") -> dict:
     for key, raw in (values or {}).items():
         if key not in DEFAULTS:
             continue                      # ignore unknown keys rather than store junk
-        value = bool(raw) if key in BOOL_KEYS else ("" if raw is None else str(raw)).strip()
+        if key in BOOL_KEYS:
+            value = bool(raw)
+        elif key in INT_KEYS:
+            value = int(raw)
+        else:
+            value = ("" if raw is None else str(raw)).strip()
         db.run("DELETE FROM settings WHERE key = ?", [key])
         db.run("INSERT INTO settings(key, value) VALUES (?,?)", [key, json.dumps(value)])
         changed[key] = value

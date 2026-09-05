@@ -1,6 +1,6 @@
 // Caregiver-side screens. Feature tasks append tests here.
 const { test, expect } = require("@playwright/test");
-const { seed, useToken, signIn, uniq, api } = require("./helpers");
+const { seed, useToken, signIn, uniq, api, dateIn } = require("./helpers");
 
 test.describe("sign-in and approval (Bucket 1 · 1, 2)", () => {
   test("the sign-in field has no placeholder number, only a hint", async ({ page }) => {
@@ -73,7 +73,7 @@ test.describe("languages (Bucket 1 · 8)", () => {
     await expect(group.getByRole("button", { name: "Cantonese" })).toBeVisible();
     await group.getByRole("button", { name: "Cantonese" }).click();
     await expect(group.getByRole("button", { name: "Mandarin" })).toHaveClass(/sel/);   // multi-select keeps the others
-    await page.locator("#date").fill("2026-12-05");
+    await page.locator("#date").fill(dateIn(7));
     await page.getByRole("button", { name: "Morning 9–12" }).click();
     await page.getByRole("button", { name: "Request this visit" }).click();
     await expect(page).toHaveURL(/#\/care\/visit\//);
@@ -86,7 +86,7 @@ test.describe("care plan, profile, start-code copy (Bucket 1 · 9)", () => {
   test("care plan sits above visits, has Bedridden and split contacts; profile is editable; start code explains itself", async ({ page, request }) => {
     const s = await seed(request);
     const v = await api(request, "POST", "/visits", { token: s.cg1.token, data: {
-      service: "Companionship", tier: "planned", date: "2026-12-06", window: "Morning 9–12", language: "English" } });
+      service: "Companionship", tier: "planned", date: dateIn(8), window: "Morning 9–12", language: "English" } });
     await api(request, "POST", `/admin/visits/${v.body.id}/assign`, { token: s.admin.token, data: { kaki_id: s.k1.user.id } });
 
     await useToken(page, s.cg1.token, "#/care/home");
@@ -107,6 +107,28 @@ test.describe("care plan, profile, start-code copy (Bucket 1 · 9)", () => {
 
     await page.goto(`/#/care/visit/${v.body.id}`);
     await expect(page.getByText("Only you can see this code")).toBeVisible();
+  });
+});
+
+test.describe("'Other' trigger and booking horizon (Bucket 1 · 10)", () => {
+  test("a caregiver can type their own reason; the date picker stops at the horizon", async ({ page, request }) => {
+    const s = await seed(request);
+    await useToken(page, s.cg1.token, "#/care/book");
+    await page.getByRole("button", { name: /Companionship/ }).click();
+    await page.getByRole("button", { name: /Soon/ }).click();
+    await page.locator("#otherTxt").fill("Cataract op");
+    await page.getByRole("button", { name: "Other — tell us" }).click();
+    await expect(page.locator(".appbar")).toContainText("Other: Cataract op");
+    await page.getByRole("button", { name: "Request this visit" }).click();
+    await expect(page.locator(".pill.gold", { hasText: "Other: Cataract op" })).toBeVisible();
+
+    await page.goto("/#/care/book");
+    await page.getByRole("button", { name: /Companionship/ }).click();
+    await page.getByRole("button", { name: /Planned/ }).click();
+    const max = await page.locator("#date").getAttribute("max");
+    const expected = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+    expect(max).toBe(expected);
+    await expect(page.getByText("up to 30 days ahead")).toBeVisible();
   });
 });
 

@@ -277,6 +277,8 @@ const AdminView = (() => {
                  "New kakis become bookable without a coordinator reviewing them first")}
         ${toggle("auto_match", s.auto_match, "Auto-match visits on booking",
                  "Assigns the best available kaki the moment a visit is booked. Never picks someone whose availability doesn't cover it — those stay for you")}
+        <label class="f-label" for="maxAdv">Bookings open up to <small>· days ahead</small></label>
+        <input class="f-input" id="maxAdv" type="number" min="1" max="365" value="${s.max_advance_days || 30}">
         <button class="btn" id="saveToggles">Save automation settings</button>
         <button class="btn quiet" id="sweepNow">Auto-match all open requests now</button>
         <p class="hint" style="font-size:.7rem;opacity:.8">The sweep runs on demand whether or not
@@ -306,7 +308,8 @@ const AdminView = (() => {
           await Api.put("/admin/settings", {
             auto_approve_caregiver: UI.el("auto_approve_caregiver").checked,
             auto_approve_kaki: UI.el("auto_approve_kaki").checked,
-            auto_match: UI.el("auto_match").checked });
+            auto_match: UI.el("auto_match").checked,
+            max_advance_days: parseInt(UI.el("maxAdv").value) || 30 });
           UI.toast("Automation settings saved ✓"); settings();
         } catch (e) { UI.toast(e.message, true); }
       };

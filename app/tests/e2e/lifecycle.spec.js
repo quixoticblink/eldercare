@@ -2,7 +2,7 @@
 // match → accept → start code → report. This is the baseline every feature
 // task must keep green, and the spec that gets rerun after every migration.
 const { test, expect } = require("@playwright/test");
-const { uniq, api, apiLogin, signIn, approve, seed, useToken } = require("./helpers");
+const { uniq, api, apiLogin, signIn, approve, seed, useToken, dateIn } = require("./helpers");
 
 test("caregiver books, kaki serves, report comes back", async ({ page, request }) => {
   const s = await seed(request);
@@ -31,8 +31,7 @@ test("caregiver books, kaki serves, report comes back", async ({ page, request }
   await page.getByRole("button", { name: /Book a visit for Mr Lim/ }).click();
   await page.getByRole("button", { name: /Companionship/ }).click();
   await page.getByRole("button", { name: /Planned/ }).click();
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-  await page.locator("#date").fill(tomorrow);
+  await page.locator("#date").fill(dateIn(1));
   await page.getByRole("button", { name: "Afternoon 2–5" }).click();
   await page.locator("#notes").fill("Likes rummy-o.");
   await page.getByRole("button", { name: "Request this visit" }).click();

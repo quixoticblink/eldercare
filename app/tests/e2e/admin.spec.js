@@ -1,6 +1,6 @@
 // Coordinator screens. Feature tasks append tests here.
 const { test, expect } = require("@playwright/test");
-const { seed, useToken, api } = require("./helpers");
+const { seed, useToken, api, dateIn } = require("./helpers");
 
 test.describe("dashboard tiles are links (Bucket 1 · 9)", () => {
   test("tapping 'to match' opens the matching screen", async ({ page, request }) => {
@@ -15,7 +15,7 @@ test.describe("coordinator", () => {
   test("today console and matching roster render", async ({ page, request }) => {
     const s = await seed(request);
     const v = await api(request, "POST", "/visits", { token: s.cg1.token, data: {
-      service: "Companionship", tier: "planned", date: "2026-10-06", window: "Afternoon 2–5", language: "Mandarin", notes: "" } });
+      service: "Companionship", tier: "planned", date: dateIn(8), window: "Afternoon 2–5", language: "Mandarin", notes: "" } });
     expect(v.status).toBe(200);
     await useToken(page, s.admin.token);
     await expect(page.getByText("Coordinator console")).toBeVisible();
