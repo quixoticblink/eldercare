@@ -98,6 +98,9 @@ def kakis(visit_id: str | None = None, user=Depends(security.current_user)):
         p = db.one("SELECT * FROM kaki_profiles WHERE user_id = ?", [r["id"]]) or {}
         r["services"] = db.uj(p.get("services"))
         r["languages"] = db.uj(p.get("languages"))
+        r["gender"] = p.get("gender") or ""
+        _pref = (visit or {}).get("kaki_gender_pref") or "any"
+        r["gender_ok"] = _pref == "any" or r["gender"] == _pref
         r["active"] = db.q("SELECT count(*) c FROM visits WHERE kaki_id = ? AND status IN ('assigned','accepted','in_progress')", [r["id"]])[0]["c"]
         r["done_with"] = {}  # visits completed per household — consistency signal
         for row in db.q("""SELECT household_id, count(*) c FROM visits
@@ -113,6 +116,7 @@ def kakis(visit_id: str | None = None, user=Depends(security.current_user)):
     if visit:
         order = {"available": 0, "unknown": 1, "unavailable": 2}
         rows.sort(key=lambda r: (order.get(r["fit"]["state"], 3),
+                                 0 if r["gender_ok"] else 1,
                                  -r["done_with"].get(visit["household_id"], 0),
                                  r["active"], (r["name"] or "").lower()))
     return rows

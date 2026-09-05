@@ -832,6 +832,44 @@ assert c.get(f"/api/visits/{v16g['id']}", headers=ch).json()["kaki_verified_at"]
 assert c.post(f"/api/visits/{v16g['id']}/cancel", headers=ch).status_code == 200
 assert c.put("/api/users/me/photo", json={"data_url": ""}, headers=kh).status_code == 200   # remove
 
+# [B2·3] gender preference: on the kaki profile, on the request, sorts the
+# coordinator's roster, and gates auto-match. "May not want a man to visit" —
+# every 21 Aug source, and NCSS.
+assert c.put("/api/users/me", json={"gender": "female"}, headers=kh).status_code == 200      # Bee Lian
+assert c.get("/api/users/me/profile", headers=kh).json()["kaki"]["gender"] == "female"
+assert c.put("/api/users/me", json={"gender": "other-thing"}, headers=kh).status_code == 400
+kh_m, kk_m = login("boon@example.com", role="kaki", name="Wong Boon")
+assert c.post(f"/api/admin/users/{kk_m['id']}/approve", json={"role": "kaki"}, headers=ah).status_code == 200
+kh_m, kk_m = login("boon@example.com")
+assert c.put("/api/users/me", json={"gender": "male", "services": ["Companionship"], "languages": ["English"]}, headers=kh_m).status_code == 200
+# 2026-08-18 is a Tuesday; Boon is available all day, Bee Lian 09:00–12:00 (set in B2·1)
+assert c.put("/api/users/me/availability", json={"weekly": {"Tue": {"from": "08:00", "to": "20:00"}}}, headers=kh_m).status_code == 200
+_r = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                 "start_time": "09:30", "end_time": "11:30", "language": "English",
+                                 "kaki_gender_pref": "female"}, headers=ch)
+assert _r.status_code == 200 and _r.json()["kaki_gender_pref"] == "female", _r.text
+_vg = _r.json()
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                   "start_time": "09:30", "end_time": "11:30", "language": "English",
+                                   "kaki_gender_pref": "robot"}, headers=ch).status_code == 400
+_roster = c.get(f"/api/admin/kakis?visit_id={_vg['id']}", headers=ah).json()
+_bl = next(r for r in _roster if r["id"] == kk["id"]); _bn = next(r for r in _roster if r["id"] == kk_m["id"])
+assert _bl["gender"] == "female" and _bl["gender_ok"] is True and _bn["gender_ok"] is False, (_bl, _bn)
+assert _roster.index(_bl) < _roster.index(_bn), "a matching preference sorts first"
+assert _bn in _roster, "sorts, never filters — the coordinator can still assign against the preference"
+_ranked = _matching.rank(db.one("SELECT * FROM visits WHERE id = ?", [_vg["id"]]))
+assert _ranked[0]["id"] == kk["id"] and _ranked[0]["score"]["gender_ok"] is True
+# auto-match never assigns against a stated preference, even if the only available kaki mismatches
+_vg2 = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                   "start_time": "14:00", "end_time": "16:00", "language": "English",
+                                   "kaki_gender_pref": "female"}, headers=ch).json()   # Bee Lian off in the afternoon; Boon free
+assert _matching.best_available(db.one("SELECT * FROM visits WHERE id = ?", [_vg2["id"]])) is None
+_vg3 = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                   "start_time": "14:00", "end_time": "16:00", "language": "English"}, headers=ch).json()
+assert _matching.best_available(db.one("SELECT * FROM visits WHERE id = ?", [_vg3["id"]]))["id"] == kk_m["id"]
+for _x in (_vg, _vg2, _vg3):
+    assert c.post(f"/api/visits/{_x['id']}/cancel", headers=ch).status_code == 200
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

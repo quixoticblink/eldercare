@@ -18,6 +18,7 @@ class VisitIn(BaseModel):
     languages: list[str] | None = None # v1.6: several; first one becomes `language`
     notes: str | None = ""
     trigger: str | None = Field(default="", max_length=120)   # urgent/soon path: what happened
+    kaki_gender_pref: str | None = "any"   # any | female | male
 
 class StartIn(BaseModel):
     otp: str
@@ -140,8 +141,9 @@ def _enrich(v: dict) -> dict:
     kaki = db.one("SELECT id, name, email, phone, photo FROM users WHERE id = ?", [v["kaki_id"]]) if v.get("kaki_id") else None
     times_together = 0
     if kaki:
-        kp = db.one("SELECT tier FROM kaki_profiles WHERE user_id = ?", [kaki["id"]]) or {}
+        kp = db.one("SELECT tier, gender FROM kaki_profiles WHERE user_id = ?", [kaki["id"]]) or {}
         kaki["tier"] = kp.get("tier", 1)
+        kaki["gender"] = kp.get("gender") or ""
         prof = db.one("SELECT languages FROM kaki_profiles WHERE user_id = ?", [kaki["id"]]) or {}
         kaki["languages"] = db.uj(prof.get("languages"))
         times_together = db.q("""SELECT count(*) c FROM visits
@@ -194,17 +196,20 @@ def create(body: VisitIn, user=Depends(security.current_user)):
     if not langs:
         raise HTTPException(400, "Pick at least one language")
     language = langs[0]
+    gender_pref = (body.kaki_gender_pref or "any").strip().lower()
+    if gender_pref not in config.GENDER_PREFS:
+        raise HTTPException(400, "Kaki preference must be any, female or male")
     h = db.one("SELECT * FROM households WHERE caregiver_id = ?", [user["id"]])
     if not h:
         raise HTTPException(400, "Set up your household and care plan first")
     vid = db.new_id()
     otp = f"{random.randint(0, 9999):04d}"
     db.run("""INSERT INTO visits(id, household_id, caregiver_id, service, tier, date, time_window, language, languages, notes, otp_code, crisis_trigger,
-                                 start_time, end_time, hours)
-              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                                 start_time, end_time, hours, kaki_gender_pref)
+              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
            [vid, h["id"], user["id"], body.service, body.tier, body.date, window,
             language, db.j(langs), body.notes or "", otp, body.trigger or "",
-            start_time, end_time, hours])
+            start_time, end_time, hours, gender_pref])
     db.audit(user["email"] or user["phone"], "visit_requested", f"{vid} {body.service} {body.tier}")
 
     # Auto-matching, when the coordinator has switched it on. It only ever picks

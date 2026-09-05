@@ -165,6 +165,8 @@ const KakiView = (() => {
         <input class="f-input" id="pname" value="${UI.esc(p.name)}">
         <label class="f-label">Phone</label>
         <input class="f-input" id="pphone" inputmode="tel" value="${UI.esc(p.phone)}" placeholder="+65 …">
+        <label class="f-label">I am <small>· some families ask for a woman or a man</small></label>
+        ${UI.chipGroup("genG", ["Female", "Male", "Prefer not to say"], k.gender === "female" ? "Female" : k.gender === "male" ? "Male" : "Prefer not to say")}
         <label class="f-label">Services I can help with</label>
         ${UI.chipMulti("svcG", App.config.services, k.services)}
         <label class="f-label">Languages I speak</label>
@@ -195,8 +197,10 @@ const KakiView = (() => {
       };
       UI.el("saveP").onclick = async () => {
         try {
+          const g = UI.chipValue("genG");
           await Api.put("/users/me", { name: UI.el("pname").value.trim(), phone: UI.el("pphone").value.trim(),
-            services: UI.chipValues("svcG"), languages: UI.chipValues("langG") });
+            services: UI.chipValues("svcG"), languages: UI.chipValues("langG"),
+            gender: g === "Female" ? "female" : g === "Male" ? "male" : "" });
           App.user.name = UI.el("pname").value.trim();
           UI.toast("Profile saved ✓");
         } catch (e) { UI.toast(e.message, true); }

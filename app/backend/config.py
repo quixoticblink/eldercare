@@ -88,3 +88,5 @@ TRIGGERS = ["Helper left suddenly", "Spouse hospitalised", "My own emergency",
 LOCKED_SERVICES = ["Medicine administration"]  # Tier 2 — visible, not bookable in v1
 TIERS = ["urgent", "soon", "planned"]
 LANGUAGES = ["English", "Mandarin", "Cantonese", "Hokkien", "Malay", "Tamil"]
+GENDERS = ["female", "male"]                 # on the kaki profile; "" = not stated
+GENDER_PREFS = ["any", "female", "male"]     # on a visit request

@@ -13,6 +13,9 @@ export JWT_SECRET="e2e-not-secret"
 export PORT="${E2E_PORT:-8100}"
 export SMS_ENABLED=0
 export TZ=Asia/Singapore
+# Every spec seeds six accounts from one address; the production cap (200 per
+# IP per 15 min) is asserted in smoke.py, not here.
+export RATE_LIMIT_CODE_PER_IP=100000
 
 rm -f "$DB_PATH" "$DB_PATH.wal"
 TMP="$(mktemp -d /tmp/kakis-e2e-assumptions.XXXXXX)"

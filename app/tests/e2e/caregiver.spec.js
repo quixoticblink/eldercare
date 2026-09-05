@@ -152,6 +152,29 @@ test.describe("exact times (Bucket 2 · 1)", () => {
   });
 });
 
+test.describe("gender preference (Bucket 2 · 3)", () => {
+  test("a caregiver asks for a female kaki and the roster says who matches", async ({ page, request }) => {
+    const s = await seed(request);
+    await api(request, "PUT", "/users/me", { token: s.k1.token, data: { gender: "female" } });
+    await api(request, "PUT", "/users/me", { token: s.k3.token, data: { gender: "male" } });
+    await useToken(page, s.cg1.token, "#/care/book");
+    await page.getByRole("button", { name: /Companionship/ }).click();
+    await page.getByRole("button", { name: /Planned/ }).click();
+    await page.locator("#date").fill(dateIn(11));
+    await page.locator("#genderG").getByRole("button", { name: "Female" }).click();
+    await page.getByRole("button", { name: "Request this visit" }).click();
+    await expect(page).toHaveURL(/#\/care\/visit\//);
+    const visitId = page.url().split("/visit/")[1];
+    await expect(page.getByText("Female kaki requested")).toBeVisible();
+    await useToken(page, s.admin.token, "#/admin/requests");
+    const card = page.locator(".card", { hasText: "Mr Nathan" }).filter({ hasText: "female kaki" }).first();
+    // Every seed reuses the same kaki names, so pick rows by the kaki's id.
+    const row = id => card.locator(".pick-row", { has: page.locator(`input[value="${id}"]`) });
+    await expect(row(s.k3.user.id)).toContainText("does not match the family's preference");
+    await expect(row(s.k1.user.id)).toContainText("female · as requested");
+  });
+});
+
 test.describe("caregiver", () => {
   test("home renders for an approved caregiver", async ({ page, request }) => {
     const s = await seed(request);

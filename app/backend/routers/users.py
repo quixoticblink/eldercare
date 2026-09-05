@@ -13,6 +13,7 @@ class ProfileIn(BaseModel):
     services: list[str] | None = None
     languages: list[str] | None = None
     area: str | None = None
+    gender: str | None = None        # kaki only: female | male | "" (not stated)
 
 class PhotoIn(BaseModel):
     data_url: str = ""     # "data:image/jpeg;base64,..." or "" to remove
@@ -63,6 +64,11 @@ def update_me(body: ProfileIn, user=Depends(security.current_user)):
             db.run("UPDATE kaki_profiles SET languages = ? WHERE user_id = ?", [db.j(body.languages), user["id"]])
         if body.area is not None:
             db.run("UPDATE kaki_profiles SET area = ? WHERE user_id = ?", [body.area, user["id"]])
+        if body.gender is not None:
+            g = body.gender.strip().lower()
+            if g not in config.GENDERS + [""]:
+                raise HTTPException(400, "Gender must be female or male, or left blank")
+            db.run("UPDATE kaki_profiles SET gender = ? WHERE user_id = ?", [g, user["id"]])
     return get_me_profile(db.one("SELECT * FROM users WHERE id = ?", [user["id"]]))
 
 @router.put("/me/photo")
@@ -95,6 +101,7 @@ def get_me_profile(user=Depends(security.current_user)):
         p = db.one("SELECT * FROM kaki_profiles WHERE user_id = ?", [user["id"]]) or {}
         out["kaki"] = {"services": db.uj(p.get("services")), "languages": db.uj(p.get("languages")),
                        "area": p.get("area", "Pasir Ris"), "tier": p.get("tier", 1),
+                       "gender": p.get("gender") or "",
                        "availability": availability.summary(user["id"])}
     return out
 

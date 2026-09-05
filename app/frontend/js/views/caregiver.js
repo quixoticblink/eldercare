@@ -238,6 +238,8 @@ const CareView = (() => {
         ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0])}`}
       <label class="f-label">Languages with them <small>· required — from the care plan; tap to change</small></label>
       ${UI.chipMulti("langG2", App.config.languages, startLangs)}
+      <label class="f-label">Kaki <small>· optional</small></label>
+      ${UI.chipGroup("genderG", ["No preference", "Female", "Male"], "No preference")}
       <label class="f-label">Anything the kaki should know? <small>· optional</small></label>
       <textarea class="f-input" id="notes" placeholder="e.g. Walks with a stick. Helper left suddenly."></textarea>
       <button class="btn gold" id="submitV">Request this visit</button>`);
@@ -247,16 +249,17 @@ const CareView = (() => {
       h.textContent = n ? `${n} hr${n === 1 ? "" : "s"} — charged by the half hour, minimum 1 hour` : "The end time must be after the start";
     };
     if (planned) { UI.el("startT").onchange = hint; UI.el("endT").onchange = hint; hint(); }
+    const genderPref = () => ({ Female: "female", Male: "male" })[UI.chipValue("genderG")] || "any";
     UI.el("submitV").onclick = async () => {
       try {
         const v = await Api.post("/visits", planned ? {
           service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
           date: UI.el("date").value, start_time: UI.el("startT").value, end_time: UI.el("endT").value,
-          languages: UI.chipValues("langG2"), notes: UI.el("notes").value } : {
+          languages: UI.chipValues("langG2"), notes: UI.el("notes").value, kaki_gender_pref: genderPref() } : {
           service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
           date: (UI.chipValue("winG") || "").startsWith("Tomorrow") ? "tomorrow" : "today",
           window: UI.chipValue("winG") || "", languages: UI.chipValues("langG2"),
-          notes: UI.el("notes").value });
+          notes: UI.el("notes").value, kaki_gender_pref: genderPref() });
         clearDraft();
         UI.toast("Request sent — the coordinator is matching a kaki");
         location.hash = "#/care/visit/" + v.id;
@@ -286,7 +289,8 @@ const CareView = (() => {
         ${UI.appbar(v.service, `${v.date} · ${v.window || ""}${v.hours ? ` · ${v.hours} hr${v.hours === 1 ? "" : "s"}` : ""} · ${UI.esc(v.senior_name)}`, "#/care/home")}
         <div class="row" style="flex-wrap:wrap">${UI.statusPill(v.status)}<span class="pill grey">${UI.TIER_LABEL[v.tier] || v.tier}</span>
         ${v.trigger ? `<span class="pill gold">${UI.esc(v.trigger)}</span>` : ""}
-        <span class="pill green">${UI.esc((v.languages || [v.language]).join(", "))}</span></div>
+        <span class="pill green">${UI.esc((v.languages || [v.language]).join(", "))}</span>
+        ${v.kaki_gender_pref && v.kaki_gender_pref !== "any" ? `<span class="pill grey">${v.kaki_gender_pref === "female" ? "Female" : "Male"} kaki requested</span>` : ""}</div>
         ${v.kaki ? `
           <div class="kakipass">
             <div class="kp-top">

@@ -30,8 +30,13 @@ def score(kaki: dict, visit: dict) -> dict:
     active = db.q("""SELECT count(*) c FROM visits WHERE kaki_id = ?
                      AND status IN ('assigned','accepted','in_progress')""", [uid])[0]["c"]
 
+    pref = visit.get("kaki_gender_pref") or "any"
+    gender = p.get("gender") or ""
+    gender_ok = pref == "any" or gender == pref
+
     total = 0
     total += {"available": 100, "unknown": 0, "unavailable": -1000}[fit["state"]]
+    total += 0 if pref == "any" else (15 if gender_ok else -40)
     total += min(history, 5) * 20          # continuity matters most after availability
     wanted = db.uj(visit.get("languages")) or ([visit["language"]] if visit.get("language") else [])
     language_ok = any(l in languages for l in wanted)
@@ -39,6 +44,7 @@ def score(kaki: dict, visit: dict) -> dict:
     total += 10 if visit.get("service") in services else 0
     total -= active * 5                    # spread the load
     return {"total": total, "fit": fit, "history": history, "active": active,
+            "gender_ok": gender_ok, "gender": gender,
             "language_ok": language_ok,
             "service_ok": visit.get("service") in services}
 
@@ -51,9 +57,11 @@ def rank(visit: dict) -> list[dict]:
     return kakis
 
 def best_available(visit: dict) -> dict | None:
-    """Top-scoring kaki whose availability positively covers the visit, else None."""
+    """Top-scoring kaki whose availability positively covers the visit and who
+    matches a stated gender preference, else None. A machine must never send
+    a man to a family that asked for a woman; a coordinator may, on the phone."""
     for k in rank(visit):
-        if k["score"]["fit"]["state"] == "available":
+        if k["score"]["fit"]["state"] == "available" and k["score"]["gender_ok"]:
             return k
     return None
 
