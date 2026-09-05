@@ -159,7 +159,7 @@ test.describe("kaki screens in 中文", () => {
 
 // English labels that must never appear on a caregiver or kaki screen in 中文.
 // Names, addresses, service values inside data, and the word Kaki are allowed.
-const LEAKS = /Welcome to Kakis|Send my code|Sign in\b|Check again|Set up your care circle|Continue|Save care plan|Caring for|Book a visit|What do they need|When\?|The details|Request this visit|Finding a kaki|Kaki assigned|Confirmed|Happening now|Completed|Cancelled|Check it's them|Start code|Estimated cost|Family pays|Visit report|Private care note|Your visits|Accept this visit|I'm on my way|Start the visit|Start visit|End the visit|Complete visit|Your report|Flag a concern|My profile|Save profile|When I can work|Nothing to do right now|Care plan|Your profile|Current visits|Recent|Step \d of \d|Usually matched|Kaki checked at the door|Requested|Home|Visits|Impact|Profile|Sign out/;
+const LEAKS = /Welcome to Kakis|Send my code|\bSign in\b|Check again|Set up your care circle|\bContinue\b|Save care plan|Caring for|Book a visit|What do they need|\bWhen\?|The details|Request this visit|Finding a kaki|Kaki assigned|\bConfirmed\b|Happening now|\bCompleted\b|\bCancelled\b|Check it's them|Start code|Estimated cost|Family pays|Visit report|Private care note|Your visits|Accept this visit|I'm on my way|Start the visit|Start visit|End the visit|Complete visit|Your report|Flag a concern|My profile|Save profile|When I can work|Nothing to do right now|Care plan|Your profile|Current visits|\bRecent\b|Step \d of \d|Usually matched|Kaki checked at the door|\bRequested\b|\bHome\b|\bVisits\b|\bImpact\b|\bProfile\b|Sign out|Your code for the family|On the way|\bHistory\b|Certificates|Payouts|My impact|Add a certificate|Days off|My normal week/;
 const noLeak = async page => {
   const txt = await page.locator("#screen").innerText();
   const nav = await page.locator("#tabs").innerText().catch(() => "");
@@ -271,6 +271,12 @@ test("中文 lifecycle: caregiver signs up, books; the English console assigns; 
   await expect(page.locator("#screen")).toContainText("History");
   const after = await api(request, "GET", "/auth/me", { token: await page.evaluate(() => localStorage.getItem("kakis_token")) });
   expect(after.body.user.lang).toBe("en");
+  // a shared phone left in 中文 by someone else does not flip this person's choice
+  await page.evaluate(() => localStorage.setItem("kakis_lang", "zh"));
+  await page.reload();
+  await expect(page.locator("#screen h1")).toContainText("Visits");
+  const still = await api(request, "GET", "/auth/me", { token: await page.evaluate(() => localStorage.getItem("kakis_token")) });
+  expect(still.body.user.lang).toBe("en");
 });
 
 test("the help panel answers a Chinese question in Chinese, signed out and signed in", async ({ page, request }) => {

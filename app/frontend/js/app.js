@@ -106,9 +106,14 @@ const App = (() => {
       // phone before signing in is kept and written back.
       if (user.role !== "admin") {
         let stored = ""; try { stored = localStorage.getItem("kakis_lang") || ""; } catch (e) {}
-        const want = stored || user.lang || UI.storedLang() || "en";
-        UI.setLang(want);
-        if (want !== (user.lang || "")) { user.lang = want; Api.put("/users/me", { lang: want }).catch(() => {}); }
+        // The server's record wins: a shared phone must not flip the next
+        // person's message language. The phone only seeds a first sign-in,
+        // and only a real choice (theirs, or this phone's) is written back —
+        // the phone's own language is a default, not a decision.
+        const chosen = user.lang || stored;
+        const want = chosen || UI.storedLang() || "en";
+        UI.setLang(want, !!chosen);
+        if (chosen && chosen !== (user.lang || "")) { user.lang = chosen; Api.put("/users/me", { lang: chosen }).catch(() => {}); }
       }
       applyLang();
       UI.el("brandRight").textContent = (user.name || user.email || "").toUpperCase().slice(0, 22) || "PASIR RIS PILOT";

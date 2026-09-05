@@ -1083,7 +1083,9 @@ _sent.clear()
 assert c.post(f"/api/admin/visits/{_vz['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
 _kz = " ".join(_texts_to("beelian@example.com")); _cz = " ".join(_texts_to("priya@example.com"))
 assert "探访" in _kz and "2026-08-18" in _kz and "Companionship" in _kz and "2 小时" in _kz, _kz
-assert "Open the app" not in _kz, _kz
+assert "Open the app" not in _kz and "personal-care" not in _kz, _kz
+_vv = c.get(f"/api/visits/{_vz['id']}", headers=kh).json()
+assert _vv["kaki_code"] and _vv["kaki_code"] not in _cz and "otp_code" not in _vv, _vv   # §9.5 holds in messages too
 assert "matched" in _cz.lower() and not any("一" <= ch_ <= "鿿" for ch_ in _cz), _cz
 _aud = db.q("SELECT detail FROM audit_log WHERE action = 'notified' ORDER BY ts DESC LIMIT 2")
 assert _aud and all(not any("一" <= ch_ <= "鿿" for ch_ in (r["detail"] or "")) for r in _aud), _aud

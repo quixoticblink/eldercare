@@ -42,8 +42,10 @@ def chat(body: ChatIn, request: Request = None, authorization: str = Header(defa
     # questions from the sign-in screen will never see it.
     ip = ratelimit.client_ip(request)
     if ip and ratelimit.count("chat_anon", ip, 15) > 60:
-        return {"reply": "I've answered a lot of questions just now. Please sign in, "
-                         "or call the Pasir Ris ICCP coordinator on 6XXX XXXX.",
+        return {"reply": ("刚才回答了很多问题。请登录，或致电巴西立 ICCP 协调员 6XXX XXXX。"
+                          if llm.is_zh(body.message) else
+                          "I've answered a lot of questions just now. Please sign in, "
+                          "or call the Pasir Ris ICCP coordinator on 6XXX XXXX."),
                 "source": "throttled"}
     if ip:
         ratelimit.record("chat_anon", ip)
