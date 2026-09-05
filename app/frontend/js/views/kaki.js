@@ -58,6 +58,10 @@ const KakiView = (() => {
           ${plan.contact_name || plan.contact_phone ? `<div class="divider"></div><p><b>Emergency:</b> ${UI.esc(plan.contact_name || "")}${plan.contact_relationship ? " (" + UI.esc(plan.contact_relationship) + ")" : ""} · ${UI.esc(plan.contact_phone || "")}<br><small>They're messaged when you start and finish.</small></p>` : ""}
           ${plan.contacts ? `<div class="divider"></div><p><b>Other contacts:</b> ${UI.esc(plan.contacts)}</p>` : ""}
         </div>
+        ${["assigned", "accepted"].includes(v.status) && v.kaki_code ? `
+          <div class="card tint"><h3>Your code for the family</h3>
+          <div class="codebox kakicode">${v.kaki_code.split("").map(d => `<span>${d}</span>`).join("")}</div>
+          <p>At the door, show this screen with your photo. The family enters this code — that's how they know it's you — and then reads you their start code.</p></div>` : ""}
         ${v.status === "assigned" ? `
           <button class="btn gold" id="acceptV">Accept this visit</button>
           <button class="btn ghost" id="declineV">I can't make it</button>` : ""}
@@ -152,8 +156,11 @@ const KakiView = (() => {
       const k = p.kaki || { services: [], languages: [] };
       UI.screen(`
         ${UI.appbar("My profile", "The coordinator matches you by this")}
-        <div class="li"><div class="face" style="width:52px;height:52px">${UI.initials(p.name)}</div>
-          <div class="body"><b>${UI.esc(p.name || p.email)}</b><span>Tier ${k.tier || 1} · Good standing · ${UI.esc(p.email)}</span></div></div>
+        <div class="li"><div class="face" style="width:52px;height:52px;overflow:hidden">${p.photo ? `<img src="${p.photo}" alt="Your photo" style="width:100%;height:100%;object-fit:cover">` : UI.initials(p.name)}</div>
+          <div class="body"><b>${UI.esc(p.name || UI.contact(p))}</b><span>Tier ${k.tier || 1} · Good standing · ${UI.esc(UI.contact(p))}</span></div>
+          <div class="end"><label class="chip" for="photoIn" style="cursor:pointer">${p.photo ? "Change photo" : "Add a photo"}</label>
+            <input type="file" id="photoIn" accept="image/*" capture="user" style="display:none"></div></div>
+        <p class="f-hint">Families see your photo on the visit page, next to your code — it's how they know it's you at the door.</p>
         <label class="f-label">Name</label>
         <input class="f-input" id="pname" value="${UI.esc(p.name)}">
         <label class="f-label">Phone</label>
@@ -177,6 +184,15 @@ const KakiView = (() => {
         <div class="li"><div class="body"><b>Working with seniors + SOPs</b><span class="mono">Vanguard in-house</span></div><span class="pill green">Valid</span></div>
         <div class="card tint"><h3>Tier 2 within reach</h3><p>Complete dementia basics to unlock dementia-care visits — ask the coordinator to book you in.</p></div>
         <button class="btn ghost" onclick="App.logout()">Sign out</button>`);
+      UI.el("photoIn").onchange = async () => {
+        const file = UI.el("photoIn").files[0];
+        if (!file) return;
+        try {
+          const dataUrl = await UI.shrinkImage(file, 320);
+          await Api.put("/users/me/photo", { data_url: dataUrl });
+          UI.toast("Photo saved ✓"); profile();
+        } catch (e) { UI.toast(e.message || "Couldn't read that photo", true); }
+      };
       UI.el("saveP").onclick = async () => {
         try {
           await Api.put("/users/me", { name: UI.el("pname").value.trim(), phone: UI.el("pphone").value.trim(),

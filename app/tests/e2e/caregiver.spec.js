@@ -106,6 +106,9 @@ test.describe("care plan, profile, start-code copy (Bucket 1 · 9)", () => {
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page.getByText("Profile saved")).toBeVisible();
 
+    // Since v1.6 the start code sits behind the kaki check: verify via the API first.
+    const kc = (await api(request, "GET", `/visits/${v.body.id}`, { token: s.k1.token })).body.kaki_code;
+    await api(request, "POST", `/visits/${v.body.id}/verify-kaki`, { token: s.cg1.token, data: { code: kc } });
     await page.goto(`/#/care/visit/${v.body.id}`);
     await expect(page.getByText("Only you can see this code")).toBeVisible();
   });

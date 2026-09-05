@@ -69,8 +69,13 @@ def assign(vid: str, kaki_id: str, actor: str, automatic: bool = False) -> dict:
     if not kaki:
         raise ValueError("Not an approved kaki")
 
-    db.run("""UPDATE visits SET kaki_id = ?, status = 'assigned', assigned_at = current_timestamp
-              WHERE id = ?""", [kaki_id, vid])
+    # A fresh 4-digit kaki code per assignment: the kaki shows it, the caregiver
+    # enters it, and only then does the family's start code appear (v1.6).
+    import random
+    kaki_code = f"{random.randint(0, 9999):04d}"
+    db.run("""UPDATE visits SET kaki_id = ?, status = 'assigned', assigned_at = current_timestamp,
+              kaki_code = ?, kaki_verified_at = NULL
+              WHERE id = ?""", [kaki_id, kaki_code, vid])
     db.audit(actor, "visit_auto_assigned" if automatic else "visit_assigned",
              f"{vid} -> {kaki['email'] or kaki['phone']}")
 

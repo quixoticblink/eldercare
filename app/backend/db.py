@@ -113,6 +113,12 @@ def _init(c):
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS start_time TEXT DEFAULT ''")
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS end_time TEXT DEFAULT ''")
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS hours DOUBLE")
+    # M-USERS / M-VISITS: identity both ways. The kaki carries a photo and, per
+    # visit, a 4-digit code the caregiver enters; only then is the caregiver's
+    # own start code revealed. Photo is a data URL, capped in the endpoint.
+    c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS photo TEXT DEFAULT ''")
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS kaki_code TEXT DEFAULT ''")
+    c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS kaki_verified_at TIMESTAMP")
 
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for

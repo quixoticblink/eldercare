@@ -95,6 +95,26 @@ const UI = (() => {
     return Math.max(1, Math.ceil(raw * 2) / 2);
   }
 
+  /* Resize an image file to max `px` on the long side and return a JPEG data
+     URL. Keeps uploads small enough to live in the database. */
+  function shrinkImage(file, px = 320) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const scale = Math.min(1, px / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(img.width * scale));
+        c.height = Math.max(1, Math.round(img.height * scale));
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        resolve(c.toDataURL("image/jpeg", 0.8));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Couldn't read that photo")); };
+      img.src = url;
+    });
+  }
+
   /* "HH:MM" in the phone's local time from a server timestamp; "" if unparseable. */
   function hhmm(ts) {
     if (!ts) return "";
@@ -107,5 +127,5 @@ const UI = (() => {
 
   return { el, esc, toast, screen, spin, appbar, chipGroup, pick, chipValue,
            chipMulti, chipValues, statusPill, initials, contact, moneyNote, hhmm, ymd, ymdIn,
-           timeOptions, hoursBetween, TIER_LABEL };
+           timeOptions, hoursBetween, shrinkImage, TIER_LABEL };
 })();

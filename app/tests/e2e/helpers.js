@@ -3,6 +3,7 @@
 // there is no back door into the database from the tests.
 const { expect } = require("@playwright/test");
 
+const TINY_PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
 let counter = 0;
 const RUN = Date.now().toString(36);
 
@@ -78,6 +79,8 @@ async function seed(request) {
   for (const [k, services, languages] of [[k1, ["Companionship", "Household help"], ["Mandarin", "English"]], [k2, ["Chaperone"], ["English", "Malay"]], [k3, ["Companionship", "Chaperone"], ["Hokkien", "English"]]]) {
     await api(request, "PUT", "/users/me", { token: k.token, data: { services, languages, phone: "" } });
   }
+  // Bee Lian has a profile photo (a 1×1 PNG); the others do not.
+  await api(request, "PUT", "/users/me/photo", { token: k1.token, data: { data_url: TINY_PNG } });
   return { admin, cg1, cg2, k1, k2, k3 };
 }
 
@@ -99,4 +102,4 @@ function dateIn(n) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-module.exports = { uniq, api, apiLogin, signIn, approve, seed, useToken, dateIn };
+module.exports = { uniq, api, apiLogin, signIn, approve, seed, useToken, dateIn, TINY_PNG };

@@ -53,9 +53,19 @@ test("caregiver books, kaki serves, report comes back", async ({ page, request }
   await page.getByRole("button", { name: "Accept this visit" }).click();
   await expect(page.getByText("Start the visit")).toBeVisible();
 
-  // Caregiver reads the 4-digit start code.
+  // v1.6 identity both ways. The kaki's page shows THEIR code for the family…
+  await expect(page.getByText("Your code for the family")).toBeVisible();
+  const kakiCode = (await page.locator(".kakicode").textContent()).replace(/\D/g, "");
+  expect(kakiCode).toMatch(/^\d{4}$/);
+
+  // …the caregiver sees the kaki's photo, enters that code, and only then the start code appears.
   const cgToken = (await apiLogin(request, cgId)).token;
   await useToken(page, cgToken, `#/care/visit/${visitId}`);
+  await expect(page.locator(".kp-face img")).toBeVisible();
+  await expect(page.locator(".codebox")).toHaveCount(0);
+  await expect(page.getByText("Check it's them")).toBeVisible();
+  for (let i = 0; i < 4; i++) await page.locator(`#k${i}`).fill(kakiCode[i]);
+  await page.getByRole("button", { name: "Confirm it's them" }).click();
   await expect(page.locator(".codebox")).toBeVisible();
   const digits = await page.locator(".codebox span").allTextContents();
   expect(digits.join("")).toMatch(/^\d{4}$/);

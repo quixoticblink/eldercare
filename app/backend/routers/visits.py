@@ -22,6 +22,9 @@ class VisitIn(BaseModel):
 class StartIn(BaseModel):
     otp: str
 
+class KakiCodeIn(BaseModel):
+    code: str
+
 class ReportIn(BaseModel):
     chips: list[str] = []
     text: str = ""
@@ -123,13 +126,18 @@ def _out(v: dict, user: dict) -> dict:
     start code — not on the visit page, not in the list, not in the response
     to their own accept/start/complete. SPEC §9.5."""
     out = _enrich(v)
-    if user.get("role") == "kaki":
-        out.pop("otp_code", None)
+    role = user.get("role")
+    if role == "kaki":
+        out.pop("otp_code", None)            # never; they get it from the family in person
+    elif role == "caregiver":
+        out.pop("kaki_code", None)           # they have to ask the kaki for it
+        if not v.get("kaki_verified_at"):
+            out.pop("otp_code", None)        # revealed only once the kaki is verified
     return out
 
 def _enrich(v: dict) -> dict:
     h = db.one("SELECT * FROM households WHERE id = ?", [v["household_id"]]) or {}
-    kaki = db.one("SELECT id, name, email, phone FROM users WHERE id = ?", [v["kaki_id"]]) if v.get("kaki_id") else None
+    kaki = db.one("SELECT id, name, email, phone, photo FROM users WHERE id = ?", [v["kaki_id"]]) if v.get("kaki_id") else None
     times_together = 0
     if kaki:
         kp = db.one("SELECT tier FROM kaki_profiles WHERE user_id = ?", [kaki["id"]]) or {}
@@ -260,8 +268,31 @@ def decline(vid: str, user=Depends(security.current_user)):
     security.approved_user(user)
     v = _transition(vid, user, ["kaki"], ["assigned"], "requested")
     kaki, cg, senior = _parties(v)          # before the kaki is cleared
-    db.run("UPDATE visits SET kaki_id = NULL, assigned_at = NULL WHERE id = ?", [vid])
+    db.run("UPDATE visits SET kaki_id = NULL, assigned_at = NULL, kaki_code = '', kaki_verified_at = NULL WHERE id = ?", [vid])
     notify.visit_declined(v, kaki, cg, senior)
+    return _out(db.one("SELECT * FROM visits WHERE id = ?", [vid]), user)
+
+@router.post("/{vid}/verify-kaki")
+def verify_kaki(vid: str, body: KakiCodeIn, user=Depends(security.current_user)):
+    """Caregiver enters the 4-digit code the kaki shows on arrival (with their
+    photo). Success reveals the caregiver's own start code. NCSS wanted the
+    code to run kaki → family as proof of identity; the family's code still
+    runs family → kaki as proof of admission. Both halves, v1.6."""
+    security.approved_user(user)
+    security.require_role(user, "caregiver")
+    v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
+    if not v:
+        raise HTTPException(404, "Visit not found")
+    if v["caregiver_id"] != user["id"]:
+        raise HTTPException(403, "Not your visit")
+    if v["status"] not in ("assigned", "accepted") or not v.get("kaki_id"):
+        raise HTTPException(400, "No kaki to check yet")
+    if body.code.strip() != (v.get("kaki_code") or ""):
+        db.audit(user["email"] or user["phone"], "kaki_code_wrong", vid)
+        raise HTTPException(400, "That code doesn't match — ask your kaki to show it again, or call the coordinator")
+    if not v.get("kaki_verified_at"):
+        db.run("UPDATE visits SET kaki_verified_at = current_timestamp WHERE id = ?", [vid])
+        db.audit(user["email"] or user["phone"], "kaki_verified", vid)
     return _out(db.one("SELECT * FROM visits WHERE id = ?", [vid]), user)
 
 @router.post("/{vid}/on-the-way")

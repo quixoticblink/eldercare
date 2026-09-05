@@ -14,6 +14,12 @@ class ProfileIn(BaseModel):
     languages: list[str] | None = None
     area: str | None = None
 
+class PhotoIn(BaseModel):
+    data_url: str = ""     # "data:image/jpeg;base64,..." or "" to remove
+
+PHOTO_MAX_BYTES = 200 * 1024
+PHOTO_TYPES = ("image/jpeg", "image/png")
+
 class WeeklyIn(BaseModel):
     # v1.6: {"Mon": {"from": "09:00", "to": "13:00"}, "Sat": {"from": "08:00", "to": "18:00"}}
     # v1.3 (still accepted): {"Mon": ["morning"], "Sat": ["morning", "afternoon"]}
@@ -59,9 +65,32 @@ def update_me(body: ProfileIn, user=Depends(security.current_user)):
             db.run("UPDATE kaki_profiles SET area = ? WHERE user_id = ?", [body.area, user["id"]])
     return get_me_profile(db.one("SELECT * FROM users WHERE id = ?", [user["id"]]))
 
+@router.put("/me/photo")
+def put_photo(body: PhotoIn, user=Depends(security.current_user)):
+    """Kaki profile photo, shown to the family on the visit page. Stored as a
+    data URL in the users table — one file, one backup, no object storage —
+    and capped, because the frontend resizes to 320px before sending."""
+    import base64, re
+    security.require_role(user, "kaki")
+    data = (body.data_url or "").strip()
+    if data:
+        m = re.match(r"^data:(image/(?:jpeg|png));base64,([A-Za-z0-9+/=]+)$", data)
+        if not m or m.group(1) not in PHOTO_TYPES:
+            raise HTTPException(400, "Photos must be JPEG or PNG")
+        try:
+            raw = base64.b64decode(m.group(2), validate=True)
+        except Exception:
+            raise HTTPException(400, "That image could not be read")
+        if len(raw) > PHOTO_MAX_BYTES:
+            raise HTTPException(413, "Photo too large — the app should resize it first")
+    db.run("UPDATE users SET photo = ? WHERE id = ?", [data, user["id"]])
+    db.audit(user["email"] or user["phone"], "photo_set" if data else "photo_removed", "")
+    return get_me_profile(db.one("SELECT * FROM users WHERE id = ?", [user["id"]]))
+
 @router.get("/me/profile")
 def get_me_profile(user=Depends(security.current_user)):
     out = {k: user.get(k) for k in ("id", "email", "name", "phone", "role", "status")}
+    out["photo"] = user.get("photo") or ""
     if user["role"] == "kaki":
         p = db.one("SELECT * FROM kaki_profiles WHERE user_id = ?", [user["id"]]) or {}
         out["kaki"] = {"services": db.uj(p.get("services")), "languages": db.uj(p.get("languages")),

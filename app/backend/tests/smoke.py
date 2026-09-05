@@ -44,6 +44,14 @@ def request_code(identifier):
     assert r.status_code == 200, r.text
     return r.json()
 
+def reveal_start_code(vid, cg_headers, kaki_headers):
+    """v1.6 identity both ways: the kaki shows a code, the caregiver enters it,
+    and only then does the caregiver's start code appear."""
+    kc = c.get(f"/api/visits/{vid}", headers=kaki_headers).json()["kaki_code"]
+    r = c.post(f"/api/visits/{vid}/verify-kaki", json={"code": kc}, headers=cg_headers)
+    assert r.status_code == 200, r.text
+    return r.json()["otp_code"]
+
 def login(identifier, role=None, name=None, **extra):
     req = request_code(identifier)
     r = c.post("/api/auth/verify",
@@ -93,7 +101,7 @@ assert r.status_code == 200 and r.json()["plan"]["meds"].startswith("Metformin")
 r = c.post("/api/visits", json={"service":"Chaperone","tier":"urgent","date":"today","window":"within the hour","language":"Tamil","notes":"Helper left suddenly","trigger":"Helper left suddenly"}, headers=ch)
 assert r.status_code == 200, r.text
 visit = r.json(); vid = visit["id"]
-assert visit["status"] == "requested" and visit["otp_code"]
+assert visit["status"] == "requested" and "otp_code" not in visit   # v1.6: revealed only after the kaki is verified
 assert visit["trigger"] == "Helper left suddenly"
 assert visit["estimate"] and visit["estimate"]["base"] == 84 and visit["estimate"]["family_pays"] > 0
 assert visit["times_together"] == 0
@@ -115,10 +123,22 @@ kv = c.get(f"/api/visits/{vid}", headers=kh).json()
 assert "otp_code" not in kv, "kaki must not see the start code"
 assert c.post(f"/api/visits/{vid}/accept", headers=kh).status_code == 200
 
-# caregiver DOES see the otp
+# [B2·2] identity both ways. The caregiver does NOT see the start code yet —
+# first the kaki shows their photo and a 4-digit kaki code, the caregiver
+# enters it, and only then is the start code revealed.
 cv = c.get(f"/api/visits/{vid}", headers=ch).json()
-otp = cv["otp_code"]
-assert otp and cv["status"] == "accepted" and cv["kaki"]["name"] == "Tan Bee Lian"
+assert "otp_code" not in cv and cv["status"] == "accepted" and cv["kaki"]["name"] == "Tan Bee Lian"
+assert cv["kaki_verified_at"] is None
+kv = c.get(f"/api/visits/{vid}", headers=kh).json()
+assert kv["kaki_code"] and len(kv["kaki_code"]) == 4 and "otp_code" not in kv, kv
+assert "kaki_code" not in cv, "the caregiver must not be shown the kaki's code — they have to ask for it"
+assert c.post(f"/api/visits/{vid}/verify-kaki", json={"code": "0000" if kv["kaki_code"] != "0000" else "1111"}, headers=ch).status_code == 400
+assert c.post(f"/api/visits/{vid}/verify-kaki", json={"code": kv["kaki_code"]}, headers=kh).status_code == 403
+otp = reveal_start_code(vid, ch, kh)
+cv = c.get(f"/api/visits/{vid}", headers=ch).json()
+assert cv["otp_code"] == otp and cv["kaki_verified_at"], cv
+# the kaki's start code entry is unchanged — still never in their own responses
+assert "otp_code" not in c.get(f"/api/visits/{vid}", headers=kh).json()
 
 # start: wrong code fails, right code works
 assert c.post(f"/api/visits/{vid}/start", json={"otp":"0000" if otp != "0000" else "1111"}, headers=kh).status_code == 400
@@ -718,7 +738,7 @@ v16e = c.post("/api/visits", json={"service": "Companionship", "tier": "planned"
                                    "window": "Morning 9–12", "language": "English"}, headers=ch).json()
 assert c.post(f"/api/admin/visits/{v16e['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
 assert c.post(f"/api/visits/{v16e['id']}/accept", headers=kh).status_code == 200
-_otp16 = c.get(f"/api/visits/{v16e['id']}", headers=ch).json()["otp_code"]
+_otp16 = reveal_start_code(v16e["id"], ch, kh)
 _sent.clear()
 assert c.post(f"/api/visits/{v16e['id']}/start", json={"otp": _otp16}, headers=kh).status_code == 200
 _ravi = [m for m in _sent if m[1] == "+6591112222"]
@@ -734,7 +754,7 @@ v16f = c.post("/api/visits", json={"service": "Companionship", "tier": "planned"
 assert c.post(f"/api/admin/visits/{v16f['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
 assert c.post(f"/api/visits/{v16f['id']}/accept", headers=kh).status_code == 200
 _sent.clear()
-assert c.post(f"/api/visits/{v16f['id']}/start", json={"otp": c.get(f"/api/visits/{v16f['id']}", headers=ch).json()["otp_code"]}, headers=kh).status_code == 200
+assert c.post(f"/api/visits/{v16f['id']}/start", json={"otp": reveal_start_code(v16f["id"], ch, kh)}, headers=kh).status_code == 200
 assert not [m for m in _sent if m[1] == "+6591112222"]
 assert c.post(f"/api/visits/{v16f['id']}/complete", json={"chips": [], "text": "ok"}, headers=kh).status_code == 200
 
@@ -789,6 +809,28 @@ db.run("UPDATE kaki_profiles SET weekly_slots = ? WHERE user_id = ?", ['{"Thu": 
 assert availmod.weekly_hours(kk["id"])["Thu"] == {"from": "13:00", "to": "18:00"}, availmod.weekly_hours(kk["id"])
 assert availmod.check(kk["id"], "2026-08-20", "14:00–16:00")["state"] == "available"
 db.run("UPDATE kaki_profiles SET weekly_slots = ? WHERE user_id = ?", ['{"Tue": {"from": "09:00", "to": "12:00"}, "Sat": {"from": "08:00", "to": "18:00"}}', kk["id"]])
+
+# [B2·2] the kaki's photo: uploaded on the profile, shown to the caregiver on
+# the visit (every 21 Aug source, and NCSS 3.1). Base64 in the database, capped.
+import base64 as _b64
+_png = "data:image/png;base64," + _b64.b64encode(b"\x89PNG\r\n\x1a\n" + b"0" * 200).decode()
+assert c.put("/api/users/me/photo", json={"data_url": _png}, headers=kh).status_code == 200
+assert c.get("/api/users/me/profile", headers=kh).json()["photo"] == _png
+_big = "data:image/jpeg;base64," + _b64.b64encode(b"\xff\xd8" + b"0" * (260 * 1024)).decode()
+assert c.put("/api/users/me/photo", json={"data_url": _big}, headers=kh).status_code == 413
+assert c.put("/api/users/me/photo", json={"data_url": "data:text/html;base64,PGI+"}, headers=kh).status_code == 400
+assert c.put("/api/users/me/photo", json={"data_url": _png}, headers=ch).status_code == 403   # caregivers have no kaki photo
+v16g = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-19",
+                                   "start_time": "09:00", "end_time": "11:00", "language": "English"}, headers=ch).json()
+assert c.post(f"/api/admin/visits/{v16g['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+assert c.get(f"/api/visits/{v16g['id']}", headers=ch).json()["kaki"]["photo"] == _png
+# a fresh assignment gets a fresh kaki code; declining clears it
+_kc1 = c.get(f"/api/visits/{v16g['id']}", headers=kh).json()["kaki_code"]
+assert c.post(f"/api/visits/{v16g['id']}/decline", headers=kh).status_code == 200
+assert c.post(f"/api/admin/visits/{v16g['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+assert c.get(f"/api/visits/{v16g['id']}", headers=ch).json()["kaki_verified_at"] is None
+assert c.post(f"/api/visits/{v16g['id']}/cancel", headers=ch).status_code == 200
+assert c.put("/api/users/me/photo", json={"data_url": ""}, headers=kh).status_code == 200   # remove
 
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string

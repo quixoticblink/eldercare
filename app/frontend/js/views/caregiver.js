@@ -277,6 +277,7 @@ const CareView = (() => {
         ["Kaki assigned", !!v.kaki, v.kaki ? `${v.kaki.name} — verified by the coordinator` : "The coordinator is matching…"],
         ["Confirmed", ["accepted", "in_progress", "completed"].includes(v.status),
           v.on_way_at && v.status === "accepted" ? `${(v.kaki && v.kaki.name) || "Your kaki"} is on the way — since ${UI.hhmm(v.on_way_at)}` : ""],
+        ["Kaki checked at the door", !!v.kaki_verified_at || ["in_progress", "completed"].includes(v.status), v.kaki_verified_at ? "Photo and code matched" : ""],
         ["Visit", v.status === "completed", v.status === "in_progress" ? "Happening now" : ""],
       ];
       const est = v.estimate;
@@ -289,7 +290,7 @@ const CareView = (() => {
         ${v.kaki ? `
           <div class="kakipass">
             <div class="kp-top">
-              <div class="kp-face">${UI.initials(v.kaki.name)}</div>
+              <div class="kp-face" style="overflow:hidden">${v.kaki.photo ? `<img src="${v.kaki.photo}" alt="${UI.esc(v.kaki.name || "Your kaki")}" style="width:100%;height:100%;object-fit:cover">` : UI.initials(v.kaki.name)}</div>
               <div><h3>${UI.esc(v.kaki.name || "Your kaki")}</h3>
                 <div class="kp-sub">${UI.esc(v.service)} · Pasir Ris</div>
                 <div class="kp-meta"><span>Tier ${v.kaki.tier || 1} · verified</span>
@@ -313,6 +314,11 @@ const CareView = (() => {
         ${v.status === "requested" ? `
           <div class="card tint"><h3>Usually matched ${MATCH_ETA[v.tier] || "soon"}</h3>
           <p>We'll message you the moment a kaki is confirmed — you don't need to keep checking.</p></div>` : ""}
+        ${["assigned", "accepted"].includes(v.status) && !v.kaki_verified_at ? `
+          <div class="card warn"><h3>Check it's them</h3>
+          <p>When ${UI.esc((v.kaki && v.kaki.name) || "your kaki")} arrives, compare the photo above, then ask for the 4-digit code on their screen and enter it here. Your start code appears once it matches.</p>
+          <div class="otp-in">${[0,1,2,3].map(i => `<input id="k${i}" inputmode="numeric" maxlength="1" aria-label="Kaki code digit ${i + 1}">`).join("")}</div>
+          <button class="btn" id="verifyK">Confirm it's them</button></div>` : ""}
         ${["assigned", "accepted"].includes(v.status) && v.otp_code ? `
           <div class="card warn"><h3>Start code — read it to your kaki when they arrive</h3>
           <div class="codebox">${v.otp_code.split("").map(d => `<span>${d}</span>`).join("")}</div>
@@ -350,6 +356,13 @@ const CareView = (() => {
             <button class="btn quiet" id="sendNote">Send care note</button></div>` : ""}
         ${["requested", "assigned", "accepted"].includes(v.status) ? `<button class="btn danger" id="cancelV">Cancel this visit</button>` : ""}
       `);
+      [0,1,2,3].forEach(i => { const o = UI.el("k" + i); if (o) o.oninput = () => { if (o.value && i < 3) UI.el("k" + (i + 1)).focus(); }; });
+      const vk = UI.el("verifyK");
+      if (vk) vk.onclick = async () => {
+        const code = [0,1,2,3].map(i => UI.el("k" + i).value).join("");
+        try { await Api.post(`/visits/${id}/verify-kaki`, { code }); UI.toast("It's them ✓ — here's your start code"); visit(id); }
+        catch (e) { UI.toast(e.message, true); }
+      };
       const sn = UI.el("sendNote");
       if (sn) sn.onclick = async () => {
         try {
