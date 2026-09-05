@@ -115,6 +115,13 @@ const UI = (() => {
     });
   }
 
+  /* A file as a data URL (for PDFs and small images that go to the server as-is). */
+  const readDataUrl = file => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result); r.onerror = () => reject(new Error("Couldn't read that file"));
+    r.readAsDataURL(file);
+  });
+
   /* "HH:MM" in the phone's local time from a server timestamp; "" if unparseable. */
   function hhmm(ts) {
     if (!ts) return "";
@@ -127,5 +134,5 @@ const UI = (() => {
 
   return { el, esc, toast, screen, spin, appbar, chipGroup, pick, chipValue,
            chipMulti, chipValues, statusPill, initials, contact, moneyNote, hhmm, ymd, ymdIn,
-           timeOptions, hoursBetween, shrinkImage, TIER_LABEL };
+           timeOptions, hoursBetween, shrinkImage, readDataUrl, TIER_LABEL };
 })();

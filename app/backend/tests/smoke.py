@@ -966,6 +966,42 @@ _w = _booked_and_accepted()
 assert c.post(f"/api/visits/{_w}/cancel", json={"reason": "Coordinator: kaki reassigned"}, headers=ah).status_code == 200
 assert db.one("SELECT cancelled_by FROM visits WHERE id = ?", [_w])["cancelled_by"] == "admin"
 
+# [B2·7] certificates on the kaki profile, visible to the coordinator at
+# approval (NCSS 1.5; committed to Vanguard on Aug 3). Certification gates
+# supply; the app has to carry the evidence.
+_pdf = "data:application/pdf;base64," + _b64.b64encode(b"%PDF-1.4 fake " + b"0" * 300).decode()
+_r = c.post("/api/users/me/certificates", json={"name": "CPR + AED", "issuer": "St. Luke's Hospital",
+                                                "expires": "2027-03-31", "file_name": "cpr.pdf", "data_url": _pdf}, headers=kh)
+assert _r.status_code == 200, _r.text
+_certs = _r.json()
+assert len(_certs) == 1 and _certs[0]["name"] == "CPR + AED" and _certs[0]["mime"] == "application/pdf", _certs
+assert "data_url" not in _certs[0], "lists carry metadata only, never the file"
+_cid = _certs[0]["id"]
+assert c.get("/api/users/me/certificates", headers=kh).json()[0]["id"] == _cid
+assert c.post("/api/users/me/certificates", json={"name": "x", "file_name": "x.exe", "data_url": "data:application/octet-stream;base64,AAAA"}, headers=kh).status_code == 400
+_huge = "data:application/pdf;base64," + _b64.b64encode(b"0" * (1100 * 1024)).decode()
+assert c.post("/api/users/me/certificates", json={"name": "big", "file_name": "big.pdf", "data_url": _huge}, headers=kh).status_code == 413
+assert c.post("/api/users/me/certificates", json={"name": "x", "file_name": "x.pdf", "data_url": _pdf}, headers=ch).status_code == 403
+# the coordinator sees it on the kaki's record and can open the file
+_admin_list = c.get(f"/api/admin/users/{kk['id']}/certificates", headers=ah)
+assert _admin_list.status_code == 200 and _admin_list.json()[0]["name"] == "CPR + AED", _admin_list.text
+_file = c.get(f"/api/admin/users/{kk['id']}/certificates/{_cid}/file", headers=ah)
+assert _file.status_code == 200 and _file.json()["data_url"] == _pdf
+assert c.get(f"/api/admin/users/{kk['id']}/certificates/{_cid}/file", headers=ch).status_code == 403
+# pending users carry their certificate count, so approval can see who is evidenced
+kh_p, kk_p = login("newkaki@example.com", role="kaki", name="Lim Ah Seng")
+assert c.post("/api/users/me/certificates", json={"name": "Mobility assistance", "issuer": "Vanguard", "file_name": "m.png",
+                                                  "data_url": "data:image/png;base64," + _b64.b64encode(b"\x89PNG" + b"0" * 50).decode()}, headers=kh_p).status_code == 200
+# (auto-approve for kakis was switched on by the v1.4 tests above, so this one is not pending;
+#  the count is on both the pending list and the everyone list)
+_everyone = next(u for u in c.get("/api/admin/users", headers=ah).json() if u["id"] == kk_p["id"])
+assert _everyone["kaki"]["certificates"] == 1, _everyone
+assert all("certificates" in u for u in c.get("/api/admin/pending-users", headers=ah).json())
+# a kaki can remove their own, nobody else's
+assert c.delete(f"/api/users/me/certificates/{_cid}", headers=kh_p).status_code == 404
+assert c.delete(f"/api/users/me/certificates/{_cid}", headers=kh).status_code == 200
+assert c.get("/api/users/me/certificates", headers=kh).json() == []
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.

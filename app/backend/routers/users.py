@@ -105,6 +105,66 @@ def get_me_profile(user=Depends(security.current_user)):
                        "availability": availability.summary(user["id"])}
     return out
 
+# ---- certificates (kaki only) -------------------------------------------------
+# Certification gates supply (Aug 3). A kaki uploads the evidence; the
+# coordinator sees it when approving and when matching. Metadata in lists,
+# the file only on an explicit fetch.
+
+CERT_MAX_BYTES = 1024 * 1024
+CERT_TYPES = ("application/pdf", "image/jpeg", "image/png")
+
+class CertificateIn(BaseModel):
+    name: str
+    issuer: str | None = ""
+    expires: str | None = ""       # YYYY-MM-DD, free text tolerated
+    file_name: str | None = ""
+    data_url: str                  # data:<mime>;base64,...
+
+def _cert_public(row: dict) -> dict:
+    return {k: row.get(k) for k in ("id", "name", "issuer", "expires", "file_name", "mime", "uploaded_at")}
+
+def list_certificates(user_id: str) -> list[dict]:
+    rows = db.q("""SELECT id, name, issuer, expires, file_name, mime, uploaded_at
+                   FROM kaki_certificates WHERE user_id = ? ORDER BY uploaded_at""", [user_id])
+    return [_cert_public(r) for r in rows]
+
+@router.get("/me/certificates")
+def my_certificates(user=Depends(security.current_user)):
+    security.require_role(user, "kaki")
+    return list_certificates(user["id"])
+
+@router.post("/me/certificates")
+def add_certificate(body: CertificateIn, user=Depends(security.current_user)):
+    import base64, re
+    security.require_role(user, "kaki")
+    name = (body.name or "").strip()
+    if not name:
+        raise HTTPException(400, "Name the certificate, e.g. CPR + AED")
+    m = re.match(r"^data:([a-z]+/[a-z0-9.+-]+);base64,([A-Za-z0-9+/=]+)$", (body.data_url or "").strip())
+    if not m or m.group(1) not in CERT_TYPES:
+        raise HTTPException(400, "Certificates must be a PDF, JPEG or PNG")
+    try:
+        raw = base64.b64decode(m.group(2), validate=True)
+    except Exception:
+        raise HTTPException(400, "That file could not be read")
+    if len(raw) > CERT_MAX_BYTES:
+        raise HTTPException(413, "File too large — 1 MB at most; a photo of the certificate is fine")
+    db.run("""INSERT INTO kaki_certificates(id, user_id, name, issuer, expires, file_name, mime, data)
+              VALUES (?,?,?,?,?,?,?,?)""",
+           [db.new_id(), user["id"], name, (body.issuer or "").strip(), (body.expires or "").strip(),
+            (body.file_name or "").strip()[:120], m.group(1), body.data_url.strip()])
+    db.audit(user["email"] or user["phone"], "certificate_added", name)
+    return list_certificates(user["id"])
+
+@router.delete("/me/certificates/{cid}")
+def remove_certificate(cid: str, user=Depends(security.current_user)):
+    security.require_role(user, "kaki")
+    if not db.one("SELECT 1 FROM kaki_certificates WHERE id = ? AND user_id = ?", [cid, user["id"]]):
+        raise HTTPException(404, "No such certificate")
+    db.run("DELETE FROM kaki_certificates WHERE id = ? AND user_id = ?", [cid, user["id"]])
+    db.audit(user["email"] or user["phone"], "certificate_removed", cid)
+    return list_certificates(user["id"])
+
 # ---- availability (kaki only) ------------------------------------------------
 
 def _kaki(user):

@@ -43,10 +43,32 @@ def overview(user=Depends(security.current_user)):
         "care_notes":     count("SELECT count(*) c FROM care_notes"),
     }
 
+def _cert_count(uid: str) -> int:
+    return db.q("SELECT count(*) c FROM kaki_certificates WHERE user_id = ?", [uid])[0]["c"]
+
 @router.get("/pending-users")
 def pending_users(user=Depends(security.current_user)):
     _admin(user)
-    return db.q("SELECT id, email, name, phone, role, status, created_at FROM users WHERE status = 'pending' ORDER BY created_at")
+    rows = db.q("SELECT id, email, name, phone, role, status, created_at FROM users WHERE status = 'pending' ORDER BY created_at")
+    for r in rows:
+        r["certificates"] = _cert_count(r["id"])
+    return rows
+
+@router.get("/users/{uid}/certificates")
+def user_certificates(uid: str, user=Depends(security.current_user)):
+    """Metadata only — the file comes from the /file route on an explicit tap."""
+    _admin(user)
+    return db.q("""SELECT id, name, issuer, expires, file_name, mime, uploaded_at
+                   FROM kaki_certificates WHERE user_id = ? ORDER BY uploaded_at""", [uid])
+
+@router.get("/users/{uid}/certificates/{cid}/file")
+def user_certificate_file(uid: str, cid: str, user=Depends(security.current_user)):
+    _admin(user)
+    row = db.one("SELECT data, mime, file_name FROM kaki_certificates WHERE id = ? AND user_id = ?", [cid, uid])
+    if not row:
+        raise HTTPException(404, "No such certificate")
+    db.audit(user["email"] or user["phone"], "certificate_viewed", f"{uid}/{cid}")
+    return {"data_url": row["data"], "mime": row["mime"], "file_name": row["file_name"]}
 
 @router.get("/users")
 def all_users(user=Depends(security.current_user)):
@@ -56,7 +78,8 @@ def all_users(user=Depends(security.current_user)):
         if r["role"] == "kaki":
             p = db.one("SELECT * FROM kaki_profiles WHERE user_id = ?", [r["id"]]) or {}
             r["kaki"] = {"services": db.uj(p.get("services")), "languages": db.uj(p.get("languages")),
-                         "area": p.get("area"), "tier": p.get("tier", 1)}
+                         "area": p.get("area"), "tier": p.get("tier", 1), "gender": p.get("gender") or "",
+                         "certificates": _cert_count(r["id"])}
     return rows
 
 @router.post("/users/{uid}/approve")

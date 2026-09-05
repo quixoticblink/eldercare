@@ -48,7 +48,9 @@ const AdminView = (() => {
         ${pend.length ? pend.map(u => `
           <div class="card warn" id="u-${u.id}">
             <div class="row"><h3 class="grow">${UI.esc(u.name || UI.contact(u))}</h3><span class="pill gold">Pending</span></div>
-            <p>${UI.esc(UI.contact(u))} · wants to join as <b>${UI.esc(u.role || "…not chosen yet")}</b></p>
+            <p>${UI.esc(UI.contact(u))} · wants to join as <b>${UI.esc(u.role || "…not chosen yet")}</b>
+            ${u.role === "kaki" ? ` · ${u.certificates || 0} certificate${u.certificates === 1 ? "" : "s"}` : ""}</p>
+            ${u.role === "kaki" ? `<button class="chip" data-uid="${u.id}" onclick="AdminView.showCertificates('${u.id}', this)">Certificates</button><div id="certs-${u.id}"></div>` : ""}
             <div class="divider"></div>
             <div class="row">
               <button class="btn quiet" style="margin:0" onclick="AdminView.approve('${u.id}','caregiver')">Approve as caregiver</button>
@@ -58,10 +60,37 @@ const AdminView = (() => {
         <div class="eyebrow">Everyone (${all.length})</div>
         ${all.map(u => `<div class="li"><div class="face">${UI.initials(u.name || UI.contact(u))}</div>
           <div class="body"><b>${UI.esc(u.name || UI.contact(u))}</b>
-          <span>${UI.esc(u.role || "no role")} · ${UI.esc(UI.contact(u))}${u.kaki ? " · " + (u.kaki.services || []).join(", ") : ""}</span></div>
+          <span>${UI.esc(u.role || "no role")} · ${UI.esc(UI.contact(u))}${u.kaki ? " · " + (u.kaki.services || []).join(", ") + ` · ${u.kaki.certificates || 0} certificate${u.kaki.certificates === 1 ? "" : "s"}` : ""}</span>
+          ${u.kaki ? `<button class="chip" style="margin-top:6px" data-uid="${u.id}" onclick="AdminView.showCertificates('${u.id}', this)">Certificates</button><div id="certs-${u.id}"></div>` : ""}</div>
           <div class="end"><span class="pill ${u.status === "approved" ? "green" : u.status === "pending" ? "gold" : "clay"}">${u.status}</span>
           ${u.status === "approved" && u.role !== "admin" ? `<br><button class="chip" style="margin-top:6px;min-height:40px;padding:8px 12px;font-size:.78rem" onclick="AdminView.suspend('${u.id}')">Suspend</button>` : ""}
           ${u.status === "suspended" ? `<br><button class="chip" style="margin-top:6px;min-height:40px;padding:8px 12px;font-size:.78rem" onclick="AdminView.approve('${u.id}','${u.role || "caregiver"}')">Reinstate</button>` : ""}</div></div>`).join("")}`);
+    } catch (e) { UI.toast(e.message, true); }
+  }
+
+  /* The kaki's certificates, fetched on tap (metadata), each file on a second tap. */
+  async function showCertificates(uid, btn) {
+    const box = UI.el("certs-" + uid);
+    if (!box) return;
+    try {
+      const certs = await Api.get(`/admin/users/${uid}/certificates`);
+      box.innerHTML = certs.length ? certs.map(c => `
+        <div class="li cert-row" style="margin-top:6px"><div class="face">📄</div>
+          <div class="body"><b>${UI.esc(c.name)}</b><span class="mono">${UI.esc(c.issuer || "")}${c.expires ? " · until " + UI.esc(c.expires) : ""}</span></div>
+          <div class="end"><button class="chip" onclick="AdminView.openCertificate('${uid}','${c.id}')">Open</button></div></div>`).join("")
+        : `<p class="f-hint" style="margin-top:6px">No certificates uploaded.</p>`;
+      if (btn) btn.hidden = true;
+    } catch (e) { UI.toast(e.message, true); }
+  }
+
+  async function openCertificate(uid, cid) {
+    try {
+      const f = await Api.get(`/admin/users/${uid}/certificates/${cid}/file`);
+      const bin = atob(f.data_url.split(",")[1]);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([bytes], { type: f.mime }));
+      window.open(url, "_blank", "noopener");
     } catch (e) { UI.toast(e.message, true); }
   }
 
@@ -356,5 +385,5 @@ const AdminView = (() => {
   }
 
   return { home, approvals, approve, suspend, requests, assign, markPicked,
-           confirmAssign, assumptions, settings, quality };
+           confirmAssign, assumptions, settings, quality, showCertificates, openCertificate };
 })();

@@ -131,6 +131,14 @@ def _init(c):
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS cancelled_by_name TEXT DEFAULT ''")
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS cancel_reason TEXT DEFAULT ''")
     c.execute("ALTER TABLE visits ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMP")
+    # M-USERS: certificates the kaki uploads; the coordinator reads them at
+    # approval. Files are data URLs, capped at 1 MB in the endpoint.
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS kaki_certificates(
+      id TEXT PRIMARY KEY, user_id TEXT, name TEXT, issuer TEXT DEFAULT '', expires TEXT DEFAULT '',
+      file_name TEXT DEFAULT '', mime TEXT DEFAULT '', data TEXT DEFAULT '',
+      uploaded_at TIMESTAMP DEFAULT current_timestamp);
+    """)
 
     # Fold the write-ahead log into the database file before serving traffic.
     # DuckDB can throw an InternalException replaying a WAL entry for

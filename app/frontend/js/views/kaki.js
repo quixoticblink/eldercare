@@ -170,7 +170,7 @@ const KakiView = (() => {
   async function profile() {
     UI.spin();
     try {
-      const p = await Api.get("/users/me/profile");
+      const [p, certs] = await Promise.all([Api.get("/users/me/profile"), Api.get("/users/me/certificates")]);
       const k = p.kaki || { services: [], languages: [] };
       UI.screen(`
         ${UI.appbar("My profile", "The coordinator matches you by this")}
@@ -199,11 +199,42 @@ const KakiView = (() => {
           <div class="end"><span class="pill ${(k.availability && k.availability.any_set) ? "green" : "gold"}">
             ${(k.availability && k.availability.any_set) ? "Set" : "Add"}</span></div></button>
         <div class="eyebrow">Training & certificates · Tier ${k.tier || 1}</div>
-        <div class="li"><div class="body"><b>CPR + AED</b><span class="mono">External cert · St. Luke's Hospital</span></div><span class="pill green">Valid</span></div>
-        <div class="li"><div class="body"><b>Mobility assistance</b><span class="mono">Half-day · Vanguard in-house</span></div><span class="pill green">Valid</span></div>
-        <div class="li"><div class="body"><b>Working with seniors + SOPs</b><span class="mono">Vanguard in-house</span></div><span class="pill green">Valid</span></div>
+        ${certs.length ? certs.map(c => `
+          <div class="li cert-row"><div class="face">📄</div>
+            <div class="body"><b>${UI.esc(c.name)}</b><span class="mono">${UI.esc(c.issuer || "")}${c.expires ? " · until " + UI.esc(c.expires) : ""}${c.file_name ? " · " + UI.esc(c.file_name) : ""}</span></div>
+            <div class="end"><button class="chip" onclick="KakiView.dropCertificate('${c.id}')">Remove</button></div></div>`).join("")
+        : `<div class="card tint"><p>No certificates yet. Add CPR + AED, mobility assistance, or anything Vanguard has trained you in — the coordinator checks these before approving and matching.</p></div>`}
+        <div class="card">
+          <h3>Add a certificate</h3>
+          <label class="f-label" for="certName">What is it <small>· required</small></label>
+          <input class="f-input" id="certName" placeholder="e.g. CPR + AED" maxlength="80">
+          <label class="f-label" for="certIssuer">Who issued it <small>· optional</small></label>
+          <input class="f-input" id="certIssuer" placeholder="e.g. St. Luke's Hospital" maxlength="80">
+          <label class="f-label" for="certExpires">Valid until <small>· optional</small></label>
+          <input class="f-input" id="certExpires" type="date">
+          <label class="f-label" for="certFile">The certificate <small>· PDF or a photo of it, up to 1 MB</small></label>
+          <input class="f-input" id="certFile" type="file" accept="application/pdf,image/*">
+          <button class="btn quiet" id="addCert">Add certificate</button>
+        </div>
         <div class="card tint"><h3>Tier 2 within reach</h3><p>Complete dementia basics to unlock dementia-care visits — ask the coordinator to book you in.</p></div>
         <button class="btn ghost" onclick="App.logout()">Sign out</button>`);
+      UI.el("addCert").onclick = async () => {
+        const file = UI.el("certFile").files[0];
+        const name = UI.el("certName").value.trim();
+        if (!name) return UI.toast("Name the certificate first", true);
+        if (!file) return UI.toast("Choose the PDF or photo", true);
+        try {
+          let dataUrl;
+          if (file.type.startsWith("image/")) dataUrl = await UI.shrinkImage(file, 1200);
+          else {
+            if (file.size > 1024 * 1024) return UI.toast("That file is over 1 MB — a photo of the certificate is fine", true);
+            dataUrl = await UI.readDataUrl(file);
+          }
+          await Api.post("/users/me/certificates", { name, issuer: UI.el("certIssuer").value.trim(),
+            expires: UI.el("certExpires").value, file_name: file.name, data_url: dataUrl });
+          UI.toast("Certificate added ✓"); profile();
+        } catch (e) { UI.toast(e.message, true); }
+      };
       UI.el("photoIn").onchange = async () => {
         const file = UI.el("photoIn").files[0];
         if (!file) return;
@@ -310,10 +341,16 @@ const KakiView = (() => {
     } catch (e) { UI.toast(e.message, true); }
   }
 
+  async function dropCertificate(id) {
+    if (!confirm("Remove this certificate?")) return;
+    try { await Api.del(`/users/me/certificates/${id}`); UI.toast("Removed"); profile(); }
+    catch (e) { UI.toast(e.message, true); }
+  }
+
   async function dropException(id) {
     try { await Api.del(`/users/me/availability/exceptions/${id}`); UI.toast("Removed"); availability(); }
     catch (e) { UI.toast(e.message, true); }
   }
 
-  return { home, visit, impact, profile, availability, dropException };
+  return { home, visit, impact, profile, availability, dropException, dropCertificate };
 })();

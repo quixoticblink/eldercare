@@ -107,6 +107,25 @@ test.describe("cancel after accepting (Bucket 2 · 6)", () => {
   });
 });
 
+test.describe("certificates (Bucket 2 · 7)", () => {
+  test("a kaki uploads a certificate and the coordinator sees it at approval", async ({ page, request }) => {
+    const s = await seed(request);
+    await useToken(page, s.k3.token, "#/kaki/profile");
+    await page.locator("#certName").fill("CPR + AED");
+    await page.locator("#certIssuer").fill("St. Luke's Hospital");
+    await page.locator("#certFile").setInputFiles({ name: "cpr.png", mimeType: "image/png",
+      buffer: Buffer.from(TINY_PNG.split(",")[1], "base64") });
+    await page.getByRole("button", { name: "Add certificate" }).click();
+    await expect(page.getByText("Certificate added")).toBeVisible();
+    await expect(page.locator(".cert-row", { hasText: "CPR + AED" })).toContainText("St. Luke's Hospital");
+    await useToken(page, s.admin.token, "#/admin/approvals");
+    const row = page.locator(".li", { has: page.locator(`[data-uid="${s.k3.user.id}"]`) });
+    await expect(row).toContainText("1 certificate");
+    await row.getByRole("button", { name: "Certificates" }).click();
+    await expect(page.locator(".cert-row", { hasText: "CPR + AED" })).toBeVisible();
+  });
+});
+
 test.describe("kaki", () => {
   test("home and profile render for an approved kaki", async ({ page, request }) => {
     const s = await seed(request);
