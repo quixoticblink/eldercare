@@ -237,13 +237,13 @@
       <div class="entry">
         <div class="date">August 21, 2026 · Table Top Exercise</div>
         <h3>Eight seniors, their own phones, the live app</h3>
-        <p>The exercise Vanguard proposed on 3 August happened at Care Corner&rsquo;s Active Ageing Centre in Toa Payoh, with Vanguard and NCSS facilitating and three of us running the coordinator screen. The lifecycle held end to end: sign-up, approval, a booking, a match, the start code read across a table, a report. The concept landed — <em>&ldquo;I need help, because I live alone, and I&rsquo;m not sure when something might happen.&rdquo;</em> What did not hold was everything around the app: getting onto wifi, what a browser is, a waiting screen nobody understood, a placeholder number one participant spent a minute trying to delete. The full account and every recommendation are in <a href="#feedback">what the seniors said</a>.</p>
+        <p>The exercise Vanguard proposed on 3 August happened at Care Corner&rsquo;s Active Ageing Centre in Toa Payoh, with Vanguard and NCSS facilitating and three of us running the coordinator screen. The lifecycle held end to end: sign-up, approval, a booking, a match, the start code read across a table, a report. The concept landed — <em>&ldquo;I need help, because I live alone, and I&rsquo;m not sure when something might happen.&rdquo;</em> And the seniors gave us the most useful gift a first test can: a precise list of what stood between them and the booking screen — getting onto wifi, what a browser is, a waiting screen that needed one more sentence, a placeholder number that read as real. Every item became a fix. The full account and every recommendation are in <a href="#feedback">what the seniors said</a>.</p>
         <div class="arc">
           <span class="step">wifi first</span>
           <span class="step">lifecycle held</span>
           <span class="step">Mandarin, Malay, Cantonese</span>
           <span class="step">subsidy rules, not price</span>
-          <span class="step final">the wall is before the product</span>
+          <span class="step final">a build list, not a verdict</span>
         </div>
       </div>
 
@@ -608,6 +608,24 @@
     <p><strong>The coordinator</strong> approves people and matches visits, urgent first. Each candidate carries an availability badge for that exact date and half-day, history with this senior, language and service match, and current workload — sorted best-first but never filtered, because an urgent case may still justify phoning someone nominally off. Approval and matching can both be automated; all three switches default to off, because each one removes a human from a decision about who enters a vulnerable person&rsquo;s home.</p>
     <p>Money is deliberately honest. Every rate, hour and subsidy percentage sits in one file with its source stated, most of it still marked <em>placeholder</em> — the community care subsidy and foundation top-up are illustrative, not confirmed. Every screen showing a dollar figure says so.</p>
   </div>
+
+  <div class="narrow">
+    <h3 class="sub-h">What changed in v1.6, and what is next</h3>
+    <div class="strategy-grid">
+      <div class="strategy-card">
+        <div class="strat-label">Shipped · 5 September 2026</div>
+        <h4>Eighteen things the August feedback asked for</h4>
+        <p><strong>At the door:</strong> the kaki shows a photo and a code of their own; the family enters it before their start code appears. <strong>Booking:</strong> exact start and end times in half-hour steps, charged by the half hour with a one-hour minimum; languages pre-filled from the care plan, Cantonese added; a female-or-male preference; &ldquo;the same kaki again&rdquo;; an &ldquo;other&rdquo; reason; no window offered after it has passed. <strong>Around the visit:</strong> messages when a kaki confirms, is on the way, or cancels; the emergency contact told at start and finish; cancellation with reasons on both sides. <strong>Kakis:</strong> working hours per day, certificates the coordinator reads before approving, household-help visits that show only what the task needs. <strong>Getting in:</strong> no placeholder number, a waiting screen that says there is nothing to do, required fields marked, a refresh that keeps your place.</p>
+        <p class="strat-source"><a href="https://github.com/quixoticblink/eldercare/blob/main/app/SPEC.md#10-change-log">app/SPEC.md · change log</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-05-v1.6-build.md">journal/2026-09-05-v1.6-build.md</a></p>
+      </div>
+      <div class="strategy-card">
+        <div class="strat-label">Roadmap · deliberately not yet</div>
+        <h4>What waits on a decision, not on code</h4>
+        <p><strong>Mandarin, then Malay.</strong> The biggest single ask from the seniors; sequenced after the door and booking changes so round 2 tests one thing at a time. <strong>Subsidy rules.</strong> Gross and net shown before a family confirms, once Vanguard and NCSS set the test (means, flat type, opt-out). <strong>Dual-role accounts</strong> and an owner role above the coordinator. <strong>Live updates</strong> without refreshing. <strong>Further out:</strong> live location during chaperone visits, an SOS path someone can answer at 2am, specialisation-based matching once certificates carry it, calendar sync. Not on the roadmap, by rule: any public rating of a kaki.</p>
+        <p class="strat-source"><a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/prototype/roadmap.md">prototype/roadmap.md</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/prototype/feature-buckets-2026-09-04.md">feature-buckets-2026-09-04.md</a></p>
+      </div>
+    </div>
+  </div>
   <div class="container">
     <div class="artefact-grid">
       <div class="artefact-card">
@@ -645,9 +663,9 @@
 <section id="feedback" aria-labelledby="feedback-h">
   <div class="narrow">
     <p class="eyebrow">What the seniors said</p>
-    <h2 id="feedback-h">The concept held. The onboarding didn&rsquo;t.</h2>
+    <h2 id="feedback-h">The concept landed. The seniors showed us what to build next.</h2>
     <p class="lede">On 21 August eight seniors at Care Corner&rsquo;s Toa Payoh Active Ageing Centre ran the live app on their own phones, with Vanguard and NCSS facilitating. Three days earlier NCSS had reviewed it screen by screen. Between them, seventy-odd recommendations.</p>
-    <p>Eight is a small number and they were chosen for tolerance — prior service users, the friendliest possible testers. That makes what they hit more telling, not less. The seven signals below are the high-level version; every item, mapped to the part of the app that owns it, is in the wiki.</p>
+    <p>Eight is a small number and they were chosen for tolerance — prior service users, the friendliest possible testers. That makes what they noticed more telling, not less, and it is why their list went straight into the build: eighteen of these recommendations shipped as v1.6 on 5 September. The seven signals below are the high-level version; every item, mapped to the part of the app that owns it, is in the wiki.</p>
 
     <div class="signals">
 

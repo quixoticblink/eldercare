@@ -32,5 +32,5 @@ Retros go in the same folder with the suffix `-retro.md` (e.g., `2026-06-15-retr
 - [[2026-08-03-ncss-vanguard]] — live-pilot ask countered with a tabletop. Scope narrows to chaperoning. Supply named as the binding constraint; three framings left unreconciled.
 - [[2026-08-03-himmat-review]] — same day, the opposite advice: real app in real hands early, demand is the constraint, don't narrow.
 - [[2026-08-18-ncss-app-review]] — NCSS desk-reviews the live app role by role. Thirty items; one reverses the start-code direction. Register in [[../prototype/ncss-app-review-2026-08-18]].
-- [[2026-08-21-tabletop-vanguard-ncss]] — Table Top Exercise, round 1. Eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard and NCSS facilitating. Concept held; onboarding didn't. Full recommendation register in [[../prototype/tabletop-2026-08-21-feedback]].
+- [[2026-08-21-tabletop-vanguard-ncss]] — Table Top Exercise, round 1. Eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard and NCSS facilitating. The concept landed; the seniors handed us the build list. Full recommendation register in [[../prototype/tabletop-2026-08-21-feedback]].
 - [[2026-09-05-v1.6-build]] — v1.6 built and shipped: eighteen features from Buckets 1 and 2, each behind a Playwright test; what the reviews caught that the tests didn't.

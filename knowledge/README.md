@@ -16,7 +16,7 @@ Three files, in order, if you're landing cold:
 
 If you want to see how the framing got here rather than just where it landed, [[reframing/README]] indexes the five dated iterations (May 19 → Jun 15 signal → Jun 25 caregiver reframe → Jul 8 crisis-only narrowing → Jul 11 broadening) with a one-line "what changed" note each.
 
-There is also a fourth thing to read if you're joining the build rather than the thinking: [[prototype/kakis-app]], the running app at **https://singaporekakis.com**, and `../app/SPEC.md`, its contract.
+There is also a fourth thing to read if you're joining the build rather than the thinking: [[prototype/kakis-app]], the running app at **https://singaporekakis.com**, [[prototype/roadmap]] for what shipped and what's next, and `../app/SPEC.md`, its contract.
 
 ## Where we are
 

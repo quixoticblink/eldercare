@@ -1,7 +1,7 @@
 ---
 title: Prototype
 status: active
-last_updated: 2026-09-04
+last_updated: 2026-09-05
 ---
 
 Woke up on 2026-07-11, ahead of the 2026-08-20 SGLN prototype milestone. Working name: **Kakis** (provisional — Singlish for trusted companions).
@@ -27,6 +27,8 @@ should be worked as one list.
 
 What's here:
 
+- **`roadmap.md`** — what shipped (v1.6 grouped by what a person notices) and what's
+  next, ordered by what has to be decided first. The page to hand a partner.
 - **`feature-buckets-2026-09-04.md`** — the cut. Both registers sorted into three
   buckets by repetition, feasibility against v1.5, and what Homage and CaregiverAsia
   already ship. Bucket 1 and 2 are the next build; Bucket 3 waits on a decision. Two
@@ -53,4 +55,4 @@ Deliberate scope cuts, documented in the brief: no real matching algorithm, no p
 
 The rubric line this feeds: *"Human centricity of the solution (not just slides)"* — the prototype runs, and each design choice traces to a human in `humans/` or a constraint in `strategy/`.
 
-Next for this folder: pressure-test against Vanguard's six crisis triggers before 2026-08-20; test sessions with real caregivers; a print/voice artifact concept for the senior.
+Next for this folder: Table Top Exercise round 2 on the crisis triggers with v1.6; the Bucket 3 decisions in [[roadmap]]; a print/voice artifact concept for the senior.

@@ -378,7 +378,8 @@ The prototype became a real thing. `app/` is a deployed application at **[singap
 | [`app/deploy/EC2-DEPLOYMENT.md`](app/deploy/EC2-DEPLOYMENT.md) | The box that's actually running — the live deployment, start to finish |
 | [`app/deploy/README.md`](app/deploy/README.md) | The generic two-shape guide: systemd, Caddy, backups, third-party service checklist. Its env block predates v1.2 — `app/backend/config.py` is the real variable list |
 | [`app/deploy/SECURITY-AUDIT.md`](app/deploy/SECURITY-AUDIT.md) | ISO/IEC 5055 self-assessment (v1.5, 9 Aug 2026), findings closed, residual risk, and what "fit for a supervised pilot" excludes |
-| [`knowledge/prototype/kakis-app.md`](knowledge/prototype/kakis-app.md) | The wiki entry — why it's built this way, and the three failures that cost real time |
+| [`knowledge/prototype/kakis-app.md`](knowledge/prototype/kakis-app.md) | The wiki entry — why it's built this way, and the failures that cost real time |
+| [`knowledge/prototype/roadmap.md`](knowledge/prototype/roadmap.md) | What shipped in each version and what's next, ordered by the decision each item waits on |
 
 **Status:** v1.6, live, hardened, 368 smoke assertions plus a 24-spec Playwright suite (`cd app && npm i && npx playwright test`) covering the full lifecycle. Fit for a **supervised tabletop**, which is exactly what NCSS and Vanguard asked for on Aug 3. Not fit for unsupervised public launch — backups have never been restore-tested, there's no PDPA review or user-facing deletion path, and the pricing is still placeholder.
 
