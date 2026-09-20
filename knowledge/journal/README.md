@@ -1,7 +1,7 @@
 ---
 title: Journal — the running log
 status: live
-last_updated: 2026-09-05
+last_updated: 2026-09-20
 ---
 
 The most boring folder in the wiki and the most important one. This is where the arc of the sprint gets recorded, one working session at a time. Six months from now, the rubric line *"evidence of learning, adaptation & resilience over 6 months"* is scored from here.
@@ -35,3 +35,4 @@ Retros go in the same folder with the suffix `-retro.md` (e.g., `2026-06-15-retr
 - [[2026-08-21-tabletop-vanguard-ncss]] — Table Top Exercise, round 1. Eight seniors on their own phones at a Care Corner AAC in Toa Payoh, Vanguard and NCSS facilitating. The concept landed; the seniors handed us the build list. Full recommendation register in [[../prototype/tabletop-2026-08-21-feedback]].
 - [[2026-09-05-v1.6-build]] — v1.6 built and shipped: eighteen features from Buckets 1 and 2, each behind a Playwright test; what the reviews caught that the tests didn't.
 - [[2026-09-05-v1.7-language]] — v1.7 the same evening: the Mandarin UI for caregivers and kakis, console English by design; the shared-phone rule the tests had encoded the wrong way round.
+- [[2026-09-11-lions-befrienders-beta]] — second senior group, first outside the Care Corner circle, on v1.7. Draft: the notes received repeat the Aug 21 sheet line for line; register in [[../prototype/lions-befrienders-2026-09-11-feedback]] maps each item to what already shipped.

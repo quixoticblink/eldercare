@@ -1,7 +1,7 @@
 ---
 title: Knowledge base
 status: live
-last_updated: 2026-09-05
+last_updated: 2026-09-20
 ---
 
 This is the working wiki for our eldercare sprint. It's a notebook, not a polished document — capture first, refactor later. The microsite in `../site/` is the public-facing version; this folder is where the thinking actually happens.
@@ -29,6 +29,8 @@ Past the first HMW reframe (Jun 25), a partner-anchored narrowing (Jul 8) and it
 **As of Aug 21:** the Table Top Exercise happened — [[journal/2026-08-21-tabletop-vanguard-ncss]]. Eight seniors, own phones, Care Corner AAC Toa Payoh 261A, Vanguard and NCSS facilitating. The lifecycle held; the onboarding around it (wifi, browser, approval wait) didn't, and the subsidy rules drew more questions than anything else. Every recommendation is in [[prototype/tabletop-2026-08-21-feedback]], mapped to the app module that would own it. Phase: **Table Top Exercise done, round 2 and the SPEC amendments next.**
 
 **As of Sep 5:** v1.6 is live — Buckets 1 and 2 of [[prototype/feature-buckets-2026-09-04]], eighteen features, each behind an end-to-end test; [[journal/2026-09-05-v1.6-build]]. The same evening v1.7 added 中文 on every caregiver and kaki screen, with the coordinator console kept English by design; [[journal/2026-09-05-v1.7-language]]. Phase: **v1.7 shipped, round 2 next — testing v1.6 and Mandarin together.**
+
+**As of Sep 11:** a second beta session, at Lions Befrienders, on the v1.7 app — [[journal/2026-09-11-lions-befrienders-beta]] (draft; more feedback arriving). The notes received repeat the Aug 21 list; the register [[prototype/lions-befrienders-2026-09-11-feedback]] marks 14 of 26 items as already shipped and asks which build the group saw.
 
 **The open decision.** Later the same day [[journal/2026-08-03-himmat-review|Himmat]] told us the opposite of Vanguard on three of four points — real app in real hands as early as possible, demand not supply is the constraint, don't narrow the scope. Neither meeting knew about the other, so we now hold **two incompatible validation plans in the same window**: a facilitated tabletop the week of 17 Aug, and "dozens of UAT interviews" the week after National Day. Nobody owns the reconciliation. Demo Day September.
 

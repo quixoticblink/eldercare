@@ -1,7 +1,7 @@
 ---
 title: Prototype
 status: active
-last_updated: 2026-09-05
+last_updated: 2026-09-20
 ---
 
 Woke up on 2026-07-11, ahead of the 2026-08-20 SGLN prototype milestone. Working name: **Kakis** (provisional — Singlish for trusted companions).
@@ -29,6 +29,9 @@ should be worked as one list.
 
 What's here:
 
+- **`lions-befrienders-2026-09-11-feedback.md`** — the second senior session, on v1.7 (draft,
+  batches still arriving). Every item as received, cross-referenced to the Aug 21 register,
+  with status as of v1.7: 14 shipped, 3 partial, 4 open, 5 policy.
 - **`roadmap.md`** — what shipped (v1.6 grouped by what a person notices) and what's
   next, ordered by what has to be decided first. The page to hand a partner.
 - **`feature-buckets-2026-09-04.md`** — the cut. Both registers sorted into three

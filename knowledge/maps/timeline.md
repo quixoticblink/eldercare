@@ -112,6 +112,10 @@ Buckets 1 and 2 of the August feedback built and shipped: the door check both wa
 
 The same evening: 中文 on every caregiver and kaki screen, the help panel and the messages, with the coordinator console kept English by design. Round 2 of the Table Top Exercise now tests v1.6 and Mandarin together. 32 Playwright specs, 394 smoke assertions.
 
+### 2026-09-11 · Lions Befrienders beta session · [[../journal/2026-09-11-lions-befrienders-beta]]
+
+Second senior group tries the live app, six days after v1.6/v1.7. Notes received on 20 Sept repeat the Aug 21 list; 14 of 26 items already shipped. Register: [[../prototype/lions-befrienders-2026-09-11-feedback]].
+
 ### 2026-09-XX · SGLN Demo Day
 
 The rubric event. Four dimensions × 25 pts = 100:
