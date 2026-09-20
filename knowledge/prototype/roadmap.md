@@ -28,6 +28,10 @@ tier badge, and help questions that match what people asked in the room. All in 
 and Chinese. Not code, but on the list: the SMS sender ID has to be registered before
 anyone uses this without us there.
 
+*v1.8.1, the same night:* certificates were never required, but the waiting screen
+read as if they were. Now "Add a certificate", marked optional, and a "Skip for now"
+on the pending kaki's profile, in both languages.
+
 ### v1.7 — 2026-09-05 · 中文 on the caregiver and kaki screens
 
 The biggest single ask from the seniors on Aug 21, built the same day v1.6 went out.
