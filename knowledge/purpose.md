@@ -1,7 +1,7 @@
 ---
 title: "Purpose & Importance of the Eldercare Sprint"
 status: solid
-last_updated: 2026-09-05
+last_updated: 2026-09-20
 ---
 
 # Purpose & Importance of the Eldercare Sprint
@@ -113,6 +113,7 @@ As of 5 September 2026 (roughly fifteen weeks in):
 - **The prototype became a running app.** [[prototype/kakis-app]] — live at **https://singaporekakis.com**, three roles, real sign-in codes to real phones, audited against ISO/IEC 5055. `prototype/` and `pitch/` are both awake.
 - **The pilot became a tabletop, and the tabletop happened.** On 3 August Vanguard countered our live-pilot ask with a supervised tabletop exercise ([[journal/2026-08-03-ncss-vanguard]]); no operational pilot inside the Demo Day window, scope narrows to chaperoning. On 18 August NCSS desk-reviewed the app role by role ([[journal/2026-08-18-ncss-app-review]]), and on 21 August eight seniors ran it on their own phones at Care Corner's Toa Payoh 261A AAC with Vanguard and NCSS facilitating ([[journal/2026-08-21-tabletop-vanguard-ncss]]). The concept held; the onboarding around it did not. Two recommendation registers, mapped to app modules: [[prototype/ncss-app-review-2026-08-18]] and [[prototype/tabletop-2026-08-21-feedback]].
 - **The feedback is built in.** v1.6 shipped on 5 September — eighteen features from Buckets 1 and 2 of [[prototype/feature-buckets-2026-09-04]], each behind an end-to-end test: the door check both ways (kaki photo and code, then the family's start code), exact times charged by the half hour, gender and same-kaki preferences, cancellation with reasons, certificates read at approval, and the onboarding fixes. The same evening, v1.7 put every caregiver and kaki screen into Mandarin as well, with the coordinator console kept English by design. What shipped and what waits is [[prototype/roadmap]]; the builds are [[journal/2026-09-05-v1.6-build]] and [[journal/2026-09-05-v1.7-language]].
+- **A second group tested it, and the model showed its edges.** Lions Befrienders on 11 September ([[journal/2026-09-11-lions-befrienders-beta]]): a kaki assigned a service she had not offered, befrienders who care for many seniors on one account built for one, and a warning not to show names or numbers between kaki and family. The small half shipped as v1.8 on 20 September ([[journal/2026-09-20-v1.8-build]]); the big half, many seniors per caregiver and what each side may see of the other, now leads the roadmap.
 
 Key early findings that still hold:
 
