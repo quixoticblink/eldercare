@@ -157,7 +157,9 @@ Payments (new `routers/payments.py`, M-PAY) · automated matching (M-ADMIN only)
 
 Live at **https://singaporekakis.com**. Three roles share one app; the role
 decides the bottom nav and everything behind it. Written so a coordinator can
-hand it to a caregiver or a kaki without translating anything.
+hand it to a caregiver or a kaki without translating anything. Current as of
+**v1.8 (2026-09-20)**; screen names below are the English ones, and every
+caregiver and kaki screen also exists in 中文.
 
 ### 9.0 Signing in — everyone
 
@@ -166,15 +168,19 @@ One box takes either an **email address** or a **Singapore mobile number**.
 6-digit code arrives by email (Resend) or SMS (Twilio); it expires in 10
 minutes and is single-use.
 
-- **First time only** you are asked for your name, whether you are a caregiver
-  or a kaki, and optionally a second way to reach you. **Every time after, just
-  the six digits** — the app recognises you before the screen is drawn.
+- **First time only** you are asked for your name, which of two things you are
+  here for — *I'm booking for someone I care for* or *I want to help as a kaki* —
+  and optionally a second way to reach you. **Every time after, just the six
+  digits** — the app recognises you before the screen is drawn.
 - After a first sign-in you land on a **waiting screen** until the coordinator
   approves you. It says so in one line — there is nothing to do; you are
   messaged when approved. A kaki can add certificates from here before
   approval, which is what the coordinator looks at.
 - Five wrong codes, or five code requests in fifteen minutes, locks the account
   for a short period. The message always carries the coordinator's number.
+- **If the code arrives from a sender your phone flags as "Likely-SCAM"**, it is
+  still ours — the sender ID is not yet registered (v1.8 known issue). Until it
+  is, sessions run with a facilitator present.
 - The **? button** floats on every screen, including before you sign in.
 - **中文 / English (v1.7).** The button at the top right switches every
   caregiver and kaki screen, the help panel and the messages you receive
@@ -185,13 +191,18 @@ minutes and is single-use.
 
 ### 9.1 Caregiver — booking respite for a family member
 
-**Set up once.** *Home → your household*: the senior's name, age and address.
-Then *Care plan*: medications, mobility (including *Bedridden*), languages, one
-emergency contact as name / relationship / mobile (that number is messaged when a
-visit starts and ends), notes. Every kaki reads the care plan before a visit
-(household-help kakis see only mobility, the contact and the address), so this is
-the single highest-value thing a caregiver fills in. *Your profile* on Home edits
-your own name and number.
+**Set up once.** *Who are you caring for?* asks for the senior's name, age and
+address — that is enough to book. The **care plan** comes next and can be
+skipped for now (v1.8) and filled in later from Home: medications, mobility
+(including *Bedridden*), languages, one emergency contact as name / relationship
+/ mobile (that number is messaged when a visit starts and ends), notes. Every
+kaki reads the care plan before a visit (household-help kakis see only mobility,
+the contact and the address), so it is still the single highest-value thing a
+caregiver fills in. *Your profile* on Home edits your own name and number.
+
+**One senior per account, for now.** A caregiver looking after several people
+(a befriender, a family with two parents) needs one sign-in per senior in v1.8.
+Changing that is the first item on the roadmap.
 
 **Book a visit.** *Home → Book a visit*:
 
@@ -205,19 +216,25 @@ your own name and number.
 4. **Details** — for a planned visit, a date (up to the coordinator's horizon,
    30 days by default) and an exact start and end in 30-minute steps, charged
    by the half hour with a one-hour minimum; for urgent and soon, an arrival
-   window that is still ahead of you. The languages come pre-filled from the
-   care plan and you can pick several. Optionally a female or male kaki, and
-   *someone they know* — a kaki who has visited before. Required and optional
-   fields say which they are, and a refresh keeps you on the same step.
+   window that is still ahead of you **and how long you need** — 1 to 8 hours,
+   2 by default (v1.8), which is what the visit is priced on. The languages
+   come pre-filled from the care plan and you can pick several. Optionally a
+   female or male kaki, and *someone they know* — a kaki who has visited
+   before. *Anything the kaki should know?* is sent to the kaki word for word
+   with their assignment message, so "please bring a ladder" reaches them before
+   they accept. Required and optional fields say which they are, and a refresh
+   keeps you on the same step.
 
 **While it runs.** The visit page says how long matching usually takes and
 messages you when a kaki is matched, confirms, is on the way, or cancels. It
 shows the assigned kaki with their **photo** (and *"N visits together"* where
-you have history) and the estimated cost stack. **At the door:** compare the
-photo, ask the kaki for the 4-digit code on their screen and enter it under
-*Check it's them*. Your own **4-digit start code** then appears; read it to the
-kaki to start the visit. Only you can see it — that is how the app confirms
-someone was really let in.
+you have history). The estimated cost sits behind **Show cost** (v1.8) so the
+page stays short; every figure there is a pilot placeholder and says so.
+**At the door:** compare the photo, ask the kaki for the 4-digit code on their
+screen and enter it under *Check it's them*. Your own **4-digit start code**
+then appears; read it to the kaki to start the visit. Only you can see it —
+that is how the app confirms someone was really let in. The timeline step reads
+*Kaki arrived* once the codes have matched.
 
 **After.** You get the kaki's report — chips, a short note, and whether
 medications were confirmed. You can add a **private care note** the care team
@@ -228,24 +245,29 @@ Whether anything is paid for a cancelled visit is the coordinator's decision.
 ### 9.2 Kaki — serving visits
 
 **Profile** (*Profile* tab) drives matching: a **photo** (families see it at
-the door), whether you are female or male (some families ask), services you can
-help with, languages you speak, phone number, and your **certificates** — CPR +
-AED, mobility training and the like, as a PDF or a photo, up to ten. The
-coordinator checks these before approving you and when matching.
+the door), whether you are female or male (two options, v1.8; some families
+ask), the **services you can help with**, languages you speak, phone number,
+and your **certificates** — CPR + AED, mobility training and the like, as a PDF
+or a photo, up to ten. The coordinator checks these before approving you and
+when matching. Tick services honestly: since v1.8 the coordinator cannot assign
+you a service you have not ticked without a warning and a deliberate override,
+and automatic matching never will.
 
-**When I can work** (*Profile → When I can work*) is the part most kakis skip
-and shouldn't. Tick the days you normally work and the hours, in 30-minute
-steps, then add dated exceptions — a day off, or an extra slot outside your
-usual pattern. Exceptions win over the weekly pattern for that date. If you set
-nothing, the coordinator sees *unknown* rather than *unavailable*, so you keep
-getting offered work — but they are guessing.
+**When I'm free** (*Profile → When I'm free*) is one screen, and the only place
+availability is asked for. Tick the days you are usually free and the hours,
+in 30-minute steps; that is all you need to fill in. Below it, *Different on a
+date?* is optional — a day off, or an extra day outside your usual week — and
+wins over the weekly pattern for that date. If you set nothing, the coordinator
+sees *unknown* rather than *unavailable*, so you keep getting offered work — but
+they are guessing.
 
 **A visit, start to finish:**
 
-1. **Assigned** — you get an SMS or email that says the service, the hours and
-   the task. You do not need to keep the app open. Open the visit: senior,
-   address, why they need help, the care plan (household help shows only what
-   the task needs), and what you will receive.
+1. **Assigned** — you get an SMS or email that says the service, the hours,
+   what the visit is for in a sentence, and anything the family typed when they
+   booked (*The family says: …*). You do not need to keep the app open. Open
+   the visit: senior, address, why they need help, the care plan (household
+   help shows only what the task needs), and what you will receive.
 2. **Accept** — or *I can't make it*, which passes it straight back to the
    coordinator with no penalty. After accepting you can still cancel with a
    reason; the family and coordinator are told and the visit goes back for a
@@ -278,17 +300,24 @@ Approve as caregiver or as kaki; the button you press sets their final role, ove
 what they chose, which is how you fix someone who picked wrong. Suspend takes
 effect on their **next request**, not at token expiry.
 
-**Matching** — one card per open request, urgent first. Each lists every
-approved kaki with:
+**Matching** — one card per open request, urgent first, with the family's note
+under it. Each lists every approved kaki with:
 
 - an availability badge — **available / unknown / unavailable** for that exact
   date and time, sorted best-first;
 - whether the family asked for this kaki, whether they match a requested
-  gender, history with this senior, language match, service match, workload.
+  gender, history with this senior, language match, workload;
+- **⚠ does not offer X** in red when the kaki has not ticked this service
+  (v1.8).
 
 Choose one, then press **Assign selected kaki** and confirm. The toast names
 who the *server* recorded. It sorts rather than filters on purpose: an urgent
-case may still justify phoning someone nominally off.
+case may still justify phoning someone nominally off. **A service mismatch is
+the one exception:** the confirm dialog says so in capitals and asks you to
+assign anyway only if you have spoken to the kaki; saying yes is recorded in
+the audit log as a separate action (`visit_assigned_service_mismatch`), and the
+server refuses the assignment without that yes. On 11 Sept a kaki who offered
+companionship was sent a household-help visit; this is why.
 
 **Settings** — three automation toggles, all **off** by default:
 
@@ -298,13 +327,17 @@ case may still justify phoning someone nominally off.
 | Auto-approve kakis | New kakis become bookable unreviewed |
 | Auto-match on booking | Assigns the best *available* kaki at booking time |
 
-Auto-matching never picks *unknown* or *unavailable*, and never assigns
-against a stated gender preference — anything it cannot fill stays for a human.
+Auto-matching never picks *unknown* or *unavailable*, never assigns against a
+stated gender preference, and never assigns a service the kaki has not ticked
+(v1.8) — anything it cannot fill stays for a human.
 Also here: **bookings open up to N days ahead** (30 by default). **Auto-match all open requests now** runs the same sweep on
 demand whether or not the toggle is on.
 
 Also here: **per-service pricing** (hours, family rate, kaki rate) written
 straight back to `assumptions.json`, and **PayNow** details shown to caregivers.
+The one-line *note* per service in that file is the sentence the kaki receives
+with an assignment; it was rewritten in v1.8 to read as a message to a person,
+and it is yours to edit.
 
 **Assumptions** — every rate, hour and subsidy percentage with its source.
 Anything marked `PLACEHOLDER` has not been confirmed with Vanguard or MOH,
@@ -327,6 +360,9 @@ The **?** button opens a guide plus a chatbot, on every screen.
 - **Signed out** → the built-in keyword guide only, returning `source: guide`.
   It still answers "how do I sign in?", which is the question that gets asked
   there, and never calls a paid provider.
+- **The four quick questions** (v1.8) are the ones people asked in the room:
+  how to book, what the two codes at the door are, how long until a match, and
+  who to call. Asked in Chinese, the guide answers in Chinese.
 - **Bad or expired token** → same as signed out. It degrades rather than
   returning 401, which is the v1.5 bug.
 - **No key configured** → the keyword guide for everyone. The app degrades; it
@@ -340,7 +376,9 @@ The **?** button opens a guide plus a chatbot, on every screen.
 - The kaki never sees the visit start code; the caregiver never sees the kaki's
   code and sees the start code only after entering the kaki's (v1.6).
 - Money figures are illustrative and say so on every screen showing them.
-- Every automation defaults off; auto-match never overrides a stated preference.
+- Every automation defaults off; auto-match never overrides a stated preference
+  and never assigns a service the kaki has not offered; a coordinator can, only
+  by confirming it, and it is audited (v1.8).
 
 ## 10. Change log
 
