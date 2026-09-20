@@ -795,6 +795,7 @@ footer.site a:focus-visible {
   border-radius: 6px;
   display: block;
 }
+.artefact-card video.cover { aspect-ratio: 16 / 9; background: #0c3d33; object-fit: cover; }
 .btn-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: auto; padding-top: 0.5rem; }
 .site-btn {
   display: inline-block;
