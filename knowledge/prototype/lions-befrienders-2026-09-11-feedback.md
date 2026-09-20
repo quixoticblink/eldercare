@@ -104,11 +104,39 @@ Cross-reference in brackets is the Aug 21 register item.
 - Caregivers want to see the kaki's photo.
 - Caregivers want a choice of kaki, and to be able to cancel.
 
+## 9. Batch 2 — Lara's screenshots and Abhishek's four points (received 2026-09-20)
+
+Six phone photos from the room (Lara, WhatsApp, 10:41–10:51 on the day) and a 30-second
+video. These settle the source question for the build: the **中文 button is on screen**,
+so the Lions group was on v1.7. Photos in `images/2026-09-11-lb-0*.png`; video in
+`evidence/sources/`.
+
+| # | Item | Module | Status | What we know |
+|---|---|---|---|---|
+| L9.1 | **A kaki who did not sign up for household help was matched to a household-help visit.** Carol Wong's profile: Chaperone + Companionship only. Her SMS: "Kakis: Household help for Madam G, today Within the hour (2 hrs)…". | M-ADMIN, M-VISITS | **bug / gap** | The roster carries `service_ok` per kaki and scores it (+10), but manual assign does not stop or warn when it is false, and the auto-matcher prefers but does not require it. Ask: block, or make the coordinator confirm past an explicit alert. |
+| L9.2 | Availability is asked for in two places. The profile card "When I can work" (with a summary) and the separate availability screen; testers said they had "already indicated all these". | M-USERS | confusing | Same data, two entry points: the card is a link to the screen, but reads as a second form. Fold the summary into the screen's title, or move the week grid onto the profile. |
+| L9.3 | "Days off and extra days · Am I working?" still asked after the week is set; phrasing confusing. | M-USERS | copy | The exceptions block should read as optional and dated: *"Different on a particular date? Add it here."* Chip labels *Not available* / *Extra availability* → *Day off* / *Extra day*. |
+| L9.4 | Gender: stick with two options, remove *Prefer not to say*. | M-USERS | decision | Alan Chen's profile shows it selected. Backend already accepts ''; frontend chip to go. |
+| L9.5 | Task wording to be more *atas* (more polished). The assignment SMS reads "Light housekeeping, laundry, simple meal prep." | M-CORE (`assumptions.json` notes), notify | copy | The task line comes from the coordinator-editable service note; rewrite the four notes in a warmer register, en and zh. |
+| L9.6 | The sign-in SMS arrives from a sender the phone labels **"Likely-SCAM"**. | out of app (SMS provider) | ops | Sender ID not registered with the SG SMS Sender ID Registry, so the carrier flags it. Register "Kakis" (or route via a partner's registered ID) before any session without a facilitator in the room. |
+| L9.7 | Alan's phone: 7 days ticked 07:00–21:00; Carol's: Fri 09:00–13:00; one profile shows Mon/Tue/Wed/Thu split hours. Availability entry works; the doubt was only where to enter it. | M-USERS | works | |
+
+*Abhishek's four points, verbatim:* (1) why are there two places where a kaki has to give
+availability; (2) gender "prefer not to say" remove; (3) task wordings to atas; (4) check
+if the work the kaki says they can do is the work matched; if manual match then there
+should be an alert and the match-making person should accept.
+
+![Availability week grid, 中文 toggle visible](../images/2026-09-11-lb-01-availability-week.png)
+![Days off and extra days block](../images/2026-09-11-lb-02-availability-exceptions.png)
+![Carol Wong's profile: Chaperone and Companionship only](../images/2026-09-11-lb-04-carol-profile-services.png)
+![Carol Wong's SMS: household help assigned, sender flagged Likely-SCAM](../images/2026-09-11-lb-06-carol-sms-household.png)
+
 ## What is new against Aug 21
 
-Only two lines have no counterpart in the Aug 21 register: the uniformed sit-with-a-couple
-service (L3.8) and, arguably, the sharper framing of the NRIC question. Everything else is
-the same list. Of the 26 items received, 14 are already shipped, 3 partial, 4 open, and 5
+From batch 1, only two lines have no counterpart in the Aug 21 register: the uniformed
+sit-with-a-couple service (L3.8) and, arguably, the sharper framing of the NRIC question.
+Batch 2 is all new: a real mismatch bug (L9.1), the double availability entry (L9.2,
+L9.3), the gender chip (L9.4), task wording (L9.5) and the scam-flagged SMS sender (L9.6). Of the 26 items received, 14 are already shipped, 3 partial, 4 open, and 5
 are partner policy. If the Lions group tested v1.7, then the striking finding is that the
 same asks came back after they were built, which would mean the fixes are not visible
 enough on the screen. If they tested an older build or these are the Aug 21 notes, the
@@ -146,6 +174,14 @@ Verbatim, in the order received. More is appended as it arrives.
 - Ask for late night / SOS request
 - Don't remember which box, but there was a dummy number in a box in grey/background for them to fill their number and one person got confused as it wasn't their number and they kept trying to delete the number
 - Then the ten numbered quotes and asks listed above.
+
+*Batch 2 (WhatsApp, Lara, 11 Sept 10:45 and 10:51; Abhishek's notes 20 Sept)*
+
+- "Feedback - alr indicated all these" (over the week grid)
+- "But still ask this - confusing. Change the phrasing" (over Days off and extra days)
+- "Gender. Stick w 2. remove PREFER NOT TO SAY"
+- "ERROR ALERT ⚠️ FOR CAROL" · "She did NOT sign up for household" · "But she got household jobs"
+- Abhishek: the four points above.
 
 *Connects to:* [[../journal/2026-09-11-lions-befrienders-beta]] · [[tabletop-2026-08-21-feedback]] ·
 [[ncss-app-review-2026-08-18]] · [[feature-buckets-2026-09-04]] · [[roadmap]]

@@ -10,7 +10,8 @@ source: "Post-session notes (docx, received 2026-09-20); more feedback being add
 
 > **Draft.** Written from the notes as received on 20 Sept, nine days after the session,
 > with more feedback still to come. Attendee names, numbers and the exact format of the
-> session are not in the notes yet. The recommendation register, with every item mapped
+> session are not in the notes yet. Batch 2 (Lara's photos) shows the 中文 button on
+> screen, so the group was on **v1.7**. The recommendation register, with every item mapped
 > to what the app already does as of v1.7, is
 > [[../prototype/lions-befrienders-2026-09-11-feedback]].
 
@@ -39,10 +40,20 @@ own phones, the real address, sign-up through to a visit.
 
 ## What we learned
 
-- **The notes are the Aug 21 notes.** Line for line, in the same order. Either the
-  observer worked from the Aug 21 sheet as a checklist and the Lions group confirmed every
-  point, or the wrong file came through. That has to be settled before this session
-  changes anything, because the two readings point in opposite directions.
+- **Batch 1 is the Aug 21 list; batch 2 is the real session.** The docx repeats the Aug 21
+  sheet line for line. Lara's photos and Abhishek's four points are new and specific, and
+  they are what this session should be remembered for.
+- **A kaki was matched to work she did not sign up for.** Carol Wong offered Chaperone
+  and Companionship; her phone got "Household help for Madam G, today". The roster shows
+  the mismatch to the coordinator but nothing stops the assignment. The fix is small
+  (an alert and an explicit confirm on manual assign; a hard requirement in auto-match)
+  and it is the first real correctness bug a tester has found since Aug 21.
+- **Her phone called us a scam.** The sign-in SMS came from a sender iOS labels
+  "Likely-SCAM". Nothing in the app can fix that; the sender ID has to be registered
+  before seniors use the app without one of us in the room.
+- **Availability reads as two forms.** The profile card and the availability screen are
+  one thing with two doors; testers thought they were being asked twice, and "Am I
+  working?" under Days off made it worse.
 - **If the list is real, the build is invisible.** Fourteen of the twenty-six items were
   shipped in v1.6 (exact times, prorating, gender, photo, same kaki again, cancel after the
   code, the waiting-screen line, no placeholder number, Cantonese, hours on the kaki's
@@ -60,15 +71,16 @@ own phones, the real address, sign-up through to a visit.
 - [[../prototype/lions-befrienders-2026-09-11-feedback]] created: every item as received,
   cross-referenced to the Aug 21 register, with status as of v1.7.
 - [[../maps/timeline]], [[README]] and [[../README]] carry the session.
-- No change to the app, the buckets or the roadmap until the source question is settled.
+- Six photos in `images/2026-09-11-lb-*`, the video in `evidence/sources/`.
+- No app change yet. Five small items (service-match alert, availability copy and
+  layout, gender chip, task wording, sender ID) are a v1.8 candidate.
 
 ## What's next
 
-- Confirm with whoever ran the session: which build did the Lions group see, and are these
-  their notes or the Aug 21 sheet?
+- Confirm with whoever wrote the docx whether it is their own notes or the Aug 21 sheet.
 - Append the remaining feedback batches to the register as they arrive.
-- If v1.7 was tested and the asks stand, the next Table Top round adds a "did you notice"
-  pass over the fourteen shipped items.
+- v1.8: block or confirm a service mismatch on assign; one availability entry point;
+  two gender chips; warmer task notes; register the SMS sender ID.
 - Name the uniformed companion service and add it to `landscape/`.
 
 *Connects to:* [[2026-08-21-tabletop-vanguard-ncss]] · [[2026-09-05-v1.7-language]] ·
