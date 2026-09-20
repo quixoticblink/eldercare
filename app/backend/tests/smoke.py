@@ -1131,6 +1131,14 @@ assert c.post("/api/visits", json={"service": "Companionship", "tier": "urgent",
 assert c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today", "window": "Within the hour",
                                    "languages": ["English"], "hours": 2.25}, headers=ch).status_code == 400
 assert c.post(f"/api/visits/{_ug.json()['id']}/cancel", json={"reason": "test"}, headers=ch).status_code == 200
+# a planned booking with a preset window ignores `hours` (only urgent/soon carry it)
+_pw = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18", "window": "Morning 9–12",
+                                  "languages": ["English"], "hours": 6}, headers=ch)
+assert _pw.status_code == 200 and _pw.json()["hours"] != 6, _pw.text
+assert c.post(f"/api/visits/{_pw.json()['id']}/cancel", json={"reason": "test"}, headers=ch).status_code == 200
+# the audit row for a confirmed mismatch names the service and is written once
+_rows = db.q("SELECT detail FROM audit_log WHERE action = 'visit_assigned_service_mismatch'")
+assert _rows and all("not offered, confirmed" in r["detail"] for r in _rows), _rows
 # the kaki's assignment message carries the family's note and the warmer task line
 _fn = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
                                   "start_time": "14:00", "end_time": "16:00", "languages": ["English"],

@@ -93,10 +93,11 @@ def assign(vid: str, kaki_id: str, actor: str, automatic: bool = False,
     # v1.8: on 11 Sept a kaki who offered chaperone and companionship was sent
     # "Household help for Madam G". The roster showed the mismatch; nothing
     # stopped it. Now the coordinator has to say yes to it in so many words.
-    if not offers(kaki_id, v.get("service") or ""):
-        if automatic or not confirm_mismatch:
-            raise ServiceMismatch(f"{kaki['name'] or 'This kaki'} does not offer {v.get('service')}")
-        db.audit(actor, "visit_assigned_service_mismatch", f"{vid} {v.get('service')} -> {kaki['email'] or kaki['phone']}")
+    mismatch = not offers(kaki_id, v.get("service") or "")
+    if mismatch and (automatic or not confirm_mismatch):
+        listed = db.uj(_profile(kaki_id).get("services"))
+        raise ServiceMismatch(f"{kaki['name'] or 'This kaki'} has not listed any services yet" if not listed
+                              else f"{kaki['name'] or 'This kaki'} does not offer {v.get('service')}")
 
     # A fresh 4-digit kaki code per assignment: the kaki shows it, the caregiver
     # enters it, and only then does the family's start code appear (v1.6).
@@ -105,8 +106,10 @@ def assign(vid: str, kaki_id: str, actor: str, automatic: bool = False,
     db.run("""UPDATE visits SET kaki_id = ?, status = 'assigned', assigned_at = current_timestamp,
               kaki_code = ?, kaki_verified_at = NULL
               WHERE id = ?""", [kaki_id, kaki_code, vid])
-    db.audit(actor, "visit_auto_assigned" if automatic else "visit_assigned",
-             f"{vid} -> {kaki['email'] or kaki['phone']}")
+    # One audit row, written after the update it describes. A confirmed
+    # mismatch is a different action name so the coordinator can find them.
+    db.audit(actor, "visit_auto_assigned" if automatic else ("visit_assigned_service_mismatch" if mismatch else "visit_assigned"),
+             f"{vid} -> {kaki['email'] or kaki['phone']}" + (f" ({v.get('service')} not offered, confirmed)" if mismatch else ""))
 
     caregiver = db.one("SELECT * FROM users WHERE id = ?", [v["caregiver_id"]])
     household = db.one("SELECT * FROM households WHERE id = ?", [v["household_id"]]) or {}

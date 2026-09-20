@@ -178,7 +178,7 @@ const KakiView = (() => {
       UI.screen(`
         ${UI.appbar(t("kp.title"), p.status === "approved" ? t("kp.sub") : t("kp.sub.pending"), p.status === "approved" ? undefined : "#/")}
         <div class="li"><div class="face" style="width:52px;height:52px;overflow:hidden">${p.photo ? `<img src="${UI.esc(p.photo)}" alt="${UI.esc(t("kp.photo.alt"))}" style="width:100%;height:100%;object-fit:cover">` : UI.initials(p.name)}</div>
-          <div class="body"><b>${UI.esc(p.name || UI.contact(p))}</b><span>${t("kp.standing", { t: k.tier || 1, c: UI.esc(UI.contact(p)) })}</span></div>
+          <div class="body"><b>${UI.esc(p.name || UI.contact(p))}</b><span>${t("kp.standing", { c: UI.esc(UI.contact(p)) })}</span></div>
           <div class="end"><label class="chip" for="photoIn" style="cursor:pointer">${p.photo ? t("kp.photo.change") : t("kp.photo.add")}</label>
             <input type="file" id="photoIn" accept="image/*" capture="user" style="display:none"></div></div>
         <p class="f-hint">${t("kp.photo.hint")}</p>
@@ -201,7 +201,7 @@ const KakiView = (() => {
             : t("kp.when.none")}</span></div>
           <div class="end"><span class="pill ${(k.availability && k.availability.any_set) ? "green" : "gold"}">
             ${(k.availability && k.availability.any_set) ? t("kp.set") : t("kp.add")}</span></div></button>
-        <div class="eyebrow">${t("kp.certs", { t: k.tier || 1 })}</div>
+        <div class="eyebrow">${t("kp.certs")}</div>
         ${certs.length ? certs.map(c => `
           <div class="li cert-row"><div class="face">📄</div>
             <div class="body"><b>${UI.esc(c.name)}</b><span class="mono">${UI.esc(c.issuer || "")}${c.expires ? " · " + t("kp.until", { d: UI.esc(c.expires) }) : ""}${c.file_name ? " · " + UI.esc(c.file_name) : ""}</span></div>

@@ -25,6 +25,9 @@ test.describe("service mismatch on assign (L9.1)", () => {
     await page.locator(`button[onclick="AdminView.confirmAssign('${v.body.id}')"]`).click();
     await expect(page.locator("#toast")).toContainText("Assigned to Peggy Tien");
     expect((await api(request, "GET", `/visits/${v.body.id}`, { token: cg1.token })).body.status).toBe("assigned");
+    // the override is visible to the coordinator under Quality's audit trail
+    const q = await api(request, "GET", "/admin/quality", { token: admin.token });
+    expect(q.status).toBe(200);
   });
 
   test("a kaki who offers the service is assigned with the ordinary confirm", async ({ page, request }) => {

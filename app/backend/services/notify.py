@@ -78,7 +78,7 @@ def _pick(user: dict, en: dict, zh: dict) -> dict:
 SERVICE_TASK_ZH = {
     "Chaperone": "陪他们去看诊、买菜或办事，全程在身边。路上和等候的时间都算。",
     "Companionship": "陪他们聊聊天、散散步、一起吃顿饭。不包括个人护理。",
-    "Wellness check": "短短探访一次，看看他们吃了饭、吃了药、家里安全。有什么不对，告诉家属。",
+    "Wellness check": "上门看一看：有没有吃饭、吃药，家里安不安全。有什么不对，告诉家属。",
     "Household help": "帮忙做些简单家务，家属会说最需要什么。不包括个人护理。",
 }
 
@@ -107,7 +107,11 @@ def visit_assigned(visit: dict, kaki: dict, caregiver: dict, senior_name: str = 
     e_who, e_who_zh, e_kname, e_task = _e(who), _e(who_zh), _e(kname), _e(task)
     # v1.8: what the family typed rides along, so "will the kaki bring a
     # ladder?" is answered before they accept. Their words, trimmed, untranslated.
-    fam = " ".join((visit.get("notes") or "").split())[:90]
+    fam = " ".join((visit.get("notes") or "").split())
+    if len(fam) > 90:
+        fam = fam[:89].rstrip() + "…"
+    elif fam and fam[-1] not in ".!?。！？…":
+        fam = fam + "."
     fam_sms = f" The family says: {fam}" if fam else ""
     fam_zh = f"家属留言：{fam} " if fam else ""
 

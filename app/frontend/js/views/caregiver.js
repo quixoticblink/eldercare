@@ -251,7 +251,7 @@ const CareView = (() => {
         <label class="f-label">${t("det.window")} <small>${t("common.required")}</small></label>
         ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0], "window")}
         <label class="f-label">${t("det.howlong")} <small>${t("det.howlong.small")}</small></label>
-        <div class="chips" id="hrsG">${[1, 2, 3, 4, 5, 6].map(h => `<button type="button" class="chip${h === 2 ? " sel" : ""}" data-v="${h}" onclick="UI.pick('hrsG', this)">${UI.esc(UI.hrs(h))}</button>`).join("")}</div>`}
+        <div class="chips" id="hrsG">${[1, 1.5, 2, 3, 4, 5, 6, 8].map(h => `<button type="button" class="chip${h === 2 ? " sel" : ""}" data-v="${h}" onclick="UI.pick('hrsG', this)">${UI.esc(UI.hrs(h))}</button>`).join("")}</div>`}
       <label class="f-label">${t("det.langs")} <small>${t("det.langs.small")}</small></label>
       ${UI.chipMulti("langG2", App.config.languages, startLangs, "language")}
       ${pastKakis.length ? `

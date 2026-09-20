@@ -219,14 +219,6 @@ const AdminView = (() => {
     }
   }
 
-  async function assign(vid, kid) {
-    try {
-      await Api.post(`/admin/visits/${vid}/assign`, { kaki_id: kid });
-      UI.toast("Assigned ✓ — the kaki sees it now");
-      requests();
-    } catch (e) { UI.toast(e.message, true); }
-  }
-
   async function quality() {
     UI.spin();
     try {
@@ -402,6 +394,6 @@ const AdminView = (() => {
     } catch (e) { UI.toast(e.message, true); }
   }
 
-  return { home, approvals, approve, suspend, requests, assign, markPicked,
+  return { home, approvals, approve, suspend, requests, markPicked,
            confirmAssign, assumptions, settings, quality, showCertificates, openCertificate };
 })();

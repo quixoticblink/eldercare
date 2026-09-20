@@ -204,7 +204,7 @@ def create(body: VisitIn, user=Depends(security.current_user)):
     if body.tier not in config.TIERS:
         raise HTTPException(400, "Pick an urgency")
     hours, exact_window, start_time, end_time = _hours_for(body.start_time, body.end_time, body.service)
-    if not exact_window and body.hours is not None:
+    if body.tier != "planned" and not exact_window and body.hours is not None:
         # Befrienders on 11 Sept: "urgent does not allow more than 2 hours, but
         # 3–6 is what is needed". A preset window plus a duration.
         try:
