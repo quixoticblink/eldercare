@@ -1,8 +1,9 @@
 ---
 title: "Beta testing session at Lions Befrienders — 2026-09-11"
 date: 2026-09-11
-attendees: [SGLN team; Lions Befrienders seniors and staff]
-medium: in-person beta session on the live app, participants' own phones
+attendees: [SGLN team (Lara in the room); Lions Befrienders befrienders and staff; NUHS staff; seniors]
+medium: "in-person at Life Unlimited @ 170 (Lions Befrienders AAC, Queenstown), briefing then live app on participants' own phones, ~10:30–11:45"
+photos: [../images/2026-09-11-lb-09-life-unlimited-170-entrance.jpg, ../images/2026-09-11-lb-10-briefing-room.jpg, ../images/2026-09-11-lb-11-testers-on-phones.jpg, ../images/2026-09-11-lb-12-room-wide.jpg]
 status: draft
 last_updated: 2026-09-20
 source: "Post-session notes (docx, received 2026-09-20); more feedback being added in batches"
@@ -14,6 +15,8 @@ source: "Post-session notes (docx, received 2026-09-20); more feedback being add
 > screen, so the group was on **v1.7**. The recommendation register, with every item mapped
 > to what the app already does as of v1.7, is
 > [[../prototype/lions-befrienders-2026-09-11-feedback]].
+
+![Life Unlimited @ 170, Lions Befrienders, Queenstown](../images/2026-09-11-lb-09-life-unlimited-170-entrance.jpg)
 
 The second group of seniors to try the live app, and the first outside the Care Corner /
 Vanguard / NCSS circle: Lions Befrienders, a befriending service for seniors living
@@ -34,6 +37,10 @@ own phones, the real address, sign-up through to a visit.
   caregiver wanted to check an NRIC.
 - Money and liability: subsidy by means, the right to decline it, a kaki who wants to
   volunteer for nothing, who pays when a caregiver cancels as the kaki arrives.
+- The WhatsApp thread from the room (batch 3) carried the sharper asks: a caregiver with
+  *many* seniors, urgent visits of three to six hours, a danger alert mid-visit, a kaki
+  reimbursed for a taxi, and a befriender's warning not to show full names or phone
+  numbers because "seniors call out of the blue, hound you forever".
 - Two quotes worth keeping: *"I need help, because I live alone, and I'm not sure when
   something might happen"*, which is the HMW in one sentence; and *"two of them came over
   to play rummy-o"*, a senior who had already used something like this the week before.
@@ -51,6 +58,14 @@ own phones, the real address, sign-up through to a visit.
 - **Her phone called us a scam.** The sign-in SMS came from a sender iOS labels
   "Likely-SCAM". Nothing in the app can fix that; the sender ID has to be registered
   before seniors use the app without one of us in the room.
+- **Befrienders are caregivers-of-many, and they want to be unreachable.** Two things the
+  Care Corner seniors never said, because they were booking for one parent and had no
+  history of being hounded. The one-household-per-caregiver model and the "Call {name}"
+  button on the visit page are both wrong for this population. These are the two items
+  that need a design decision, not a copy fix.
+- **"Too atas" and "more atas" in the same hour.** A befriender found the app too polished
+  to navigate; Abhishek wants the kaki's task wording more polished. Both can be right:
+  plain words on the senior-facing screens, a warmer register in the kaki's message.
 - **Availability reads as two forms.** The profile card and the availability screen are
   one thing with two doors; testers thought they were being asked twice, and "Am I
   working?" under Days off made it worse.
@@ -71,7 +86,8 @@ own phones, the real address, sign-up through to a visit.
 - [[../prototype/lions-befrienders-2026-09-11-feedback]] created: every item as received,
   cross-referenced to the Aug 21 register, with status as of v1.7.
 - [[../maps/timeline]], [[README]] and [[../README]] carry the session.
-- Six photos in `images/2026-09-11-lb-*`, the video in `evidence/sources/`.
+- Twelve photos in `images/2026-09-11-lb-*` (six screenshots, two WhatsApp threads, four of
+  the room), the video in `evidence/sources/`.
 - No app change yet. Five small items (service-match alert, availability copy and
   layout, gender chip, task wording, sender ID) are a v1.8 candidate.
 
@@ -79,9 +95,14 @@ own phones, the real address, sign-up through to a visit.
 
 - Confirm with whoever wrote the docx whether it is their own notes or the Aug 21 sheet.
 - Append the remaining feedback batches to the register as they arrive.
-- v1.8: block or confirm a service mismatch on assign; one availability entry point;
-  two gender chips; warmer task notes; register the SMS sender ID.
-- Name the uniformed companion service and add it to `landscape/`.
+- v1.8 (small): block or confirm a service mismatch on assign; one availability entry
+  point; two gender chips; task notes; urgent bookings with a duration; register the SMS
+  sender ID.
+- Decisions before v1.9: many seniors per caregiver; what a kaki and a family see of each
+  other's name and number; a mid-visit danger alert and who answers it; reimbursement of
+  a kaki's transport.
+- Name the uniformed companion service and add it to `landscape/`; add Lions Befrienders
+  (befrienders, "village chiefs", Life Unlimited @ 170) as a landscape entry.
 
 *Connects to:* [[2026-08-21-tabletop-vanguard-ncss]] · [[2026-09-05-v1.7-language]] ·
 [[../prototype/lions-befrienders-2026-09-11-feedback]] · [[../prototype/roadmap]]

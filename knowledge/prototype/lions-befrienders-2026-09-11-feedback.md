@@ -131,12 +131,53 @@ should be an alert and the match-making person should accept.
 ![Carol Wong's profile: Chaperone and Companionship only](../images/2026-09-11-lb-04-carol-profile-services.png)
 ![Carol Wong's SMS: household help assigned, sender flagged Likely-SCAM](../images/2026-09-11-lb-06-carol-sms-household.png)
 
+## 10. Batch 3 — the WhatsApp group thread, 10:58–11:43 (received 2026-09-20)
+
+Lara relaying from the room in real time (`images/2026-09-11-lb-07`, `-08`). A
+participant, Christina We, listed what matters to her: **loneliness, ageing at home
+safely, getting help quickly, community building, neighbours and trust.** Then feedback in
+five bursts.
+
+| # | Item as received | Module | Status | What we know |
+|---|---|---|---|---|
+| L10.1 | Book multiple appointments or tasks at the same time | M-VISITS | open | One booking = one visit today. A repeat / series booking is new. |
+| L10.2 | "As a caregiver I have MANY elderlies to take care of. Not a 1:1 mapping." | M-CARE | open · design | One household per caregiver since v1. Multi-household is the mirror of Aug 21 item 1.9 (many caregivers, one senior); together they are a data-model change. **The most important new item in the session:** LB staff and befrienders are caregivers-of-many, and so are most family caregivers with two parents. |
+| L10.3 | "Urgent" does not allow more than 2 hrs; 3–6 hrs needed | M-VISITS | gap | Urgent and Soon use a preset window; only Planned takes exact times. Let urgent bookings carry a duration (or start/end) too. |
+| L10.4 | Raise an alert for a dangerous situation: senior abusive to kaki, or the other way round | M-VISITS, M-ADMIN | partial | Kaki has "Flag a concern" after a completed visit; caregiver has a private care note. Neither is a live, mid-visit alert that reaches a human now. Ties to the SOS line (L3.7) and the liability question. |
+| L10.5 | Slow SMS | ops | note | Sign-in codes took long enough to notice; same provider that carries the "Likely-SCAM" label (L9.6). |
+| L10.6 | Every user both kaki and caregiver | M-AUTH, M-USERS | open | Repeats L1.5 and Aug 21 1.5; third session to ask. |
+| L10.7 | Free text to create new tasks | M-VISITS | partial | "Other — tell us" exists on the trigger step; the four services are fixed. A free-text *service* is a matching question (who is qualified?), not just a field. |
+| L10.8 | Caregiver has more to fill in; "a bit troublesome" | M-CARE, M-VISITS | note | Household + care plan + booking is three forms before a first visit. Could default more and ask less on the first booking. |
+| L10.9 | If the kaki pays first for the ride (taxi for a chaperone visit), reimbursement must be possible | M-VISITS, money + policy | open | The estimate has a transport line for the kaki's fee; there is no out-of-pocket claim. Policy first (who approves, cap), then a field on the report. |
+| L10.10 | "Volunteers are daunted by the visits, they don't last long (Homage)" | landscape | note | Retention of paid volunteers is a known problem at a competitor; supports the consistency argument in `strategy/`. |
+| L10.11 | Transportation costs | money + policy | note | Same as L10.9 from the other side: who pays the kaki's own travel. |
+| L10.12 | "Befrienders" available; "village chiefs" = visiting (NUHS and LB) | landscape | note | LB and NUHS already run befriender and "village chief" visiting roles; a supply pool, and a naming convention we should learn. Add to `landscape/lions-befrienders`. |
+| L10.13 | "App too difficult and atas to navigate" | M-CORE (copy, IA) | open | Direct contradiction of Abhishek's "task wording to atas" (L9.5): one voice wants the language plainer, one wants it more polished. Resolve by audience: plain on the senior-facing screens, polished only in the SMS the kaki gets. |
+| L10.14 | **Do not reveal full name. No phone number either.** "Seniors call out of the blue, hound you forever." Dangerous. PDPA. Security. | M-VISITS, M-USERS | **gap** | Today the caregiver sees the kaki's full name and can tap "Call {first name}" (phone exposed); the kaki sees the senior's name and address. A befriender with experience of being hounded says this is unsafe. Options: first name + last initial, calls routed via the coordinator, or a masked number. Needs a decision before the pilot. |
+
+Two closing lines from Lara: *"Folks still had a lot of stories and warnings to share with me"* and *"Thank you all for today!"*
+
+## The room
+
+Life Unlimited @ 170, Lions Befrienders' active ageing centre in Queenstown (opened 23 May
+2026, Temasek Foundation partnership). A briefing on the SGLN journey and the Vanguard
+validation, then phones out. NUHS staff were in the room alongside LB befrienders.
+
+![Life Unlimited @ 170, the LB centre where the session ran](../images/2026-09-11-lb-09-life-unlimited-170-entrance.jpg)
+![The briefing before phones came out](../images/2026-09-11-lb-10-briefing-room.jpg)
+![Testers on their own phones, one NUHS participant](../images/2026-09-11-lb-11-testers-on-phones.jpg)
+![The room mid-session](../images/2026-09-11-lb-12-room-wide.jpg)
+
 ## What is new against Aug 21
 
 From batch 1, only two lines have no counterpart in the Aug 21 register: the uniformed
 sit-with-a-couple service (L3.8) and, arguably, the sharper framing of the NRIC question.
 Batch 2 is all new: a real mismatch bug (L9.1), the double availability entry (L9.2,
-L9.3), the gender chip (L9.4), task wording (L9.5) and the scam-flagged SMS sender (L9.6). Of the 26 items received, 14 are already shipped, 3 partial, 4 open, and 5
+L9.3), the gender chip (L9.4), task wording (L9.5) and the scam-flagged SMS sender (L9.6).
+Batch 3 adds the three that change the model: **a caregiver with many seniors (L10.2)**,
+**names and numbers hidden between kaki and family (L10.14)**, and urgent visits longer
+than two hours (L10.3); plus repeat bookings, a mid-visit danger alert, reimbursement of a
+kaki's out-of-pocket transport, and the note that Homage's volunteers don't last. Of the 26 items received, 14 are already shipped, 3 partial, 4 open, and 5
 are partner policy. If the Lions group tested v1.7, then the striking finding is that the
 same asks came back after they were built, which would mean the fixes are not visible
 enough on the screen. If they tested an older build or these are the Aug 21 notes, the
@@ -182,6 +223,18 @@ Verbatim, in the order received. More is appended as it arrives.
 - "Gender. Stick w 2. remove PREFER NOT TO SAY"
 - "ERROR ALERT ⚠️ FOR CAROL" · "She did NOT sign up for household" · "But she got household jobs"
 - Abhishek: the four points above.
+
+*Batch 3 (WhatsApp group, Lara, 11 Sept 10:58–11:43)*
+
+- Christina We: Loneliness / Ageing at home in a safe / Getting help quickly / Community building / Neighbours and trust
+- FEEDBACK 1. Can we book multiple appts or tasks at the same time 2. As a Care Giver, I have MANY elderlies to take care of. SO IT'S NOT A 1:1 MAPPING 3. "URGENT" option currently does NOT allow more than 2 hrs. But is needed for 3 ~ 6 hrs
+- ANOTHER FEEDBACK: WE SHOULD BE ABLE TO RAISE ALERT FOR A DANGEROUS SITUATION WHERE THE SENIOR IS ABUSIVE OR THE OTHER WAY AROUND
+- FEEDBACK 1. SLOW SPEED W SMS 2. CAN WE ALLOW EVERY USER TO BE BOTH KAKI & CARE GIVER 3. FREE TEXT TO CREATE NEW TASKS 4. CARE GIVER MORE THINGS TO FILL IN, BIT TROUBLESOME
+- FEEDBACK: IF THE KAKI PAYS ON BEHALF OF THE CAREGIVER OR ELDERLY FIRST FOR THE RIDE, THEN WE NEED TO ENABLE THE REIMBURSEMENT
+- Volunteers are daunted by the visits, they don't last long (Homage) / Transportation costs / "BEFRIENDERS" available / Village chiefs = visiting (NUHS & LB)
+- APP TOO DIFFICULT AND ATAS TO NAVIGATE
+- DO NOT REVEAL FULL NAME / NO PHONE NUMBER ALSO, "seniors call out of the blue, hound you forever" / DANGEROUS / PDPA / SECURITY
+- Ok just got out. Folks still had a lot of stories and warnings to share w me. Thank you all for today!
 
 *Connects to:* [[../journal/2026-09-11-lions-befrienders-beta]] · [[tabletop-2026-08-21-feedback]] ·
 [[ncss-app-review-2026-08-18]] · [[feature-buckets-2026-09-04]] · [[roadmap]]

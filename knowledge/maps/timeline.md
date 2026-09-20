@@ -114,7 +114,7 @@ The same evening: 中文 on every caregiver and kaki screen, the help panel and 
 
 ### 2026-09-11 · Lions Befrienders beta session · [[../journal/2026-09-11-lions-befrienders-beta]]
 
-Second senior group tries the live app, six days after v1.6/v1.7. Notes received on 20 Sept repeat the Aug 21 list; 14 of 26 items already shipped. Register: [[../prototype/lions-befrienders-2026-09-11-feedback]].
+Second group tries the live app at Life Unlimited @ 170, six days after v1.6/v1.7. Befrienders, not family caregivers: many seniors each, and a warning not to show names or numbers. One matching bug found. Register: [[../prototype/lions-befrienders-2026-09-11-feedback]].
 
 ### 2026-09-XX · SGLN Demo Day
 
