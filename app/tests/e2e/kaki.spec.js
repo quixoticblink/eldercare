@@ -113,8 +113,15 @@ test.describe("certificates (Bucket 2 · 7)", () => {
     const kakiId = uniq("newkaki");
     await signIn(page, kakiId, { role: "kaki", name: "Lim Ah Seng" });
     await expect(page.getByRole("heading", { name: "Nothing to do right now" })).toBeVisible();
-    await page.getByRole("button", { name: "Add your certificates now" }).click();
-    await expect(page.getByText("Waiting for approval — add your certificates")).toBeVisible();
+    // v1.8.1: certificates are optional — the waiting screen says so, and the
+    // profile has a way back without adding one
+    await expect(page.getByText("Optional. CPR + AED")).toBeVisible();
+    await page.getByRole("button", { name: "Add a certificate" }).click();
+    await expect(page.getByText("Waiting for approval — certificates are optional")).toBeVisible();
+    await expect(page.getByText("None yet, and that is fine.")).toBeVisible();
+    await page.getByRole("button", { name: "Skip for now" }).click();
+    await expect(page.getByRole("heading", { name: "Nothing to do right now" })).toBeVisible();
+    await page.getByRole("button", { name: "Add a certificate" }).click();
     await page.locator("#certName").fill("CPR + AED");
     await page.locator("#certIssuer").fill("St. Luke's Hospital");
     await page.locator("#certFile").setInputFiles({ name: "cpr.png", mimeType: "image/png",

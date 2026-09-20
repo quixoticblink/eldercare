@@ -220,6 +220,7 @@ const KakiView = (() => {
           <button class="btn quiet" id="addCert">${t("kp.cert.btn")}</button>
         </div>
         <div class="card tint"><h3>${t("kp.tier2")}</h3><p>${t("kp.tier2.body")}</p></div>
+        ${p.status === "approved" ? "" : `<button class="btn quiet" onclick="location.hash='#/'">${t("kp.certs.later")}</button>`}
         <button class="btn ghost" onclick="App.logout()">${t("menu.signout")}</button>`);
       UI.el("addCert").onclick = async () => {
         const file = UI.el("certFile").files[0];

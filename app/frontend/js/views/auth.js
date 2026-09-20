@@ -98,7 +98,7 @@ const AuthView = (() => {
         <h3>${t("pending.nothing")}</h3>
         <p>${t("pending.body", { what: user.role === "kaki" ? t("pending.see") : t("pending.book") })}</p>
       </div>
-      ${user.role === "kaki" ? `<button class="btn" onclick="location.hash='#/kaki/profile'">${t("pending.certs")}</button>
+      ${user.role === "kaki" ? `<button class="btn quiet" onclick="location.hash='#/kaki/profile'">${t("pending.certs")}</button>
       <p class="f-hint">${t("pending.certs.hint")}</p>` : ""}
       <button class="btn quiet" onclick="App.boot()">${t("pending.again")}</button>
       <button class="btn ghost" onclick="App.logout()">${t("menu.signout")}</button>
