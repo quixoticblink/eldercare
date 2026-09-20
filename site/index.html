@@ -30,6 +30,7 @@
       <a href="#strategy">Strategy</a>
       <a href="#showcase">Build</a>
       <a href="#feedback">Feedback</a>
+      <a href="#beta">Beta</a>
       <a href="#wiki">Knowledge</a>
     </nav>
   </div>
@@ -271,6 +272,19 @@
           <span class="step">console stays English</span>
           <span class="step">a shared-phone rule</span>
           <span class="step final">v1.7 live</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="date">September 11, 2026 · Beta</div>
+        <h3>Lions Befrienders try v1.7</h3>
+        <p>Six days after v1.6 and v1.7 went out, a second group ran the app at Life Unlimited @ 170, Lions Befrienders&rsquo; centre in Queenstown, with NUHS staff in the room. Not family caregivers this time: befrienders, people who visit many seniors a week and have been phoned at midnight by some of them. They found the first real matching bug (a kaki assigned to work she had not offered), told us the one-household model is wrong for anyone who cares for more than one person, and asked that neither side see the other&rsquo;s full name or number. The account is in <a href="#beta">the befrienders&rsquo; round</a>.</p>
+        <div class="arc">
+          <span class="step">v1.7, own phones</span>
+          <span class="step">many seniors, one caregiver</span>
+          <span class="step">a matching bug</span>
+          <span class="step">no names, no numbers</span>
+          <span class="step final">a v1.8 list, and two decisions</span>
         </div>
       </div>
 
@@ -747,6 +761,74 @@
   </div>
 </section>
 
+<section id="beta" aria-labelledby="beta-h">
+  <div class="narrow">
+    <p class="eyebrow">The befrienders&rsquo; round</p>
+    <h2 id="beta-h">The second group had done this before. They had warnings.</h2>
+    <p class="lede">On 11 September, six days after v1.6 and v1.7 shipped, befrienders and staff from Lions Befrienders and NUHS ran the app on their own phones at Life Unlimited @ 170 in Queenstown. The first group booked for one parent. This group visits many seniors a week, and some of those seniors have their number.</p>
+    <img class="photo" src="assets/lions-befrienders-170.jpg" alt="The entrance of Life Unlimited @ 170, Lions Befrienders' active ageing centre in Queenstown, where the session ran." loading="lazy">
+    <p>Much of what they said was the August list again, and fourteen of those items were already live in front of them, which is its own finding: a fix nobody notices is not finished. The new signals came from the room&rsquo;s WhatsApp thread and from watching over shoulders. Six, below. Every item, with what the app already does about it, is in the wiki.</p>
+
+    <div class="signals">
+
+      <div class="signal">
+        <div class="signal-num" aria-hidden="true">01</div>
+        <div class="signal-body">
+          <h3>A caregiver is not one senior.</h3>
+          <p>&ldquo;As a caregiver I have many elderlies to take care of. It is not a one-to-one mapping.&rdquo; The app has had one household per caregiver since the first build. That fits a daughter with one parent and nobody else in the room: not a befriender with a round, not a family with two parents in two flats, not the staff member booking on their behalf. This is the item that changes the data model.</p>
+          <blockquote class="signal-quote">&ldquo;Loneliness. Ageing at home safely. Getting help quickly. Community building. Neighbours and trust.&rdquo;<cite>— A participant&rsquo;s list of what matters, sent from the room</cite></blockquote>
+        </div>
+      </div>
+
+      <div class="signal">
+        <div class="signal-num" aria-hidden="true">02</div>
+        <div class="signal-body">
+          <h3>Do not show the name. Do not show the number.</h3>
+          <p>&ldquo;Seniors call out of the blue, hound you forever.&rdquo; A befriender with years of it said the visit page, which shows the kaki&rsquo;s full name and a call button, is dangerous, and named PDPA in the same breath. The August group wanted <em>more</em> identity at the door; this group wants less of it to leave the room. First name and last initial, calls through the coordinator, or a masked number: a decision before the pilot, not a copy change.</p>
+        </div>
+      </div>
+
+      <div class="signal">
+        <div class="signal-num" aria-hidden="true">03</div>
+        <div class="signal-body">
+          <h3>The first real bug a tester found.</h3>
+          <p>One kaki signed up for chaperone and companionship visits only. Her phone got &ldquo;Household help for Madam G, today.&rdquo; The coordinator&rsquo;s roster does mark whether a kaki offers the service, but nothing stops the assignment when she doesn&rsquo;t. The fix is small: an alert and an explicit confirm on manual matching, a hard rule in automatic matching. It goes first in v1.8.</p>
+        </div>
+      </div>
+
+      <div class="signal">
+        <div class="signal-num" aria-hidden="true">04</div>
+        <div class="signal-body">
+          <h3>Her phone called us a scam.</h3>
+          <p>The sign-in code arrived from a sender the phone labelled <em>Likely-SCAM</em>, and it arrived slowly. Nothing in the app fixes that. The SMS sender has to be registered in Singapore&rsquo;s sender-ID registry before any senior uses this without one of us beside them. The most important line in the register is not about the app at all.</p>
+        </div>
+      </div>
+
+      <div class="signal">
+        <div class="signal-num" aria-hidden="true">05</div>
+        <div class="signal-body">
+          <h3>Urgent is longer than two hours, and sometimes ends badly.</h3>
+          <p>An urgent booking today takes a preset window; only planned visits take exact times. Befrienders said three to six hours is what an urgent situation actually needs. They also asked for a way to raise an alert mid-visit when a senior is abusive to a kaki, or the other way round, and for a kaki who pays for the taxi to be paid back. The app records who cancelled and why; it does not yet let anyone shout for help while the visit is running.</p>
+        </div>
+      </div>
+
+      <div class="signal">
+        <div class="signal-num" aria-hidden="true">06</div>
+        <div class="signal-body">
+          <h3>Too atas, and not atas enough.</h3>
+          <p>One befriender found the app &ldquo;too difficult and atas to navigate&rdquo;. In the same hour, the team wanted the kaki&rsquo;s task wording more polished. Both can be right: plain words on every screen a senior reads, a warmer register in the message a kaki receives. The availability screen made the point for them: the week grid and the days-off block read as being asked the same thing twice.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="callout"><strong>What changes next.</strong> A short v1.8: the service-match alert, one availability entry point, two gender options instead of three, urgent bookings with a duration, and the sender ID registered. Then two decisions before anything larger is built: many seniors per caregiver, and what a kaki and a family may see of each other.</div>
+
+    <p>Session record: <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-11-lions-befrienders-beta.md">journal/2026-09-11-lions-befrienders-beta.md</a>. The register, every item mapped to an app module and to what v1.7 already does: <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/prototype/lions-befrienders-2026-09-11-feedback.md">lions-befrienders-2026-09-11-feedback.md</a>.</p>
+  </div>
+</section>
+
+
 <section id="wiki" aria-labelledby="wiki-h">
   <div class="narrow">
     <p class="eyebrow">How We Work</p>
@@ -920,7 +1002,7 @@
     <div>
       <h4>Eldercare Sprint</h4>
       <p>A six-month leadership sprint working out how caregivers of the relatively healthy elderly in Singapore can activate trusted respite when a need arises — planned or urgent. Started May 19, 2026. Five people. Public journey. Anchored on Vanguard&rsquo;s Pasir Ris pilot from July 8 onward.</p>
-      <p class="colophon">Updated 2026-09-05 (evening) · Singapore</p>
+      <p class="colophon">Updated 2026-09-20 · Singapore</p>
     </div>
     <div>
       <h4>Find your way</h4>
@@ -934,6 +1016,7 @@
         <li><a href="#strategy">Strategy</a></li>
         <li><a href="#showcase">The build — prototype &amp; deck</a></li>
         <li><a href="#feedback">What the seniors said</a></li>
+        <li><a href="#beta">The befrienders&rsquo; round</a></li>
         <li><a href="#wiki">Knowledge base</a></li>
         <li><a href="https://github.com/quixoticblink/eldercare/tree/main/knowledge">Full wiki on GitHub</a></li>
         <li><a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/README.md">Sprint journal</a></li>

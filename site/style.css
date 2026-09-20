@@ -786,6 +786,9 @@ footer.site a:focus-visible {
   color: var(--text);
 }
 .artefact-card p { color: var(--text-soft); font-size: 0.95rem; margin: 0; }
+/* a single photo inside a narrow prose section (#beta) */
+.narrow .photo { display:block; width:100%; height:auto; border-radius: 10px; margin: 1.4rem 0 1.6rem; }
+
 .artefact-card .cover {
   width: 100%;
   border: 1px solid var(--border);
