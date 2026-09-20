@@ -8,6 +8,10 @@ HELP_GUIDE = {
     "book": "Caregivers: Home → Book a visit → pick the service → pick when (Urgent / Soon / Planned) → add details → submit. The coordinator matches a kaki and you'll see it under Visits.",
     "urgent": "Urgent means you need someone within the hour — e.g. your helper left suddenly. The coordinator prioritises these requests first.",
     "otp": "When the kaki arrives, the caregiver's visit page shows a 4-digit start code. The kaki enters it to start the visit — that's how we confirm they're really there.",
+    "door": "At the door there are two codes. The kaki shows a 4-digit kaki code with their photo; the caregiver enters it under 'Check it's them'. Then the caregiver's start code appears, and they read it to the kaki to start the visit.",
+    "how long": "Urgent requests are usually matched within the hour, soon within two hours, planned within a day. We message you the moment a kaki is confirmed — no need to keep checking.",
+    "match": "The coordinator matches every request by hand during the pilot: urgent first, then by who is free, speaks the language and offers the service. You are messaged when it is done.",
+    "who do i call": "Call the Pasir Ris ICCP coordinator on 6XXX XXXX — for anything, any time during the pilot.",
     "start code": "Caregivers: when your kaki arrives, first enter the 4-digit kaki code from their screen under 'Check it's them' — your start code then appears on the visit page. Read it to your kaki to start the visit.",
     "kaki code": "Kakis: your visit page shows a 4-digit code for the family. Show it (with your photo) at the door; the family enters it, then reads you their start code.",
     "photo": "Kakis: add a photo on your Profile — families see it on the visit page so they know it's you at the door.",
@@ -26,6 +30,9 @@ HELP_GUIDE = {
 # senior would type. Matched only when the question itself is in Chinese.
 HELP_GUIDE_ZH = {
     # specific phrases first: "Kaki 验证码" must not fall into "验证码" (the sign-in code)
+    "门口": "门口有两个码。Kaki 出示 4 位数 Kaki 验证码和照片，照顾者在“确认是本人”输入。然后照顾者的开始码会出现，读给 Kaki，探访就开始。",
+    "多久": "紧急申请通常一小时内配对，尽快两小时内，预约一天内。Kaki 一确认我们就会发信息给您，不用一直查看。",
+    "找谁": "请致电巴西立 ICCP 协调员 6XXX XXXX，试点期间任何事都可以找他们。",
     "kaki 验证码": "Kaki：您的探访页面有一个给家属的 4 位数 Kaki 验证码。到门口时连同您的照片一起出示，家属输入后会把开始码读给您。",
     "kaki验证码": "Kaki：您的探访页面有一个给家属的 4 位数 Kaki 验证码。到门口时连同您的照片一起出示，家属输入后会把开始码读给您。",
     "开始码": "照顾者：Kaki 到达时，先在“确认是本人”输入 Kaki 屏幕上的 4 位数 Kaki 验证码，您的开始码就会出现在探访页面。把开始码读给 Kaki，探访就开始。",
@@ -114,6 +121,11 @@ def guide_reply(message: str) -> str:
     if is_zh(message):
         return _guide_zh(message)
     m = (message or "").lower()
+    # the door codes before the sign-in fast path: "what are the codes at the
+    # door?" contains "code" but is not about signing in (v1.8 quick question)
+    for key in ("door", "start code", "kaki code", "how long", "who do i call"):
+        if key in m:
+            return HELP_GUIDE[key]
     if any(w in m for w in ("sign in", "signin", "log in", "login", "code", "otp")):
         return HELP_GUIDE["sign in"]
     for key, answer in HELP_GUIDE.items():

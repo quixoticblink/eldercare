@@ -18,28 +18,28 @@
       "family_rate_per_hour": 28,
       "kaki_rate_per_hour": 12,
       "source": "PLACEHOLDER — pilot estimate, not confirmed with Vanguard",
-      "note": "Accompanying to appointments; longest typical visit because of travel and waiting."
+      "note": "Go with them to the clinic, market or an errand, and stay by their side the whole way. Travel and waiting time count."
     },
     "Companionship": {
       "hours": 2,
       "family_rate_per_hour": 24,
       "kaki_rate_per_hour": 11,
       "source": "PLACEHOLDER — pilot estimate, not confirmed with Vanguard",
-      "note": "Conversation, a walk, a meal together. No personal-care tasks."
+      "note": "Keep them company: a chat, a walk, a meal together. No personal care."
     },
     "Wellness check": {
       "hours": 1,
       "family_rate_per_hour": 24,
       "kaki_rate_per_hour": 12,
       "source": "PLACEHOLDER — pilot estimate, not confirmed with Vanguard",
-      "note": "Short drop-in to confirm the senior is safe and well."
+      "note": "A short visit to see they have eaten, taken their medicine and are safe at home. Tell the family if anything seems off."
     },
     "Household help": {
       "hours": 2,
       "family_rate_per_hour": 22,
       "kaki_rate_per_hour": 10,
       "source": "PLACEHOLDER — pilot estimate, not confirmed with Vanguard",
-      "note": "Light housekeeping, laundry, simple meal prep."
+      "note": "A hand with light chores around the home. The family will say what would help most. No personal care."
     }
   },
   "subsidies": {

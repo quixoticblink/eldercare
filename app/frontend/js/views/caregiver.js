@@ -93,7 +93,11 @@ const CareView = (() => {
         ${plan?.contacts ? `<textarea class="f-input" id="contacts" aria-label="${UI.esc(t("plan.other"))}">${UI.esc(plan.contacts)}</textarea>` : `<input type="hidden" id="contacts" value="">`}
         <label class="f-label">${t("plan.notes")}</label>
         <textarea class="f-input" id="notes" placeholder="${UI.esc(t("plan.notes.ph"))}">${UI.esc(plan?.notes)}</textarea>
-        <button class="btn" id="savePlan">${t("plan.save")}</button>`);
+        <button class="btn" id="savePlan">${t("plan.save")}</button>
+        ${(plan && (plan.meds || plan.mobility)) ? "" : `<button class="btn ghost" id="skipPlan">${t("plan.skip")}</button>
+        <p class="f-hint" style="margin-top:-4px">${t("plan.skip.hint")}</p>`}`);
+      const sk = UI.el("skipPlan");
+      if (sk) sk.onclick = () => { location.hash = "#/care/home"; };
       UI.el("savePlan").onclick = async () => {
         try {
           await Api.put("/care/plan", {
@@ -245,7 +249,9 @@ const CareView = (() => {
         <p class="f-hint" id="hoursHint" style="margin-top:6px">${t("det.hours", { h: UI.hrs(2) })}</p>`
       : `
         <label class="f-label">${t("det.window")} <small>${t("common.required")}</small></label>
-        ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0], "window")}`}
+        ${UI.chipGroup("winG", windowsFor(bookDraft.tier), windowsFor(bookDraft.tier)[0], "window")}
+        <label class="f-label">${t("det.howlong")} <small>${t("det.howlong.small")}</small></label>
+        <div class="chips" id="hrsG">${[1, 2, 3, 4, 5, 6].map(h => `<button type="button" class="chip${h === 2 ? " sel" : ""}" data-v="${h}" onclick="UI.pick('hrsG', this)">${UI.esc(UI.hrs(h))}</button>`).join("")}</div>`}
       <label class="f-label">${t("det.langs")} <small>${t("det.langs.small")}</small></label>
       ${UI.chipMulti("langG2", App.config.languages, startLangs, "language")}
       ${pastKakis.length ? `
@@ -275,6 +281,7 @@ const CareView = (() => {
           service: bookDraft.service, tier: bookDraft.tier, trigger: bookDraft.trigger || "",
           date: (UI.chipValue("winG") || "").startsWith("Tomorrow") ? "tomorrow" : "today",
           window: UI.chipValue("winG") || "", languages: UI.chipValues("langG2"),
+          hours: Number(UI.chipValue("hrsG") || 2),
           notes: UI.el("notes").value, kaki_gender_pref: genderPref(), preferred_kaki_id: UI.chipValue("prefK") || "" });
         clearDraft();
         UI.toast(t("det.sent"));
@@ -349,6 +356,8 @@ const CareView = (() => {
           <div class="codebox">${vd.otp_code.split("").map(d => `<span>${d}</span>`).join("")}</div>
           <p>${t("cv.startcode.body")}</p></div>` : ""}
         ${est && vd.status !== "cancelled" ? `
+          <button class="btn quiet" id="costBtn" aria-expanded="false" aria-controls="costBox">${t("cv.cost.show")}</button>
+          <div id="costBox" hidden>
           <div class="eyebrow">${t("cv.cost")}</div>
           <div class="stack">
             <div class="s-row"><span>${t("cv.rate", { h: UI.hrs(est.hours), r: est.rate })}<span class="who">${t("cv.rate.who", { s: UI.esc(UI.lang === "zh" ? v("service", vd.service) : vd.service.toLowerCase()) })}</span></span><span class="amt">$${est.base.toFixed(2)}</span></div>
@@ -366,7 +375,7 @@ const CareView = (() => {
                 App.config.paynow.name ? " · " + UI.esc(App.config.paynow.name) : ""}.</p>
               <p style="font-size:.72rem;opacity:.85">${t("cv.paynow.note")}</p>
             </div>` : ""}
-          ${UI.moneyNote()}` : ""}
+          ${UI.moneyNote()}</div>` : ""}
         ${vd.status === "completed" && vd.report ? `
           <div class="card"><h3>${t("cv.report")}</h3>
             <p>${UI.esc(vd.report.text || "")}</p><div class="divider"></div>
@@ -380,6 +389,8 @@ const CareView = (() => {
         ${["requested", "assigned", "accepted", "in_progress"].includes(vd.status) ? `<button class="btn danger" id="cancelV">${vd.status === "in_progress" ? t("cv.end") : t("cv.cancel")}</button>` : ""}
       `);
       [0,1,2,3].forEach(i => { const o = UI.el("k" + i); if (o) o.oninput = () => { if (o.value && i < 3) UI.el("k" + (i + 1)).focus(); }; });
+      const cb = UI.el("costBtn");
+      if (cb) cb.onclick = () => { const box = UI.el("costBox"); box.hidden = !box.hidden; cb.textContent = box.hidden ? t("cv.cost.show") : t("cv.cost.hide"); cb.setAttribute("aria-expanded", String(!box.hidden)); };
       const vk = UI.el("verifyK");
       if (vk) vk.onclick = async () => {
         const code = [0,1,2,3].map(i => UI.el("k" + i).value).join("");

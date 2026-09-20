@@ -76,10 +76,10 @@ def _pick(user: dict, en: dict, zh: dict) -> dict:
 # assumptions.json (the coordinator's file); this is its counterpart, keyed by
 # the English service name that stays in every message.
 SERVICE_TASK_ZH = {
-    "Chaperone": "陪同看诊、买菜或办事，全程陪在身边。不包括个人护理。",
-    "Companionship": "聊天、散步、一起吃饭。不包括个人护理。",
-    "Wellness check": "看看用餐、吃药和家里是否安全，有问题就告诉家属。",
-    "Household help": "简单家务，家属会说明要做什么。不包括个人护理。",
+    "Chaperone": "陪他们去看诊、买菜或办事，全程在身边。路上和等候的时间都算。",
+    "Companionship": "陪他们聊聊天、散散步、一起吃顿饭。不包括个人护理。",
+    "Wellness check": "短短探访一次，看看他们吃了饭、吃了药、家里安全。有什么不对，告诉家属。",
+    "Household help": "帮忙做些简单家务，家属会说最需要什么。不包括个人护理。",
 }
 
 def _hours_zh(hours: float) -> str:
@@ -105,22 +105,30 @@ def visit_assigned(visit: dict, kaki: dict, caregiver: dict, senior_name: str = 
     task_zh = SERVICE_TASK_ZH.get(service, "")
     kname = kaki.get("name") or "a kaki"
     e_who, e_who_zh, e_kname, e_task = _e(who), _e(who_zh), _e(kname), _e(task)
+    # v1.8: what the family typed rides along, so "will the kaki bring a
+    # ladder?" is answered before they accept. Their words, trimmed, untranslated.
+    fam = " ".join((visit.get("notes") or "").split())[:90]
+    fam_sms = f" The family says: {fam}" if fam else ""
+    fam_zh = f"家属留言：{fam} " if fam else ""
 
     kaki_res = _pick(kaki,
         en=dict(subject=f"You've been matched: {service} · {hours_txt}",
-                sms=(f"Kakis: {service} for {who}, {when} ({hours_txt}). {task} "
+                sms=(f"Kakis: {service} for {who}, {when} ({hours_txt}). {task}{fam_sms} "
                      f"Open the app to accept.").replace("  ", " "),
                 email=(f"<p>You've been matched to a <b>{service}</b> visit for {e_who}.</p>"
                        f"<p><b>When:</b> {when} · <b>{hours_txt}</b></p>"
                        + (f"<p><b>The task:</b> {e_task}</p>" if task else "")
+                       + (f"<p><b>The family says:</b> {_e(fam)}</p>" if fam else "")
                        + f"<p>Open Kakis to accept or pass it back to the coordinator.</p>")),
         zh=dict(subject=f"已为您安排探访：{service} · {_hours_zh(hours)}",
                 sms=(f"Kakis：已为您安排 {who_zh} 的探访（{service}），{when}，{_hours_zh(hours)}。"
                      + (f"任务：{task_zh} " if task_zh else "")
+                     + fam_zh
                      + "请打开应用接受。").replace("  ", " "),
                 email=(f"<p>已为您安排 {e_who_zh} 的 <b>{service}</b> 探访。</p>"
                        f"<p><b>时间：</b>{when} · <b>{_hours_zh(hours)}</b></p>"
                        + (f"<p><b>任务：</b>{task_zh}</p>" if task_zh else "")
+                       + (f"<p><b>家属留言：</b>{_e(fam)}</p>" if fam else "")
                        + "<p>请打开 Kakis 接受，或退回给协调员。</p>")))
     cg_res = _pick(caregiver,
         en=dict(subject=f"A kaki has been matched: {service}",

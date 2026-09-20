@@ -148,6 +148,7 @@ test.describe("exact times (Bucket 2 · 1)", () => {
     await page.getByRole("button", { name: "Request this visit" }).click();
     await expect(page).toHaveURL(/#\/care\/visit\//);
     await expect(page.locator(".appbar")).toContainText("09:30–11:30");
+    await page.getByRole("button", { name: "Show cost" }).click();   // v1.8: cost sits behind a toggle
     await expect(page.getByText("2 hrs ×")).toBeVisible();
   });
 });

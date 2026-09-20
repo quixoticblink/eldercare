@@ -95,7 +95,7 @@ test.describe("caregiver screens in 中文", () => {
     await page.reload();
     await expect(page.locator("#screen")).toContainText("确认是本人");
     await expect(page.locator("#screen")).toContainText("已确认");
-    await expect(page.locator("#screen")).toContainText("门口已核对 Kaki");
+    await expect(page.locator("#screen")).toContainText("Kaki 已到");
     for (let i = 0; i < 4; i++) await page.locator(`#k${i}`).fill("0");
     await page.locator("#verifyK").click();
     await expect(page.locator("#toast")).toContainText(/验证码不对|开始码/);
@@ -151,7 +151,7 @@ test.describe("kaki screens in 中文", () => {
     await expect(page.locator("#screen")).toContainText("培训与证书");
     await expect(page.locator("#svcG .chip[data-v='Chaperone']")).toHaveText("陪同外出");
     await page.goto("/#/kaki/availability");
-    await expect(page.locator("#screen h1")).toContainText("我可以工作的时间");
+    await expect(page.locator("#screen h1")).toContainText("我有空的时间");
     await expect(page.locator("label[for='day-Mon']")).toHaveText("周一");
     await expect(page.locator("#exHalf .chip[data-v='morning']")).toHaveText("上午");
   });
@@ -159,7 +159,7 @@ test.describe("kaki screens in 中文", () => {
 
 // English labels that must never appear on a caregiver or kaki screen in 中文.
 // Names, addresses, service values inside data, and the word Kaki are allowed.
-const LEAKS = /Welcome to Kakis|Send my code|\bSign in\b|Check again|Set up your care circle|\bContinue\b|Save care plan|Caring for|Book a visit|What do they need|\bWhen\?|The details|Request this visit|Finding a kaki|Kaki assigned|\bConfirmed\b|Happening now|\bCompleted\b|\bCancelled\b|Check it's them|Start code|Estimated cost|Family pays|Visit report|Private care note|Your visits|Accept this visit|I'm on my way|Start the visit|Start visit|End the visit|Complete visit|Your report|Flag a concern|My profile|Save profile|When I can work|Nothing to do right now|Care plan|Your profile|Current visits|\bRecent\b|Step \d of \d|Usually matched|Kaki checked at the door|\bRequested\b|\bHome\b|\bVisits\b|\bImpact\b|\bProfile\b|Sign out|Your code for the family|On the way|\bHistory\b|Certificates|Payouts|My impact|Add a certificate|Days off|My normal week/;
+const LEAKS = /Welcome to Kakis|Send my code|\bSign in\b|Check again|Set up your care circle|\bContinue\b|Save care plan|Caring for|Book a visit|What do they need|\bWhen\?|The details|Request this visit|Finding a kaki|Kaki assigned|\bConfirmed\b|Happening now|\bCompleted\b|\bCancelled\b|Check it's them|Start code|Estimated cost|Family pays|Visit report|Private care note|Your visits|Accept this visit|I'm on my way|Start the visit|Start visit|End the visit|Complete visit|Your report|Flag a concern|My profile|Save profile|When I can work|Nothing to do right now|Care plan|Your profile|Current visits|\bRecent\b|Step \d of \d|Usually matched|Kaki arrived|\bRequested\b|\bHome\b|\bVisits\b|\bImpact\b|\bProfile\b|Sign out|Your code for the family|On the way|\bHistory\b|Certificates|Payouts|My impact|Add a certificate|Days off|My normal week/;
 const noLeak = async page => {
   const txt = await page.locator("#screen").innerText();
   const nav = await page.locator("#tabs").innerText().catch(() => "");
@@ -184,7 +184,7 @@ test("中文 lifecycle: caregiver signs up, books; the English console assigns; 
   expect(me.body.user.lang).toBe("zh");                      // the choice followed the person to the server
   await approve(request, s.admin.token, me.body.user.id, "caregiver");
   await page.getByRole("button", { name: "再查看一次" }).click();
-  await expect(page.locator("#screen h1")).toContainText("设置您的照护圈");
+  await expect(page.locator("#screen h1")).toContainText("您在照顾谁");
   await noLeak(page);
   await page.locator("#sn").fill("林先生");
   await page.locator("#sa").fill("80");
@@ -284,7 +284,7 @@ test("the help panel answers a Chinese question in Chinese, signed out and signe
   await page.locator("#helpBtn").click();
   await expect(page.locator("#helpTitle")).toHaveText("需要帮忙吗？");
   await expect(page.locator("#chatLog")).toContainText("Kakis 小帮手");
-  await page.locator("#helpQuick .chip", { hasText: "开始码" }).click();
+  await page.locator("#helpQuick .chip", { hasText: "门口的两个码" }).click();
   await expect(page.locator("#chatLog .msg.bot").last()).toContainText("开始码");
   await expect(page.locator("#chatLog .msg.bot").last()).not.toContainText(/start code/i);
   const { cg1 } = await seed(request);

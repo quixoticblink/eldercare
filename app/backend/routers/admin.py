@@ -2,12 +2,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from .. import assumptions, db, security, settings
+from ..errors import KakisError
 from ..services import availability, matching
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 class AssignIn(BaseModel):
     kaki_id: str
+    confirm_mismatch: bool = False   # v1.8: the coordinator has read the service warning
 
 class ApproveIn(BaseModel):
     role: str | None = None   # optionally set/override role on approval
@@ -159,7 +161,12 @@ def assign(vid: str, body: AssignIn, user=Depends(security.current_user)):
     # identically. Returns who actually received it — assigning to the wrong
     # kaki is silent otherwise, and looks exactly like the feature being broken.
     try:
-        return matching.assign(vid, body.kaki_id, user["email"] or user["phone"])
+        return matching.assign(vid, body.kaki_id, user["email"] or user["phone"],
+                               confirm_mismatch=body.confirm_mismatch)
+    except matching.ServiceMismatch as e:
+        # 409, not 400: the request was well-formed, the coordinator just has
+        # to confirm it. The console turns this into a warning + a second tap.
+        raise KakisError(409, f"{e}. Confirm to assign anyway.", "service_mismatch")
     except ValueError as e:
         raise HTTPException(400, str(e))
 

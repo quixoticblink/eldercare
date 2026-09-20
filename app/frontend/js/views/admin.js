@@ -152,12 +152,12 @@ const AdminView = (() => {
                   pref ? (k.gender_ok ? `${UI.esc(k.gender)} · as requested` : `${UI.esc(k.gender || "gender not stated")} · does not match the family's preference`) : null,
                   history ? `${history}× with this senior` : null,
                   langOk ? `speaks ${UI.esc((v.languages || [v.language]).join("/"))}` : `no ${UI.esc((v.languages || [v.language]).join("/"))} on profile`,
-                  svcOk ? null : "service not on profile",
+                  svcOk ? null : `<b style="color:var(--clay)">⚠ does not offer ${UI.esc(v.service)}</b>`,
                   k.active ? `${k.active} active visit${k.active === 1 ? "" : "s"}` : "no active visits",
                 ].filter(Boolean).join(" · ");
                 return `
                 <label class="pick-row" onclick="AdminView.markPicked('${v.id}', this)">
-                  <input type="radio" name="pick-${v.id}" value="${k.id}" data-name="${UI.esc(k.name || UI.contact(k))}">
+                  <input type="radio" name="pick-${v.id}" value="${k.id}" data-name="${UI.esc(k.name || UI.contact(k))}" data-svc-ok="${svcOk ? 1 : 0}" data-service="${UI.esc(v.service)}">
                   <span class="grow">
                     <span class="who">${UI.esc(k.name || UI.contact(k))}</span>
                     <span class="fit ${fit.state}" style="margin-left:6px">${fit.state}${fit.why ? " · " + UI.esc(fit.why) : ""}</span>
@@ -193,12 +193,30 @@ const AdminView = (() => {
     const picked = document.querySelector(`input[name="pick-${vid}"]:checked`);
     if (!picked) return UI.toast("Pick a kaki first", true);
     const who = picked.dataset.name;
-    if (!confirm(`Assign this visit to ${who}?\n\nThey'll see it on their Visits screen straight away.`)) return;
+    // v1.8: a kaki who does not offer this service gets a different question,
+    // and the answer is recorded server-side (11 Sept: "Household help for
+    // Madam G" went to a companionship kaki with nobody noticing).
+    const mismatch = picked.dataset.svcOk === "0";
+    const msg = mismatch
+      ? `⚠ ${who} has NOT offered ${picked.dataset.service}.\n\nAssign anyway? Only do this if you have spoken to them. It will be recorded.`
+      : `Assign this visit to ${who}?\n\nThey'll see it on their Visits screen straight away.`;
+    if (!confirm(msg)) return;
     try {
-      const r = await Api.post(`/admin/visits/${vid}/assign`, { kaki_id: picked.value });
+      const r = await Api.post(`/admin/visits/${vid}/assign`, { kaki_id: picked.value, confirm_mismatch: mismatch });
       UI.toast(`Assigned to ${r.assigned_to?.name || who} ✓`);
       requests();
-    } catch (e) { UI.toast(e.message, true); }
+    } catch (e) {
+      if (e.code === "service_mismatch") {
+        // The server is the source of truth for what the kaki offers; if the
+        // roster was stale, ask again with the server's words.
+        if (confirm(`⚠ ${e.message}\n\nOnly if you have spoken to them. It will be recorded.`)) {
+          try { const r = await Api.post(`/admin/visits/${vid}/assign`, { kaki_id: picked.value, confirm_mismatch: true }); UI.toast(`Assigned to ${r.assigned_to?.name || who} ✓`); requests(); return; }
+          catch (e2) { return UI.toast(e2.message, true); }
+        }
+        return;
+      }
+      UI.toast(e.message, true);
+    }
   }
 
   async function assign(vid, kid) {

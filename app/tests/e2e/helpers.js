@@ -44,8 +44,8 @@ async function signIn(page, identifier, { role = null, name = null } = {}) {
   await page.locator("#codeIn").fill(code);
   if (name && (await page.locator("#nameIn").count())) {
     await page.locator("#nameIn").fill(name);
-    if (role === "caregiver") await page.getByRole("button", { name: /A caregiver/ }).click();
-    if (role === "kaki") await page.getByRole("button", { name: /A kaki/ }).click();
+    if (role === "caregiver") await page.locator("#roleG .chip[data-v='caregiver']").click();
+    if (role === "kaki") await page.locator("#roleG .chip[data-v='kaki']").click();
   }
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await page.waitForFunction(() => !!localStorage.getItem("kakis_token"));

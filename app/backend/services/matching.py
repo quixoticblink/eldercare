@@ -60,15 +60,26 @@ def rank(visit: dict) -> list[dict]:
     return kakis
 
 def best_available(visit: dict) -> dict | None:
-    """Top-scoring kaki whose availability positively covers the visit and who
-    matches a stated gender preference, else None. A machine must never send
-    a man to a family that asked for a woman; a coordinator may, on the phone."""
+    """Top-scoring kaki whose availability positively covers the visit, who
+    matches a stated gender preference, and who offers the service, else None.
+    A machine must never send a man to a family that asked for a woman, or a
+    companionship kaki to do housework (11 Sept); a coordinator may, on the
+    phone, after an explicit confirm."""
     for k in rank(visit):
-        if k["score"]["fit"]["state"] == "available" and k["score"]["gender_ok"]:
+        s = k["score"]
+        if s["fit"]["state"] == "available" and s["gender_ok"] and s["service_ok"]:
             return k
     return None
 
-def assign(vid: str, kaki_id: str, actor: str, automatic: bool = False) -> dict:
+class ServiceMismatch(ValueError):
+    """The kaki does not offer this visit's service. Manual assignment must
+    say so and be confirmed; automatic assignment never crosses it."""
+
+def offers(kaki_id: str, service: str) -> bool:
+    return service in db.uj(_profile(kaki_id).get("services"))
+
+def assign(vid: str, kaki_id: str, actor: str, automatic: bool = False,
+           confirm_mismatch: bool = False) -> dict:
     """The single assignment path. Returns a summary including who was notified."""
     v = db.one("SELECT * FROM visits WHERE id = ?", [vid])
     if not v:
@@ -79,6 +90,13 @@ def assign(vid: str, kaki_id: str, actor: str, automatic: bool = False) -> dict:
                   [kaki_id])
     if not kaki:
         raise ValueError("Not an approved kaki")
+    # v1.8: on 11 Sept a kaki who offered chaperone and companionship was sent
+    # "Household help for Madam G". The roster showed the mismatch; nothing
+    # stopped it. Now the coordinator has to say yes to it in so many words.
+    if not offers(kaki_id, v.get("service") or ""):
+        if automatic or not confirm_mismatch:
+            raise ServiceMismatch(f"{kaki['name'] or 'This kaki'} does not offer {v.get('service')}")
+        db.audit(actor, "visit_assigned_service_mismatch", f"{vid} {v.get('service')} -> {kaki['email'] or kaki['phone']}")
 
     # A fresh 4-digit kaki code per assignment: the kaki shows it, the caregiver
     # enters it, and only then does the family's start code appear (v1.6).

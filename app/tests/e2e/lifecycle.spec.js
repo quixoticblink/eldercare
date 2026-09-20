@@ -16,7 +16,7 @@ test("caregiver books, kaki serves, report comes back", async ({ page, request }
   await page.getByRole("button", { name: "Check again" }).click();
 
   // Household + care plan.
-  await expect(page.getByText("Set up your care circle")).toBeVisible();
+  await expect(page.locator("#screen h1")).toContainText("Who are you caring for?");
   await page.locator("#sn").fill("Mr Lim");
   await page.locator("#sa").fill("80");
   await page.locator("#ad").fill("Blk 261A Toa Payoh");

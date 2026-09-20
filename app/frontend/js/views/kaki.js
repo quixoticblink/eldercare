@@ -174,7 +174,7 @@ const KakiView = (() => {
     try {
       const [p, certs] = await Promise.all([Api.get("/users/me/profile"), Api.get("/users/me/certificates")]);
       const k = p.kaki || { services: [], languages: [] };
-      const genderLabel = k.gender === "female" ? "Female" : k.gender === "male" ? "Male" : "Prefer not to say";
+      const genderLabel = k.gender === "female" ? "Female" : k.gender === "male" ? "Male" : null;   // v1.8: two options; unset until chosen
       UI.screen(`
         ${UI.appbar(t("kp.title"), p.status === "approved" ? t("kp.sub") : t("kp.sub.pending"), p.status === "approved" ? undefined : "#/")}
         <div class="li"><div class="face" style="width:52px;height:52px;overflow:hidden">${p.photo ? `<img src="${UI.esc(p.photo)}" alt="${UI.esc(t("kp.photo.alt"))}" style="width:100%;height:100%;object-fit:cover">` : UI.initials(p.name)}</div>
@@ -187,7 +187,7 @@ const KakiView = (() => {
         <label class="f-label">${t("kp.phone")}</label>
         <input class="f-input" id="pphone" inputmode="tel" value="${UI.esc(p.phone)}" placeholder="+65 …">
         <label class="f-label">${t("kp.iam")} <small>${t("kp.iam.small")}</small></label>
-        ${UI.chipGroup("genG", ["Female", "Male", "Prefer not to say"], genderLabel, "gender")}
+        ${UI.chipGroup("genG", ["Female", "Male"], genderLabel, "gender")}
         <label class="f-label">${t("kp.services")}</label>
         ${UI.chipMulti("svcG", App.config.services, k.services, "service")}
         <label class="f-label">${t("kp.langs")}</label>
@@ -291,6 +291,7 @@ const KakiView = (() => {
         <button class="btn" id="saveAvail">${t("ka.save")}</button>
 
         <div class="eyebrow">${t("ka.exceptions")}</div>
+        <p class="f-hint" style="margin:-4px 4px 8px">${t("ka.exceptions.hint")}</p>
         ${(a.exceptions || []).length ? (a.exceptions || []).map(e => `
           <div class="li"><div class="face">${e.available ? "＋" : "✕"}</div>
             <div class="body"><b>${UI.esc(e.date)} · ${UI.esc(v("half", e.half_day))}</b>
@@ -306,7 +307,10 @@ const KakiView = (() => {
           <label class="f-label">${t("ka.part")}</label>
           ${UI.chipGroup("exHalf", ["all", "morning", "afternoon"], "all", "half")}
           <label class="f-label">${t("ka.working")}</label>
-          ${UI.chipGroup("exAvail", ["Not available", "Extra availability"], "Not available", "exception")}
+          <div class="chips" id="exAvail">
+            <button type="button" class="chip sel" data-v="Not available" onclick="UI.pick('exAvail', this)">${t("ka.off")}</button>
+            <button type="button" class="chip" data-v="Extra availability" onclick="UI.pick('exAvail', this)">${t("ka.extra")}</button>
+          </div>
           <label class="f-label" for="exNote">${t("ka.reason")} <small>${t("common.optional")}</small></label>
           <input class="f-input" id="exNote" placeholder="${UI.esc(t("ka.reason.ph"))}">
           <button class="btn quiet" id="addEx">${t("ka.add")}</button>

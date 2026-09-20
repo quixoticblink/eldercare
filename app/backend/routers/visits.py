@@ -21,6 +21,7 @@ class VisitIn(BaseModel):
     trigger: str | None = Field(default="", max_length=120)   # urgent/soon path: what happened
     kaki_gender_pref: str | None = "any"   # any | female | male
     preferred_kaki_id: str | None = ""     # a kaki this household has had before
+    hours: float | None = None             # v1.8: urgent/soon bookings say how long (1–8 h, half-hour steps)
 
 class StartIn(BaseModel):
     otp: str
@@ -203,6 +204,16 @@ def create(body: VisitIn, user=Depends(security.current_user)):
     if body.tier not in config.TIERS:
         raise HTTPException(400, "Pick an urgency")
     hours, exact_window, start_time, end_time = _hours_for(body.start_time, body.end_time, body.service)
+    if not exact_window and body.hours is not None:
+        # Befrienders on 11 Sept: "urgent does not allow more than 2 hours, but
+        # 3–6 is what is needed". A preset window plus a duration.
+        try:
+            h = float(body.hours)
+        except (TypeError, ValueError):
+            raise HTTPException(400, "Hours should be a number like 3 or 3.5")
+        if not (1 <= h <= 8) or (h * 2) != int(h * 2):
+            raise HTTPException(400, "Hours go from 1 to 8, in half-hour steps")
+        hours = h
     window = exact_window or (body.window or "")
     if not window:
         raise HTTPException(400, "Pick a time")

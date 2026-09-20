@@ -156,7 +156,13 @@ assert c.post(f"/api/visits/{vid}/care-note", json={"chips":["All fine"],"text":
 # times_together increments after completion (consistency signal — v1.1)
 r = c.post("/api/visits", json={"service":"Wellness check","tier":"planned","date":"2026-08-01","window":"Morning 9–12","language":"Tamil"}, headers=ch)
 v2 = r.json()
-c.post(f"/api/admin/visits/{v2['id']}/assign", json={"kaki_id": kaks[0]["id"]}, headers=ah)
+# v1.8: this kaki offers Chaperone + Companionship, the visit is a Wellness check.
+# Assigning without saying so is refused with a code; confirming goes through.
+_mm = c.post(f"/api/admin/visits/{v2['id']}/assign", json={"kaki_id": kaks[0]["id"]}, headers=ah)
+assert _mm.status_code == 409 and _mm.json()["error"] == "service_mismatch", _mm.text
+assert c.get(f"/api/visits/{v2['id']}", headers=ch).json()["status"] == "requested"
+assert c.post(f"/api/admin/visits/{v2['id']}/assign", json={"kaki_id": kaks[0]["id"], "confirm_mismatch": True}, headers=ah).status_code == 200
+assert db.one("SELECT 1 FROM audit_log WHERE action = 'visit_assigned_service_mismatch'"), "the override must be audited"
 v2b = c.get(f"/api/visits/{v2['id']}", headers=ch).json()
 assert v2b["times_together"] == 1, v2b["times_together"]
 
@@ -288,6 +294,8 @@ assert availmod.check(kk["id"], "2026-08-03", "09:00–11:00")["state"] == "unav
 # otherwise the coordinator would silently stop offering them work
 kh2, kk2 = login("newkaki@example.com", role="kaki", name="Fresh Kaki")
 c.post(f"/api/admin/users/{kk2['id']}/approve", json={"role": "kaki"}, headers=ah)
+kh2, kk2 = login("newkaki@example.com")
+assert c.put("/api/users/me", json={"services": ["Companionship"]}, headers=kh2).status_code == 200
 assert availmod.check(kk2["id"], "2026-08-01", "09:00–11:00")["state"] == "unknown"
 
 # roster is scored per visit and never hides anyone
@@ -522,7 +530,7 @@ assert app.docs_url is None and app.openapi_url is None, "API docs should be off
 # a kaki can pass a visit back to the coordinator
 dv = c.post("/api/visits", json={"service":"Wellness check","tier":"planned","date":"2026-08-01",
                                  "window":"09:00–11:00","language":"English"}, headers=ch).json()
-c.post(f"/api/admin/visits/{dv['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah)
+assert c.post(f"/api/admin/visits/{dv['id']}/assign", json={"kaki_id": kk["id"], "confirm_mismatch": True}, headers=ah).status_code == 200
 r = c.post(f"/api/visits/{dv['id']}/decline", headers=kh)
 assert r.status_code == 200 and r.json()["status"] == "requested", r.text
 assert r.json().get("kaki") is None, "declining must release the kaki, not keep them attached"
@@ -643,7 +651,7 @@ assert _kaki_msgs, _sent
 _m = " ".join(_kaki_msgs)
 assert "Companionship" in _m and "2026-08-12" in _m, _m
 assert "2 hr" in _m, "hours missing from the kaki's message: " + _m
-assert "Conversation" in _m, "task description missing from the kaki's message: " + _m
+assert "Keep them company" in _m, "task description missing from the kaki's message: " + _m
 assert c.post(f"/api/visits/{v16b['id']}/cancel", headers=ch).status_code == 200
 # the help guide answers the 'do I keep the app open' question
 _g = c.post("/api/chat", json={"message": "do I need to keep the app open?"}).json()
@@ -1105,9 +1113,38 @@ assert "验证码" in _zq, _zq
 _eq = c.post("/api/chat", json={"message": "what is the start code?"}, headers=ch).json()["reply"]
 assert not any("一" <= ch_ <= "鿿" for ch_ in _eq), _eq
 
+# ---- v1.8: the befrienders' round --------------------------------------------
+# auto-match never crosses a service the kaki did not offer
+_ws = c.post("/api/visits", json={"service": "Wellness check", "tier": "planned", "date": "2026-08-18",
+                                  "start_time": "09:00", "end_time": "10:00", "languages": ["English"]}, headers=ch).json()
+assert c.put("/api/users/me", json={"services": ["Chaperone", "Companionship"]}, headers=kh).status_code == 200
+_sw = c.post("/api/admin/auto-match", headers=ah).json()
+assert _ws["id"] in [u["visit_id"] for u in _sw["unmatched"]], _sw
+assert c.put("/api/users/me", json={"services": ["Chaperone", "Companionship", "Wellness check", "Household help"]}, headers=kh).status_code == 200
+assert c.post(f"/api/visits/{_ws['id']}/cancel", json={"reason": "test"}, headers=ch).status_code == 200
+# urgent and soon bookings carry a duration; it prices the visit
+_ug = c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today", "window": "Within the hour",
+                                  "languages": ["English"], "hours": 4}, headers=ch)
+assert _ug.status_code == 200 and _ug.json()["hours"] == 4 and _ug.json()["estimate"]["hours"] == 4, _ug.text
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today", "window": "Within the hour",
+                                   "languages": ["English"], "hours": 9}, headers=ch).status_code == 400
+assert c.post("/api/visits", json={"service": "Companionship", "tier": "urgent", "date": "today", "window": "Within the hour",
+                                   "languages": ["English"], "hours": 2.25}, headers=ch).status_code == 400
+assert c.post(f"/api/visits/{_ug.json()['id']}/cancel", json={"reason": "test"}, headers=ch).status_code == 200
+# the kaki's assignment message carries the family's note and the warmer task line
+_fn = c.post("/api/visits", json={"service": "Companionship", "tier": "planned", "date": "2026-08-18",
+                                  "start_time": "14:00", "end_time": "16:00", "languages": ["English"],
+                                  "notes": "Please help change the curtains, ladder is in the store room"}, headers=ch).json()
+_sent.clear()
+assert c.post(f"/api/admin/visits/{_fn['id']}/assign", json={"kaki_id": kk["id"]}, headers=ah).status_code == 200
+_km = " ".join(_texts_to("beelian@example.com"))
+assert "The family says:" in _km and "Please help change the curtains" in _km, _km
+assert "Keep them company" in _km and "No personal-care tasks" not in _km, _km
+assert c.post(f"/api/visits/{_fn['id']}/cancel", json={"reason": "test"}, headers=ch).status_code == 200
+
 # Count the assertions from the source rather than hardcoding a number. Four
 # separate docs had four different figures because the banner was a string
 # somebody had to remember to bump. This one cannot go stale.
 _n = sum(1 for _line in open(os.path.abspath(__file__), encoding="utf-8")
          if _line.lstrip().startswith("assert "))
-print(f"ALL SMOKE TESTS PASSED ✓  (v1.7 — {_n} assertions)")
+print(f"ALL SMOKE TESTS PASSED ✓  (v1.8 — {_n} assertions)")
