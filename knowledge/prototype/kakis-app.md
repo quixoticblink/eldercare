@@ -122,7 +122,7 @@ function in the frontend again.
 Live, hardened, and audited against ISO/IEC 5055 — see
 [[app/deploy/SECURITY-AUDIT|SECURITY-AUDIT.md]]. Rate limiting on sign-in and on both
 door codes, health data off world-readable permissions, security headers, pinned
-dependencies. 394 smoke assertions and 32 Playwright end-to-end specs covering the full
+dependencies. 415 smoke assertions and 37 Playwright end-to-end specs covering the full
 lifecycle, in English and in Chinese — the smoke figure derives from its own source, after the hand-maintained
 version drifted to six different numbers across five documents.
 
@@ -188,3 +188,4 @@ rules, dual-role accounts, live updates — Bucket 3.
 *2026-09-04: added the Aug 18 NCSS review and the Aug 21 Table Top Exercise outcome to "Where it stands"; linked the recommendation register.*
 *2026-09-05: v1.6 shipped — Buckets 1 and 2; two new entries under "what went wrong" (the start-code leak, the UTC box).*
 *2026-09-05, later: v1.7 shipped — the Mandarin UI for caregivers and kakis; console English by design.*
+*2026-09-20: v1.8 shipped — the befrienders' round: service-mismatch guard, urgent durations, plainer screens. Roadmap re-ordered around many seniors per caregiver and what each side sees of the other.*

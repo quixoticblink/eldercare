@@ -288,10 +288,23 @@
         </div>
       </div>
 
+      <div class="entry">
+        <div class="date">September 20, 2026 · Build</div>
+        <h3>The befrienders&rsquo; list, small half</h3>
+        <p>Nine days after Lions Befrienders, ten of their items shipped as v1.8. The bug first: a kaki can no longer be assigned a service she did not offer without the coordinator reading a warning, saying yes to it, and having that yes recorded; automatic matching never says yes. Then the things a befriender would notice next time: urgent visits of three to six hours, the kaki&rsquo;s message reading like a message with the family&rsquo;s note riding along, one door for availability, two gender options, a care plan that can wait, the cost hidden until asked for, and plainer words on the way in. The big half of their list, a caregiver with many seniors and what each side may see of the other, now leads the roadmap.</p>
+        <div class="arc">
+          <span class="step">two lists</span>
+          <span class="step">the bug, three ways</span>
+          <span class="step">plain on screen, warm in the SMS</span>
+          <span class="step">37 end-to-end specs</span>
+          <span class="step final">v1.8 live</span>
+        </div>
+      </div>
+
       <div class="entry future">
         <div class="date">September 2026 · Round 2</div>
         <h3>Same seniors, changed app</h3>
-        <p>v1.7 back in front of the same group — the door and booking changes and the Mandarin screens together — to validate rather than discover. Round 1 ran planned bookings; round 2 has to run the crisis triggers.</p>
+        <p>v1.8 back in front of the same group — the door and booking changes and the Mandarin screens together — to validate rather than discover. Round 1 ran planned bookings; round 2 has to run the crisis triggers.</p>
       </div>
 
       <div class="entry future">
@@ -637,18 +650,18 @@
   </div>
 
   <div class="narrow">
-    <h3 class="sub-h">What changed in v1.6 and v1.7, and what is next</h3>
+    <h3 class="sub-h">What changed in v1.6, v1.7 and v1.8, and what is next</h3>
     <div class="strategy-grid">
       <div class="strategy-card">
-        <div class="strat-label">Shipped · 5 September 2026</div>
-        <h4>Eighteen things the August feedback asked for, and the app in Mandarin</h4>
-        <p><strong>中文 (v1.7):</strong> every caregiver and kaki screen, the help panel and the messages, with one tap; remembered on the phone and the account; the coordinator console stays English by design. <strong>At the door:</strong> the kaki shows a photo and a code of their own; the family enters it before their start code appears. <strong>Booking:</strong> exact start and end times in half-hour steps, charged by the half hour with a one-hour minimum; languages pre-filled from the care plan, Cantonese added; a female-or-male preference; &ldquo;the same kaki again&rdquo;; an &ldquo;other&rdquo; reason; no window offered after it has passed. <strong>Around the visit:</strong> messages when a kaki confirms, is on the way, or cancels; the emergency contact told at start and finish; cancellation with reasons on both sides. <strong>Kakis:</strong> working hours per day, certificates the coordinator reads before approving, household-help visits that show only what the task needs. <strong>Getting in:</strong> no placeholder number, a waiting screen that says there is nothing to do, required fields marked, a refresh that keeps your place.</p>
-        <p class="strat-source"><a href="https://github.com/quixoticblink/eldercare/blob/main/app/SPEC.md#10-change-log">app/SPEC.md · change log</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-05-v1.6-build.md">journal/2026-09-05-v1.6-build.md</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-05-v1.7-language.md">journal/2026-09-05-v1.7-language.md</a></p>
+        <div class="strat-label">Shipped · 5 and 20 September 2026</div>
+        <h4>The August feedback, the app in Mandarin, and the befrienders&rsquo; round</h4>
+        <p><strong>v1.8, 20 September:</strong> a service-mismatch guard on matching (warning, explicit confirm, audited; never automatic), urgent visits with a duration, the kaki&rsquo;s message rewritten with the family&rsquo;s note attached, one availability door, two gender options, a skippable care plan, cost behind a tap, plainer words on sign-in and setup, help questions from the room. <strong>中文 (v1.7):</strong> every caregiver and kaki screen, the help panel and the messages, with one tap; remembered on the phone and the account; the coordinator console stays English by design. <strong>At the door:</strong> the kaki shows a photo and a code of their own; the family enters it before their start code appears. <strong>Booking:</strong> exact start and end times in half-hour steps, charged by the half hour with a one-hour minimum; languages pre-filled from the care plan, Cantonese added; a female-or-male preference; &ldquo;the same kaki again&rdquo;; an &ldquo;other&rdquo; reason; no window offered after it has passed. <strong>Around the visit:</strong> messages when a kaki confirms, is on the way, or cancels; the emergency contact told at start and finish; cancellation with reasons on both sides. <strong>Kakis:</strong> working hours per day, certificates the coordinator reads before approving, household-help visits that show only what the task needs. <strong>Getting in:</strong> no placeholder number, a waiting screen that says there is nothing to do, required fields marked, a refresh that keeps your place.</p>
+        <p class="strat-source"><a href="https://github.com/quixoticblink/eldercare/blob/main/app/SPEC.md#10-change-log">app/SPEC.md · change log</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-05-v1.6-build.md">journal/2026-09-05-v1.6-build.md</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-05-v1.7-language.md">journal/2026-09-05-v1.7-language.md</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-20-v1.8-build.md">journal/2026-09-20-v1.8-build.md</a></p>
       </div>
       <div class="strategy-card">
         <div class="strat-label">Roadmap · deliberately not yet</div>
         <h4>What waits on a decision, not on code</h4>
-        <p><strong>Malay.</strong> The same dictionary as the Mandarin screens; waits for a Malay-speaking reviewer. <strong>Subsidy rules.</strong> Gross and net shown before a family confirms, once Vanguard and NCSS set the test (means, flat type, opt-out). <strong>Dual-role accounts</strong> and an owner role above the coordinator. <strong>Live updates</strong> without refreshing. <strong>Further out:</strong> live location during chaperone visits, an SOS path someone can answer at 2am, specialisation-based matching once certificates carry it, calendar sync. Not on the roadmap, by rule: any public rating of a kaki.</p>
+        <p><strong>A caregiver is not one senior.</strong> Befrienders visit many; families have two parents; the one-household model has to become people and households. <strong>What each side sees of the other.</strong> No full name, no number between kaki and family, decided with NCSS before the pilot. <strong>A mid-visit danger alert</strong> with a human on the other end. <strong>Subsidy rules.</strong> Gross and net shown before a family confirms, once Vanguard and NCSS set the test (means, flat type, opt-out). <strong>Dual-role accounts</strong> and an owner role above the coordinator. <strong>Live updates</strong> without refreshing. <strong>Further out:</strong> repeat bookings, reimbursement of a kaki&rsquo;s transport, live location during chaperone visits, specialisation-based matching once certificates carry it, calendar sync, Singpass and the PDPA package, Malay. Not on the roadmap, by rule: any public rating of a kaki.</p>
         <p class="strat-source"><a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/prototype/roadmap.md">prototype/roadmap.md</a> · <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/prototype/feature-buckets-2026-09-04.md">feature-buckets-2026-09-04.md</a></p>
       </div>
     </div>
@@ -822,7 +835,7 @@
 
     </div>
 
-    <div class="callout"><strong>What changes next.</strong> A short v1.8: the service-match alert, one availability entry point, two gender options instead of three, urgent bookings with a duration, and the sender ID registered. Then two decisions before anything larger is built: many seniors per caregiver, and what a kaki and a family may see of each other.</div>
+    <div class="callout"><strong>What changed next.</strong> v1.8 shipped on 20 September with the small half of this list: the service-match guard, one availability entry point, two gender options, urgent bookings with a duration, plainer screens. The sender ID is being registered. Two decisions remain before anything larger is built: many seniors per caregiver, and what a kaki and a family may see of each other.</div>
 
     <p>Session record: <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/journal/2026-09-11-lions-befrienders-beta.md">journal/2026-09-11-lions-befrienders-beta.md</a>. The register, every item mapped to an app module and to what v1.7 already does: <a href="https://github.com/quixoticblink/eldercare/blob/main/knowledge/prototype/lions-befrienders-2026-09-11-feedback.md">lions-befrienders-2026-09-11-feedback.md</a>.</p>
   </div>
@@ -1002,7 +1015,7 @@
     <div>
       <h4>Eldercare Sprint</h4>
       <p>A six-month leadership sprint working out how caregivers of the relatively healthy elderly in Singapore can activate trusted respite when a need arises — planned or urgent. Started May 19, 2026. Five people. Public journey. Anchored on Vanguard&rsquo;s Pasir Ris pilot from July 8 onward.</p>
-      <p class="colophon">Updated 2026-09-20 · Singapore</p>
+      <p class="colophon">Updated 2026-09-20 (evening) · Singapore</p>
     </div>
     <div>
       <h4>Find your way</h4>

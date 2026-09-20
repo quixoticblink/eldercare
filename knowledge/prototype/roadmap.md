@@ -1,7 +1,7 @@
 ---
 title: "Kakis — what shipped, what's next"
 status: live
-last_updated: 2026-09-05
+last_updated: 2026-09-20
 based_on: [prototype/feature-buckets-2026-09-04, prototype/tabletop-2026-08-21-feedback, prototype/ncss-app-review-2026-08-18]
 ---
 
@@ -11,6 +11,22 @@ running summary, updated every release. The version that people can use is alway
 **https://singaporekakis.com**.
 
 ## Shipped
+
+### v1.8 — 2026-09-20 · the befrienders' round
+
+Ten small things from the [[../journal/2026-09-11-lions-befrienders-beta|Lions Befrienders session]],
+nine days after it. **The bug:** a kaki can no longer be assigned a service she did not
+offer without the coordinator reading a warning and saying yes to it, and that yes is
+recorded; automatic matching never crosses it. **Urgent visits can be long:** a booking
+for now or soon carries how many hours, one to eight, and is priced on them. **The kaki's
+message:** the task line reads like a message to a person, and the family's own note
+rides along ("The family says: please help change the curtains"). **Plainer screens:**
+"Who are you caring for?", "I'm booking for someone I care for", "Kaki arrived", the cost
+stack behind a tap, the care plan skippable on day one, the kaki's availability behind
+one door with "Different on a date?" instead of "Am I working?", two gender options, no
+tier badge, and help questions that match what people asked in the room. All in English
+and Chinese. Not code, but on the list: the SMS sender ID has to be registered before
+anyone uses this without us there.
 
 ### v1.7 — 2026-09-05 · 中文 on the caregiver and kaki screens
 
@@ -78,7 +94,24 @@ and automation toggles, ISO/IEC 5055 hardening. [[kakis-app]] tells that story.
 
 ## Roadmap
 
-Ordered by what has to be decided before it can be built, not by difficulty.
+Ordered by what has to be decided before it can be built, not by difficulty. Revised
+2026-09-20 after the Lions Befrienders session; the two items at the top are new.
+
+**A caregiver is not one senior.** A befriender visits many; a family has two parents
+in two flats; a staff member books on behalf of a round. The app has had one household
+per caregiver since v1. Pair it with the Aug 21 ask for many caregivers per senior and
+it is one change: people and households as a many-to-many relationship, with a
+"booking for whom?" step. Touches M-CARE, M-VISITS, M-ADMIN. Decide the shape first.
+
+**What each side sees of the other.** "Do not reveal full name. No phone number.
+Seniors call out of the blue, hound you forever." First name and initial, calls routed
+through the coordinator or a masked number, while the photo and the two codes at the
+door stay. A PDPA question as much as a design one; decide before the pilot, with
+NCSS in the room.
+
+**A mid-visit danger alert.** Either side presses one button and a human answers now.
+Joins the late-night / SOS line below; someone has to be on the other end before the
+button exists.
 
 **Round 2 of the Table Top Exercise.** Same eight seniors, the v1.6 app, and this time
 the crisis triggers — the one thing the HMW is about that round 1 didn't exercise. Owner:
@@ -95,15 +128,26 @@ confounded is only the *onboarding* reading — whether a screen was hard becaus
 words or because of the step — and the facilitators note the language each senior used.
 Malay is the same dictionary mechanism and waits for a Malay-speaking reviewer.
 
-**Subsidy rules.** Every money question on Aug 21 was about the *rules* — means test,
-flat type, can I decline — and none about the price. The app already shows an
+**Subsidy rules, opt-out, volunteering, compensation.** Every money question on Aug 21
+and again on 11 Sept was about the *rules* — means test, flat type, can I decline, can I
+volunteer for nothing, who pays when a caregiver cancels as the kaki arrives — and none
+about the price. The app already shows an
 illustrative stack with every figure sourced. Showing gross and net before a family
 confirms needs Vanguard and NCSS to state the test. Until then every dollar figure keeps
 the word *placeholder*.
 
-**Dual-role accounts, and an owner above the coordinator.** Seniors wanted to sign up as
-both caregiver and kaki; NCSS wants admin by work email only and a role that can see
-what coordinators can't. Both are the same auth change, done once.
+**Dual-role accounts, and an owner above the coordinator.** Asked for a third time on
+11 Sept. Seniors and befrienders want to sign up as both caregiver and kaki; NCSS wants
+admin by work email only and a role that can see what coordinators can't. Both are the
+same auth change, done once.
+
+**Repeat and series bookings.** Several visits in one go. Small on the screen, a
+matching and pricing question underneath.
+
+**Free-text services and reimbursement.** "Change the curtains" is not one of the four
+services; whether a kaki is qualified is a matching problem, and it sits with
+specialisation-based matching below. A kaki who pays for the taxi first needs a way to
+be paid back: a policy (who approves, what cap) before a field on the report.
 
 **Live updates.** Screens that refresh themselves when something changes, so nobody has
 to reload; real push notifications after that (iOS web push has constraints).
@@ -111,7 +155,9 @@ to reload; real push notifications after that (iOS web push has constraints).
 **Further out.** Live location during chaperone visits (privacy review first). A
 late-night / SOS path — an operating commitment before it is a feature, because someone
 has to answer at 2am. Specialisation-based matching once certificates carry the skill.
-Calendar sync. Singpass identity.
+Calendar sync. Singpass identity and the PDPA package (consent text, deletion path);
+the befrienders' privacy warning moves these up. Malay UI, when there is a Malay-speaking
+reviewer.
 
 **Never, by rule.** Public ratings of kakis. Concerns go privately to a human.
 
@@ -123,5 +169,5 @@ is the cut into three buckets with the reasoning; this page is the outcome. When
 ships, its items move up here; when a decision unblocks a roadmap line, it moves into the
 next bucket.
 
-*Connects to:* [[kakis-app]] · [[feature-buckets-2026-09-04]] · [[plans/v1.6-buckets-1-2]] · [[plans/v1.7-language-switch]] · [[../journal/2026-09-05-v1.7-language]] ·
+*Connects to:* [[kakis-app]] · [[feature-buckets-2026-09-04]] · [[lions-befrienders-2026-09-11-feedback]] · [[plans/v1.6-buckets-1-2]] · [[plans/v1.7-language-switch]] · [[plans/v1.8-befrienders-round]] · [[../journal/2026-09-20-v1.8-build]] · [[../journal/2026-09-05-v1.7-language]] ·
 [[../journal/2026-09-05-v1.6-build]] · [[../journal/2026-08-21-tabletop-vanguard-ncss]]

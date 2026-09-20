@@ -1,7 +1,7 @@
 ---
 title: "Feature buckets after the August feedback round — 2026-09-04"
 status: solid
-last_updated: 2026-09-05
+last_updated: 2026-09-20
 based_on: [prototype/tabletop-2026-08-21-feedback, prototype/ncss-app-review-2026-08-18]
 ---
 
@@ -70,7 +70,28 @@ In this order.
 6. Cancellation after accept and after start, by either side, with reason and who-cancelled recorded. The compensation rule stays policy and out of scope. (M-VISITS)
 7. Certificate upload on the kaki profile, visible on the coordinator approval tab. Committed to Vanguard on Aug 3; gates supply. (M-USERS, M-ADMIN)
 
+## v1.8 — shipped (2026-09-20)
+
+The Lions Befrienders list, small half. Register: [[lions-befrienders-2026-09-11-feedback]];
+plan: [[plans/v1.8-befrienders-round]].
+
+1. Service-mismatch guard on assign: warning, explicit confirm, audited; auto-match requires the service. (M-ADMIN, matching)
+2. Urgent and soon bookings carry a duration, 1–8 hours. (M-VISITS)
+3. Task notes rewritten for the kaki; the family's note in the assignment message. (M-CORE, notify)
+4. One availability entry point; "Different on a date?" with Day off / Extra day. (M-USERS)
+5. Gender: Female / Male only. (M-USERS)
+6. Plainer copy: sign-in, role chips, setup, "Kaki arrived", no tier badge; cost behind a toggle; care plan skippable; help questions from the room. (frontend, M-HELP)
+7. Ops: register the SMS sender ID (not code; blocks unaccompanied sessions).
+
 ## Bucket 3 — defer, or decide something first
+
+Revised 2026-09-20: the first three are new from Lions Befrienders and now lead [[roadmap]].
+
+- Many seniors per caregiver (and many caregivers per senior). A households-to-people change. (M-CARE, M-VISITS, M-ADMIN)
+- What each side sees of the other: no full name, no number between kaki and family. PDPA. (M-VISITS, M-USERS)
+- A mid-visit danger alert that reaches a human. Operating commitment first. (M-VISITS, M-ADMIN)
+- Repeat / series bookings. (M-VISITS)
+- Free-text services; reimbursement of a kaki's transport (policy first). (M-VISITS, money)
 
 - Malay UI. Mandarin shipped as v1.7 (above); Malay is the same dictionary mechanism plus translation, and waits for a Malay-speaking reviewer. (M-CORE)
 - Gross and net cost with the rule shown, and an opt-out toggle. Needs the subsidy test from Vanguard and NCSS first. (M-VISITS, `assumptions.json`)

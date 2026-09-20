@@ -344,6 +344,12 @@ ssh -i ~/Documents/Claude/Keypairs/eldercare.pem ec2-user@3.1.33.212 \
 - The `rsync` above needs more excludes now that the repo carries a Playwright suite: add `--exclude 'node_modules/' --exclude 'test-results/' --exclude 'playwright-report/' --exclude '.env' --exclude '*.wal'`. Without the first one the sync ships ~200 MB of browser tooling to the box.
 - `audit_log` had a `rates_changed` row, so `assumptions.json` was excluded from the sync (`--exclude 'assumptions.json'`). Check the count on the backup copy: `sudo -u kakis /home/kakis/eldercare/app/.venv/bin/python -c "import duckdb; print(duckdb.connect('/home/kakis/kakis.duckdb.bak-<ts>', read_only=True).execute(\"select count(*) from audit_log where action='rates_changed'\").fetchall())"`.
 - Backup taken before the sync: `kakis.duckdb.bak-20260905-050030` (+ `.wal.bak`). The `users.lang` column is added on first boot; the second restart proves the checkpoint held.
+**Learned on the v1.8 deploy (2026-09-20):**
+
+- `assumptions.json` now carries copy we own (the four service `note`s) next to rates the coordinator owns. Do not rsync it; patch the notes on the box with a four-line Python snippet run as `kakis`, so an edited rate is never reverted.
+- The SMS sender showed as **"Likely-SCAM"** on an iPhone on 11 Sept (`SMS_SENDER_ID=Kakis`, unregistered). Register the sender ID with the SSIR before any session without a facilitator; until then, say so on the printed onboarding card.
+- Backup: `kakis.duckdb.bak-20260920-142734` (+ `.wal.bak`).
+
 - Post-deploy check without signing in: load `/`, confirm the script tags say `?v=1.7` and `#langBtn` is visible; tap it and the heading reads 欢迎使用 Kakis; open the help panel and ask 什么是开始码？ — the signed-out guide answers in Chinese. Tap back to English. Clear `localStorage` afterwards so the shared test browser is not left in Chinese.
 
 Handy one-liners:

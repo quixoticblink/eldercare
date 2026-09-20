@@ -116,6 +116,10 @@ The same evening: 中文 on every caregiver and kaki screen, the help panel and 
 
 Second group tries the live app at Life Unlimited @ 170, six days after v1.6/v1.7. Befrienders, not family caregivers: many seniors each, and a warning not to show names or numbers. One matching bug found. Register: [[../prototype/lions-befrienders-2026-09-11-feedback]].
 
+### 2026-09-20 · Kakis v1.8 · [[../journal/2026-09-20-v1.8-build]]
+
+The befrienders' round: service-mismatch guard, urgent bookings with a duration, warmer task notes, plainer screens, one availability door. 37 Playwright specs, 415 smoke assertions. Roadmap re-ordered: many seniors per caregiver, and what each side sees of the other, now lead.
+
 ### 2026-09-XX · SGLN Demo Day
 
 The rubric event. Four dimensions × 25 pts = 100:

@@ -88,8 +88,8 @@ own phones, the real address, sign-up through to a visit.
 - [[../maps/timeline]], [[README]] and [[../README]] carry the session.
 - Twelve photos in `images/2026-09-11-lb-*` (six screenshots, two WhatsApp threads, four of
   the room), the video in `evidence/sources/`.
-- No app change yet. Five small items (service-match alert, availability copy and
-  layout, gender chip, task wording, sender ID) are a v1.8 candidate.
+- **v1.8 shipped on 2026-09-20** with the small half of this list — [[2026-09-20-v1.8-build]].
+  The big half leads the roadmap.
 
 ## What's next
 

@@ -29,6 +29,7 @@ should be worked as one list.
 
 What's here:
 
+- **`plans/v1.8-befrienders-round.md`** — the plan executed on 2026-09-20 for the small half of that list.
 - **`lions-befrienders-2026-09-11-feedback.md`** — the second senior session, on v1.7 (draft,
   batches still arriving). Every item as received, cross-referenced to the Aug 21 register,
   with status as of v1.7: 14 shipped, 3 partial, 4 open, 5 policy.
