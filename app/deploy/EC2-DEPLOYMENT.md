@@ -376,7 +376,8 @@ Before the pilot, every test person and interaction was wiped with
 `deploy/purge-for-pilot.py` (stop service, back up, run against the live file, start).
 Kept: `settings`, and two admins (Abhishek, Lara), both channels verified. `.env`
 `ADMIN_EMAILS` / `ADMIN_PHONES` list the same two so the admin flag survives a fresh
-sign-in. Pre-purge backup: `kakis.duckdb.bak-prepilot-20260928-111836` (+ `.wal.bak`);
+sign-in; `ADMIN_EMAILS` also carries Rusydi Yaakup and Chermaine Teo (NCSS), who become
+admin on their first email sign-in. Pre-purge backup: `kakis.duckdb.bak-prepilot-20260928-111836` (+ `.wal.bak`);
 a full export of that data is in `app/deploy/exports/` locally (git-ignored). SMS is on
 Twilio (`SMS_PROVIDER=twilio`, `SMS_ENABLED=1`); SNS was tested the same day and works,
 but "Kakis" shows as Likely-SCAM on either carrier route until it is registered with SSIR
