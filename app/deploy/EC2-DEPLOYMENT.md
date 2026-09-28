@@ -359,3 +359,13 @@ sudo journalctl -u kakis -f            # app logs
 sudo journalctl -u caddy -f            # TLS / proxy logs
 systemctl status kakis caddy           # health
 ```
+
+## Exporting the data (2026-09-28)
+
+The live `kakis.duckdb` cannot be opened while the service holds it, so exports run
+against a copy of the latest backup pair. `deploy/export-csv.py` writes one CSV per
+table (photo and certificate blobs replaced by a byte length); its docstring has the
+exact four commands. Then `scp -r` the `csv/` directory down and build a workbook
+locally (one sheet per table plus a README naming the source backup). Exports hold
+emails, phones, door codes and OTPs: they live in `app/deploy/exports/`, which is
+git-ignored, and nowhere else. First run: 13 tables, 87 users, 67 visits, 872 audit rows.

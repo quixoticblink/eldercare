@@ -8,3 +8,6 @@ app/.env
 app/.env.sh
 __pycache__/
 .playwright-mcp/
+
+# data exports from production (personal data, never commit)
+app/deploy/exports/
